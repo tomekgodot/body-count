@@ -1222,3 +1222,18 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   background:rgba(239,155,139,.09);
   color:#f7e5df;
 }
+
+/* v4.2 — rebuilt About Him icons + simple Load */
+.persistent-symbols{gap:14px;width:min(88%,370px)}
+.art-symbol{overflow:visible!important;border-radius:50%;aspect-ratio:1}
+.art-symbol img{
+  width:100%;height:100%;object-fit:contain!important;border-radius:50%;
+  transform:scale(.94);display:block
+}
+.detail-hero-icon{
+  object-fit:contain!important;
+  transform:scale(.96);
+  background:transparent!important;
+  padding:0!important;
+}
+.load-text-options{margin-top:10px}

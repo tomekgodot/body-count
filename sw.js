@@ -1,26 +1,29 @@
-const CACHE='body-count-v3.4';
+const CACHE='body-count-v3.6';
 const ASSETS=[
 './',
 './index.html',
-'./styles.css?v=3.4',
-'./app.js?v=3.4',
-'./manifest.webmanifest?v=3.4',
+'./styles.css?v=3.6',
+'./app.js?v=3.6',
+'./manifest.webmanifest?v=3.6',
 './icon.svg',
 './brand-mark.png',
-  './assets/age-young.jpg?v=34',
-  './assets/age-30s.jpg?v=34',
-  './assets/age-middle.jpg?v=34',
-  './assets/age-older.jpg?v=34',
-  './assets/body-slim.jpg?v=34',
-  './assets/body-average.jpg?v=34',
-  './assets/body-athletic.jpg?v=34',
-  './assets/body-big.jpg?v=34',
-  './assets/type-twink.jpg?v=34',
-  './assets/type-twonk.jpg?v=34',
-  './assets/type-otter.jpg?v=34',
-  './assets/type-average.jpg?v=34',
-  './assets/type-bear.jpg?v=34',
-  './assets/type-daddy.jpg?v=34'
+  './assets/age-young.jpg?v=36',
+  './assets/age-30s.jpg?v=36',
+  './assets/age-middle.jpg?v=36',
+  './assets/age-older.jpg?v=36',
+  './assets/body-slim.jpg?v=36',
+  './assets/body-average.jpg?v=36',
+  './assets/body-athletic.jpg?v=36',
+  './assets/body-big.jpg?v=36',
+  './assets/type-twink.jpg?v=36',
+  './assets/type-twonk.jpg?v=36',
+  './assets/type-otter.jpg?v=36',
+  './assets/type-average.jpg?v=36',
+  './assets/type-bear.jpg?v=36',
+  './assets/type-daddy.jpg?v=36',
+  './assets/detail-eggplant.jpg?v=36',
+  './assets/detail-peach.jpg?v=36',
+  './assets/detail-drops.jpg?v=36'
 ];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

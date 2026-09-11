@@ -976,3 +976,42 @@ html,body{
 .wheel-face.twink .type-photo,.wheel-face.twonk .type-photo,.wheel-face.otter .type-photo,
 .wheel-face.otter-daddy .type-photo,.wheel-face.daddy .type-photo,.wheel-face.daddy-bear .type-photo,
 .wheel-face.bear .type-photo,.wheel-face.young-bear .type-photo{filter:none!important;transform:none!important}
+
+/* v3.5 detail icons */
+.persistent-symbols{display:grid!important;grid-template-columns:repeat(3,1fr);gap:16px;width:min(86%,360px);margin:14px auto 8px}
+.art-symbol{border:0!important;background:transparent!important;padding:0!important;min-width:0!important;aspect-ratio:1;overflow:hidden;border-radius:50%;opacity:.9;transition:transform .16s ease,opacity .16s ease}
+.art-symbol:active{transform:scale(.94);opacity:1}
+.art-symbol img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* v3.6 — first private detail editor */
+.private-detail-screen{min-height:100vh;background:#050505;color:#f6f1ea;padding:0 16px 34px}
+.detail-hero{display:flex;justify-content:center;margin:6px 0 10px}
+.detail-hero-icon{width:92px;height:92px;border-radius:50%;object-fit:cover;opacity:.94}
+.detail-block{width:min(100%,430px);margin:18px auto 0;padding:17px 0 0;border-top:1px solid rgba(255,255,255,.07)}
+.detail-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.detail-title-row>span,.detail-label{font-size:10px;letter-spacing:.16em;color:rgba(255,255,255,.42);font-weight:700}
+.exact-toggle{border:0;background:transparent;color:#efb0a4;font-size:11px;padding:4px 0}
+.detail-pills{display:grid;gap:7px}
+.detail-pills.four{grid-template-columns:repeat(4,1fr)}
+.detail-pills.two{grid-template-columns:repeat(2,1fr)}
+.detail-pills button,.curve-grid button{
+  border:1px solid rgba(255,255,255,.12);background:#0b0b0b;color:rgba(255,255,255,.66);
+  border-radius:16px;padding:10px 5px;font-size:11px
+}
+.detail-pills button.on,.curve-grid button.on{
+  color:#f7e5df;border-color:rgba(239,155,139,.42);background:rgba(239,155,139,.10)
+}
+.exact-wrap{display:none;margin-top:12px}
+.exact-wrap.show{display:block}
+.exact-value{display:flex;align-items:baseline;gap:6px;justify-content:center;margin-bottom:5px}
+.exact-value strong{font-size:27px}.exact-value span{font-size:10px;color:rgba(255,255,255,.38)}
+.exact-wrap input[type=range]{width:100%;accent-color:#ef9b8b}
+.split-block{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.split-block .detail-label{margin-bottom:8px}
+.curve-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:8px}
+.curve-grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px}
+.curve-glyph{font-size:22px;line-height:1}.curve-grid small{font-size:9px;color:inherit}
+@media(max-width:370px){
+  .detail-pills.four{grid-template-columns:repeat(2,1fr)}
+  .curve-grid{grid-template-columns:repeat(5,1fr);gap:4px}
+}

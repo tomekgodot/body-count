@@ -34,6 +34,8 @@ async function render(){
   if(state.screen==='postadd') return renderPostAdd();
   if(state.screen==='about') return renderAboutHim();
   if(state.screen==='penis') return renderPenis();
+  if(state.screen==='peach') return renderPeach();
+  if(state.screen==='drops') return renderDrops();
   if(state.screen==='person') return renderPerson();
   if(state.screen==='collection') return renderCollection();
   if(state.screen==='insights') return renderPlaceholder('Insights','Your patterns will live here once there is enough data.','insights');
@@ -246,7 +248,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=37" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=39" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -268,7 +270,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=37" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=39" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -289,7 +291,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=37" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=39" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -305,9 +307,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.jpg?v=37" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.jpg?v=37" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.jpg?v=37" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.jpg?v=39" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.jpg?v=39" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.jpg?v=39" alt=""></button>
     </div>
   </main>`;
 
@@ -315,7 +317,8 @@ async function renderAboutHim(){
   document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.aboutPage=b.dataset.page;render()});
   document.querySelectorAll('[data-subopen]').forEach(b=>b.onclick=()=>{
       if(b.dataset.subopen==='egg'){state.screen='penis';render();return;}
-      state.detailsTab='anatomy';state.detailsReturn='about';state.anatomySub=b.dataset.subopen;state.screen='details';render()
+      if(b.dataset.subopen==='peach'){state.screen='peach';render();return;}
+      if(b.dataset.subopen==='drop'){state.screen='drops';render();return;}
     });
 
   const persist=async()=>{const current=await get('people',state.selectedPersonId);current.about={...(current.about||{}),...(p.about||{})};await put('people',current)};
@@ -328,11 +331,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=37`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=39`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=37`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=39`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -360,7 +363,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=37`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=39`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -374,7 +377,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=37`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=39`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -397,8 +400,8 @@ async function renderPenis(){
 
   const lengthClass=n=>n<=12?'S':n<=15?'M':n<=17?'L':n<=19?'XL':'XXL';
   const lengthDefault={S:12,M:14,L:16,XL:18,XXL:21};
-  const girthClass=n=>n<10?'Slim':n<12?'Average':n<14?'Thick':'Very thick';
-  const girthDefault={'Slim':9,'Average':11,'Thick':13,'Very thick':15};
+  const girthClass=n=>n<=9?'Slim':n<=11?'Average':n<=13?'Thick':'Massive';
+  const girthDefault={'Slim':9,'Average':11,'Thick':13,'Massive':15};
 
   const lenExact=d.lengthExact!==''&&d.lengthExact!=null;
   const girExact=d.girthExact!==''&&d.girthExact!=null;
@@ -406,16 +409,15 @@ async function renderPenis(){
   const girVal=Number(d.girthExact||girthDefault[d.girth]||11);
 
   app.innerHTML=`<main class="private-detail-screen">
-    <div class="about-top"><button class="about-back" id="backPenis">‹</button><div>DETAILS</div><span></span></div>
-    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-eggplant.jpg?v=37" alt=""></section>
+    <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
+    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-eggplant.jpg?v=39" alt=""></section>
 
     <section class="detail-block slider-detail">
       <div class="detail-title-row"><span>LENGTH</span></div>
       <div class="live-measure">
-        <strong id="lengthNumber">${lenExact?lenVal:''}</strong><span id="lengthUnit">${lenExact?'cm':''}</span>
-        <b id="lengthClass">${lenExact?lengthClass(lenVal):(d.length||'')}</b>
+        <strong id="lengthNumber">${lenExact?lenVal:(d.length||'')}</strong><span id="lengthUnit">${lenExact?'cm':''}</span>
       </div>
-      <input id="lengthSlider" class="measure-slider" type="range" min="10" max="25" step="0.5" value="${lenVal}">
+      <input id="lengthSlider" class="measure-slider" type="range" min="10" max="25" step="1" value="${lenVal}">
       <div class="size-pills five">
         ${['S','M','L','XL','XXL'].map(x=>`<button data-length="${x}" class="${!lenExact&&d.length===x?'on':''}">${x}</button>`).join('')}
       </div>
@@ -424,12 +426,11 @@ async function renderPenis(){
     <section class="detail-block slider-detail">
       <div class="detail-title-row"><span>GIRTH</span></div>
       <div class="live-measure">
-        <strong id="girthNumber">${girExact?girVal:''}</strong><span id="girthUnit">${girExact?'cm':''}</span>
-        <b id="girthClass">${girExact?girthClass(girVal):(d.girth||'')}</b>
+        <strong id="girthNumber">${girExact?girVal:(d.girth||'')}</strong><span id="girthUnit">${girExact?'cm':''}</span>
       </div>
-      <input id="girthSlider" class="measure-slider" type="range" min="7" max="18" step="0.5" value="${girVal}">
+      <input id="girthSlider" class="measure-slider" type="range" min="7" max="18" step="1" value="${girVal}">
       <div class="size-pills four">
-        ${['Slim','Average','Thick','Very thick'].map(x=>`<button data-girth="${x}" class="${!girExact&&d.girth===x?'on':''}">${x}</button>`).join('')}
+        ${['Slim','Average','Thick','Massive'].map(x=>`<button data-girth="${x}" class="${!girExact&&d.girth===x?'on':''}">${x}</button>`).join('')}
       </div>
       <div class="measure-note">circumference</div>
     </section>
@@ -449,13 +450,13 @@ async function renderPenis(){
       <div class="detail-label">CURVE</div>
       <div class="curve-grid three">
         <button data-curve="up" class="${d.curve==='up'?'on':''}">
-          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 31 C29 31 47 24 63 8"/></svg><small>Up</small>
+          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 30 C24 30 35 28 45 22 C54 17 59 12 64 7"/></svg><small>Up</small>
         </button>
         <button data-curve="straight" class="${d.curve==='straight'?'on':''}">
-          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 19 L64 19"/></svg><small>Straight</small>
+          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 19 C28 19 44 19 64 19"/></svg><small>Straight</small>
         </button>
         <button data-curve="down" class="${d.curve==='down'?'on':''}">
-          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 7 C29 7 47 14 63 30"/></svg><small>Down</small>
+          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 8 C24 8 35 10 45 16 C54 21 59 26 64 31"/></svg><small>Down</small>
         </button>
       </div>
     </section>
@@ -473,14 +474,12 @@ async function renderPenis(){
     d.lengthExact=String(n); d.length=cl;
     document.getElementById('lengthNumber').textContent=n;
     document.getElementById('lengthUnit').textContent='cm';
-    document.getElementById('lengthClass').textContent=cl;
-    document.querySelectorAll('[data-length]').forEach(x=>x.classList.toggle('soft-on',x.dataset.length===cl));
+        document.querySelectorAll('[data-length]').forEach(x=>x.classList.toggle('soft-on',x.dataset.length===cl));
   };
   ls.oninput=paintLength; ls.onchange=async()=>{paintLength();await save()};
   document.querySelectorAll('[data-length]').forEach(b=>b.onclick=async()=>{
     d.length=b.dataset.length; d.lengthExact='';
-    document.getElementById('lengthNumber').textContent='';document.getElementById('lengthUnit').textContent='';
-    document.getElementById('lengthClass').textContent=b.dataset.length;
+    document.getElementById('lengthNumber').textContent=b.dataset.length;document.getElementById('lengthUnit').textContent='';
     document.querySelectorAll('[data-length]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
     ls.value=lengthDefault[b.dataset.length]; await save();
   });
@@ -491,14 +490,12 @@ async function renderPenis(){
     d.girthExact=String(n); d.girth=cl;
     document.getElementById('girthNumber').textContent=n;
     document.getElementById('girthUnit').textContent='cm';
-    document.getElementById('girthClass').textContent=cl;
-    document.querySelectorAll('[data-girth]').forEach(x=>x.classList.toggle('soft-on',x.dataset.girth===cl));
+        document.querySelectorAll('[data-girth]').forEach(x=>x.classList.toggle('soft-on',x.dataset.girth===cl));
   };
   gs.oninput=paintGirth; gs.onchange=async()=>{paintGirth();await save()};
   document.querySelectorAll('[data-girth]').forEach(b=>b.onclick=async()=>{
     d.girth=b.dataset.girth; d.girthExact='';
-    document.getElementById('girthNumber').textContent='';document.getElementById('girthUnit').textContent='';
-    document.getElementById('girthClass').textContent=b.dataset.girth;
+    document.getElementById('girthNumber').textContent=b.dataset.girth;document.getElementById('girthUnit').textContent='';
     document.querySelectorAll('[data-girth]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
     gs.value=girthDefault[b.dataset.girth]; await save();
   });
@@ -506,6 +503,85 @@ async function renderPenis(){
   document.querySelectorAll('[data-cut]').forEach(b=>b.onclick=async()=>{d.cut=b.dataset.cut;document.querySelectorAll('[data-cut]').forEach(x=>x.classList.toggle('on',x===b));await save()});
   document.querySelectorAll('[data-veins]').forEach(b=>b.onclick=async()=>{d.veins=b.dataset.veins;document.querySelectorAll('[data-veins]').forEach(x=>x.classList.toggle('on',x===b));await save()});
   document.querySelectorAll('[data-curve]').forEach(b=>b.onclick=async()=>{d.curve=b.dataset.curve;document.querySelectorAll('[data-curve]').forEach(x=>x.classList.toggle('on',x===b));await save()});
+}
+
+
+async function renderPeach(){
+  const p=await get('people',state.selectedPersonId);
+  p.about ||= {}; p.about.peach ||= {};
+  const d=p.about.peach;
+
+  const row=(label,key,items)=>`<section class="detail-block compact-choice-block">
+    <div class="detail-label">${label}</div>
+    <div class="detail-pills ${items.length===3?'three':'four'}">
+      ${items.map(([v,t])=>`<button data-peach-key="${key}" data-peach-value="${v}" class="${d[key]===v?'on':''}">${t}</button>`).join('')}
+    </div>
+  </section>`;
+
+  app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
+    <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div>
+    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-peach.jpg?v=39" alt=""></section>
+    ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
+    ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
+    ${row('FIRMNESS','firmness',[['soft','Soft'],['medium','Medium'],['firm','Firm']])}
+    ${row('HAIR','hair',[['smooth','Smooth'],['trimmed','Trimmed'],['natural','Natural'],['hairy','Hairy']])}
+  </main>`;
+
+  const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.peach={...d};await put('people',c)};
+  document.getElementById('backPeach').onclick=async()=>{await save();state.screen='about';render()};
+  document.querySelectorAll('[data-peach-key]').forEach(b=>b.onclick=async()=>{
+    const key=b.dataset.peachKey,val=b.dataset.peachValue;
+    d[key]=val;
+    document.querySelectorAll(`[data-peach-key="${key}"]`).forEach(x=>x.classList.toggle('on',x===b));
+    await save();
+  });
+}
+
+async function renderDrops(){
+  const p=await get('people',state.selectedPersonId);
+  p.about ||= {}; p.about.drops ||= {};
+  const d=p.about.drops;
+
+  const distanceOrder=['flow','shot','big-shot'];
+  const distanceIndex=Math.max(0,distanceOrder.indexOf(d.distance||'shot'));
+
+  app.innerHTML=`<main class="private-detail-screen drops-screen">
+    <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div>
+    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-drops.jpg?v=39" alt=""></section>
+
+    <section class="detail-block drops-block">
+      <div class="detail-label">AMOUNT</div>
+      <div class="drop-options">
+        <button data-amount="low" class="${d.amount==='low'?'on':''}" aria-label="Low"><span>💧</span></button>
+        <button data-amount="medium" class="${d.amount==='medium'?'on':''}" aria-label="Medium"><span>💧💧💧</span></button>
+        <button data-amount="high" class="${d.amount==='high'?'on':''}" aria-label="High"><span>💧💧💧💧💧</span></button>
+      </div>
+    </section>
+
+    <section class="detail-block distance-block">
+      <div class="detail-label">DISTANCE</div>
+      <div class="distance-value" id="distanceValue">${({flow:'Flow',shot:'Shot','big-shot':'Big shot'})[d.distance||'shot']}</div>
+      <input id="distanceSlider" class="measure-slider distance-slider" type="range" min="0" max="2" step="1" value="${distanceIndex}">
+      <div class="distance-scale">
+        <span class="${d.distance==='flow'?'on':''}"><i class="flow-mark">⌁</i>Flow</span>
+        <span class="${(!d.distance||d.distance==='shot')?'on':''}"><i class="shot-mark">→</i>Shot</span>
+        <span class="${d.distance==='big-shot'?'on':''}"><i class="big-shot-mark">⟶</i>Big shot</span>
+      </div>
+    </section>
+  </main>`;
+
+  const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.drops={...d};await put('people',c)};
+  document.getElementById('backDrops').onclick=async()=>{await save();state.screen='about';render()};
+  document.querySelectorAll('[data-amount]').forEach(b=>b.onclick=async()=>{
+    d.amount=b.dataset.amount;document.querySelectorAll('[data-amount]').forEach(x=>x.classList.toggle('on',x===b));await save()
+  });
+  const s=document.getElementById('distanceSlider');
+  const paint=()=>{
+    d.distance=distanceOrder[Number(s.value)];
+    document.getElementById('distanceValue').textContent=({flow:'Flow',shot:'Shot','big-shot':'Big shot'})[d.distance];
+    document.querySelectorAll('.distance-scale span').forEach((x,i)=>x.classList.toggle('on',i===Number(s.value)));
+  };
+  s.oninput=paint;s.onchange=async()=>{paint();await save()};
 }
 
 async function renderDetails(){
@@ -597,7 +673,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=3.7');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=3.9');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

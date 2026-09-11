@@ -1032,3 +1032,64 @@ html,body{
 .curve-grid.three button{padding:8px 5px}
 .curve-grid svg{width:54px;height:30px;overflow:visible}
 .curve-grid svg path{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
+
+/* v3.8 — compact single-screen private detail editor */
+.private-detail-screen{
+  min-height:100svh;
+  height:100svh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  padding:0 14px max(10px,env(safe-area-inset-bottom));
+}
+.compact-detail-top{min-height:40px;margin-bottom:0}
+.detail-hero{margin:0 auto 2px;flex:0 0 auto}
+.detail-hero-icon{width:72px;height:72px}
+.detail-block{
+  width:min(100%,430px);
+  margin:8px auto 0;
+  padding-top:9px;
+}
+.slider-detail .detail-title-row{margin-bottom:1px}
+.detail-title-row>span,.detail-label{font-size:9px;letter-spacing:.15em}
+.live-measure{min-height:33px;margin:0 0 2px}
+.live-measure strong{font-size:24px}
+.measure-slider{margin:0 0 6px}
+.size-pills{gap:5px}
+.size-pills button{padding:7px 2px;font-size:10px;border-radius:13px}
+.measure-note{margin-top:2px;font-size:8px}
+.split-block{gap:10px}
+.split-block .detail-label{margin-bottom:5px}
+.detail-pills button,.curve-grid button{padding:7px 4px;font-size:10px;border-radius:13px}
+.curve-grid.three{gap:6px;margin-top:5px}
+.curve-grid.three button{padding:5px 4px}
+.curve-grid svg{width:48px;height:24px}
+.curve-grid svg path{stroke-width:2.8}
+.curve-grid small{font-size:8px}
+@media(max-height:740px){
+  .detail-hero-icon{width:62px;height:62px}
+  .detail-block{margin-top:5px;padding-top:6px}
+  .live-measure{min-height:28px}
+  .live-measure strong{font-size:22px}
+  .size-pills button,.detail-pills button{padding:6px 2px}
+}
+
+/* v3.9 — peach + drops */
+.compact-choice-screen .detail-hero{margin-bottom:5px}
+.compact-choice-block{margin-top:10px;padding-top:10px}
+.compact-choice-block .detail-label{margin-bottom:7px}
+.detail-pills.three{grid-template-columns:repeat(3,1fr)}
+.detail-pills.four{grid-template-columns:repeat(4,1fr)}
+.drops-screen{justify-content:flex-start}
+.drops-block,.distance-block{margin-top:18px;padding-top:15px}
+.drop-options{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+.drop-options button{min-height:62px;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:#0b0b0b;color:rgba(255,255,255,.58)}
+.drop-options button span{font-size:16px;letter-spacing:-5px;padding-right:5px;filter:grayscale(1) sepia(.15);opacity:.75}
+.drop-options button.on{border-color:rgba(239,155,139,.42);background:rgba(239,155,139,.09);color:#f7e5df}
+.drop-options button.on span{opacity:1}
+.distance-value{text-align:center;font-size:23px;font-weight:650;margin:14px 0 7px;color:#f3eee8}
+.distance-slider{margin-bottom:8px}
+.distance-scale{display:grid;grid-template-columns:repeat(3,1fr);font-size:9px;color:rgba(255,255,255,.28);text-align:center}
+.distance-scale span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.distance-scale span.on{color:#efb0a4}
+.distance-scale i{font-style:normal;font-size:20px;line-height:1}

@@ -1377,3 +1377,31 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   transform:none!important;
   filter:none!important;
 }
+
+/* v4.8 — editorial stroke-only private icons */
+.art-symbol img,.private-tabs img{
+  object-fit:contain!important;
+  border-radius:0!important;
+  transform:none!important;
+  filter:none!important;
+}
+.art-symbol img{padding:10px!important}
+.private-tabs img{padding:4px!important}
+
+/* Privacy copy behaves like a quiet brand line, not a control */
+.home-privacy{display:none!important}
+.home-privacy-slogan{
+  display:block;
+  margin:7px auto 0;
+  padding:2px 8px;
+  border:0;
+  background:transparent;
+  color:rgba(255,255,255,.42);
+  font:inherit;
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  text-align:center;
+  cursor:pointer;
+}
+.home-privacy-slogan:active{opacity:.62}

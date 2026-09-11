@@ -122,3 +122,10 @@ A local-first prototype focused on people first, encounters second.
 - Vertical height control and horizontal exact weight
 - Build as categorical alternative to exact weight
 - Circular continuous TYPE wheel with blended archetypes
+
+
+## v3.0.1
+- Fixed cumulative star highlighting
+- Removed SAVE from About Him
+- About Him now autosaves selections/changes immediately
+- Bumped service worker cache

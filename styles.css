@@ -788,3 +788,7 @@ html,body{
 .wheel-face.bear .face-head,.wheel-face.young-bear .face-head{border-bottom-width:6px}
 .wheel-knob{position:absolute;width:18px;height:18px;border-radius:50%;background:#ef9b8b;box-shadow:0 0 0 5px rgba(239,155,139,.12);z-index:5}
 .type-help{font-size:10px;letter-spacing:.08em;opacity:.25;margin-top:10px}
+
+/* v3.0.1 */
+.star-wide-btn.on{color:#f3b04f!important;opacity:1!important}
+.about-visual .about-save{display:none!important}

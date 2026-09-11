@@ -108,7 +108,7 @@ async function renderAdd(){
 
     <div class="quick-rating-block">
       <div class="quick-rating star-rating-wide" aria-label="Rating from 1 to 5">
-        ${[1,2,3,4,5].map(n=>`<button class="star-wide-btn ${state.quick.rating===n?'on':''}" data-star="${n}" aria-label="Rating ${n} out of 5">★</button>`).join('')}
+        ${[1,2,3,4,5].map(n=>`<button class="star-wide-btn ${n<=Number(state.quick.rating||0)?'on':''}" data-star="${n}" aria-label="Rating ${n} out of 5">★</button>`).join('')}
       </div>
     </div>
 
@@ -192,13 +192,6 @@ async function renderPostAdd(){
 
 
 
-function paintRating(value){
-  document.querySelectorAll('[data-rating]').forEach(star=>{
-    const n=Number(star.dataset.rating); paintRating(this?.dataset?.rating || event?.currentTarget?.dataset?.rating);
-    star.classList.toggle('selected', n<=Number(value));
-    star.setAttribute('aria-pressed', n<=Number(value) ? 'true':'false');
-  });
-}
 
 async function renderAboutHim(){
   const p=await get('people',state.selectedPersonId);
@@ -311,10 +304,9 @@ async function renderAboutHim(){
     <div class="about-symbols persistent-symbols">
       <button class="about-symbol" data-subopen="egg">🍆</button><button class="about-symbol" data-subopen="peach">🍑</button><button class="about-symbol" data-subopen="drop">💦</button>
     </div>
-    <button class="primary about-save" id="saveAbout">SAVE</button>
   </main>`;
 
-  document.getElementById('back').onclick=()=>{state.screen='postadd';render()};
+  document.getElementById('back').onclick=async()=>{await persist();state.screen='postadd';render()};
   document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.aboutPage=b.dataset.page;render()});
   document.querySelectorAll('[data-subopen]').forEach(b=>b.onclick=()=>{state.detailsTab='anatomy';state.detailsReturn='about';state.anatomySub=b.dataset.subopen;state.screen='details';render()});
 
@@ -330,10 +322,11 @@ async function renderAboutHim(){
       const fig=document.querySelector('.age-figure');
       if(fig){const maturity=(n-18)/62;fig.style.setProperty('--age-maturity',maturity.toFixed(2))}
     };
-    s.oninput=paintAge;
-    document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=()=>{
+    s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
+    document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
       p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
+      await persist();
     });
     if(a.ageExact) paintAge();
   }
@@ -351,15 +344,17 @@ async function renderAboutHim(){
       const n=Number(ws.value);p.about.weightExact=String(n);wv.textContent=n+' kg';
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.remove('on'));
     };
-    hs.oninput=paintHeight;ws.oninput=paintWeight;
-    document.querySelectorAll('.axis-label').forEach(lbl=>lbl.onclick=()=>{
+    hs.oninput=paintHeight; ws.oninput=paintWeight; hs.onchange=async()=>{paintHeight();await persist()}; ws.onchange=async()=>{paintWeight();await persist()};
+    document.querySelectorAll('.axis-label').forEach(lbl=>lbl.onclick=async()=>{
       const band=lbl.classList.contains('tall')?'tall':lbl.classList.contains('short')?'short':'medium';
       p.about.heightExact='';p.about.heightBand=band;hv.textContent=heightBandLabel(band);
       document.querySelectorAll('.axis-label').forEach(x=>x.classList.toggle('on',x===lbl));
+      await persist();
     });
-    document.querySelectorAll('[data-build]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
       p.about.weightExact='';p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;wv.textContent=b.textContent;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
+      await persist();
     });
   }
 
@@ -376,13 +371,11 @@ async function renderAboutHim(){
       const x=t.clientX-(rect.left+rect.width/2),y=t.clientY-(rect.top+rect.height/2);
       paint(Math.atan2(y,x)*180/Math.PI);
     };
-    wheel.onpointerdown=e=>{wheel.setPointerCapture(e.pointerId);point(e)};
+    wheel.onpointerdown=e=>{wheel.setPointerCapture(e.pointerId);point(e)}; wheel.onpointerup=async e=>{point(e);await persist()};
     wheel.onpointermove=e=>{if(e.buttons)point(e)};
-    wheel.ontouchmove=e=>{point(e);e.preventDefault()};
+    wheel.ontouchmove=e=>{point(e);e.preventDefault()}; wheel.ontouchend=async()=>{await persist()};
     paint(typeAngle);
   }
-
-  document.getElementById('saveAbout').onclick=async()=>{await persist();state.screen='postadd';render()};
 }
 
 async function renderDetails(){
@@ -471,11 +464,3 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
 
 (async()=>{db=await openDB();render();if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{})})();
 
-if(!window.bodyCountRatingCapture){
-  window.bodyCountRatingCapture=true;
-  document.addEventListener('click',e=>{
-    const star=e.target.closest && e.target.closest('[data-rating]');
-    if(!star) return;
-    requestAnimationFrame(()=>paintRating(star.dataset.rating));
-  },true);
-}

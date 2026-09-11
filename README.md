@@ -17,3 +17,10 @@ A local-first prototype focused on people first, encounters second.
 - New bottom nav: Count / People / Insights / You
 - Brand palette and BC artwork integrated as the visual anchor
 - No latest additions or stats on the first screen
+
+
+## v1.5
+- Count home now uses a circular brand button.
+- Added a pulsing + action badge and a subtle breathing animation.
+- Added a single CTA label: ADD SOMEONE.
+- Tap feedback contracts the button and fades the + before Quick Add.

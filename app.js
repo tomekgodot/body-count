@@ -51,15 +51,21 @@ function attachNav(){document.querySelectorAll('[data-nav]').forEach(b=>b.onclic
 
 async function renderHome(){
   app.innerHTML=`<main class="count-home" aria-label="Body Count home">
-    <button class="bc-action" id="addBtn" aria-label="Add to the count">
-      <img src="brand-mark.png" alt="" class="bc-action-image">
-      <span class="bc-action-halo" aria-hidden="true"></span>
-    </button>
+    <div class="count-cta-wrap">
+      <button class="bc-action" id="addBtn" aria-label="Add someone">
+        <span class="bc-action-halo" aria-hidden="true"></span>
+        <span class="bc-action-core">
+          <img src="brand-mark.png" alt="" class="bc-action-image">
+        </span>
+        <span class="bc-plus" aria-hidden="true">+</span>
+      </button>
+      <div class="count-cta-label">ADD SOMEONE</div>
+    </div>
   </main>${nav('home')}`;
   document.getElementById('addBtn').onclick=()=>{
     const btn=document.getElementById('addBtn');
     btn.classList.add('pressed');
-    setTimeout(()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()},150);
+    setTimeout(()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()},220);
   };
   attachNav();
 }

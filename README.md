@@ -90,3 +90,27 @@ A local-first prototype focused on people first, encounters second.
 
 ## v2.5
 - Removed the HOW WAS IT? heading above the mood rating for a cleaner Quick Add screen
+
+
+## v2.6
+- Restored star rating
+- Stars use the same full-width five-column layout as the previous mood faces
+
+
+## v2.7
+- Reoriented the eggplant on the home screen so its curve opens to the right and visually hugs the peach
+
+
+## v2.8
+- Post-add reduced to ABOUT HIM and ENCOUNTER
+- New ABOUT HIM progressive screen: age, height, build/weight, type
+- Optional anatomy details hidden behind 🍆 🍑 💦
+- ENCOUNTER continues into the existing encounter-detail flow for now
+
+
+## v2.9
+- Rebuilt ABOUT HIM as AGE / BODY / TYPE visual carousel
+- AGE supports broad shortcuts and exact slider
+- BODY combines height and build, including two-dimensional touch gesture
+- TYPE is a selectable visual carousel with multi-select
+- 🍆 🍑 💦 stay persistently available below the visual editor

@@ -32,6 +32,7 @@ async function render(){
   if(state.screen==='home') return renderHome();
   if(state.screen==='add') return renderAdd();
   if(state.screen==='postadd') return renderPostAdd();
+  if(state.screen==='about') return renderAboutHim();
   if(state.screen==='person') return renderPerson();
   if(state.screen==='collection') return renderCollection();
   if(state.screen==='insights') return renderPlaceholder('Insights','Your patterns will live here once there is enough data.','insights');
@@ -106,14 +107,8 @@ async function renderAdd(){
     </div>
 
     <div class="quick-rating-block">
-      <div class="quick-rating mood-rating" aria-label="How was it?">
-        ${[
-          [1,'😞','Very bad'],
-          [2,'🙁','Not great'],
-          [3,'😐','Okay'],
-          [4,'🙂','Good'],
-          [5,'😄','Great']
-        ].map(([n,face,label])=>`<button class="mood-btn ${state.quick.rating===n?'on':''}" data-star="${n}" aria-label="${label}">${face}</button>`).join('')}
+      <div class="quick-rating star-rating-wide" aria-label="Rating from 1 to 5">
+        ${[1,2,3,4,5].map(n=>`<button class="star-wide-btn ${state.quick.rating===n?'on':''}" data-star="${n}" aria-label="Rating ${n} out of 5">★</button>`).join('')}
       </div>
     </div>
 
@@ -178,11 +173,179 @@ async function saveQuick(){
 function detailTiles(){return [['position','↕','Position','Top, bottom, vers…'],['happened','✦','What happened','Keep it brief or detailed'],['health','＋','Health','Protection & context'],['about','◌','About him','Age, height, notes'],['anatomy','◇','The details','Private extras']];}
 async function renderPostAdd(){
   const p=await get('people',state.selectedPersonId);
-  app.innerHTML=`<div class="success"><b>${state.lastAddMode==='existing'?`Another one with ${esc(displayName(p))} ✓`:`${esc(displayName(p))} added ✓`}</b><span>Anything else worth remembering?</span></div>
-  <p class="sub">Optional. Pick one, several, or none.</p>
-  <div class="option-grid">${detailTiles().map(x=>`<button class="option" data-detail="${x[0]}"><div class="ico">${x[1]}</div><b>${x[2]}</b><span>${x[3]}</span></button>`).join('')}</div><div style="height:18px"></div><button class="primary" id="done">DONE</button>`;
-  document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{state.detailsTab=b.dataset.detail;state.detailsReturn='postadd';state.screen='details';render()});
+  app.innerHTML=`<main class="postadd-clean">
+    <div class="postadd-confirm">
+      <div class="eyebrow">ADDED</div>
+      <h1>${esc(displayName(p))}</h1>
+      ${p.lastMemory?`<p>${esc(p.lastMemory)}</p>`:''}
+    </div>
+    <div class="postadd-two">
+      <button class="postadd-choice" id="aboutChoice"><span>ABOUT HIM</span><b>›</b></button>
+      <button class="postadd-choice" id="encounterChoice"><span>ENCOUNTER</span><b>›</b></button>
+    </div>
+    <button class="postadd-done" id="done">DONE</button>
+  </main>`;
+  document.getElementById('aboutChoice').onclick=()=>{state.screen='about';render()};
+  document.getElementById('encounterChoice').onclick=()=>{state.detailsTab='happened';state.detailsReturn='postadd';state.screen='details';render()};
   document.getElementById('done').onclick=()=>{state.screen='person';render()};
+}
+
+
+async function renderAboutHim(){
+  const p=await get('people',state.selectedPersonId);
+  p.about ||= {};
+  const a=p.about;
+  state.aboutPage ||= 'age';
+
+  const age = Number(a.ageExact || 32);
+  const height = Number(a.heightExact || 180);
+  const buildOrder=['slim','lean','average','athletic','stocky','chubby'];
+  const build = a.buildVisual || (Array.isArray(a.build) && a.build[0]) || 'average';
+  const buildIndex=Math.max(0,buildOrder.indexOf(build));
+  const typeOrder=['twink','otter','daddy','bear'];
+  const selectedTypes=Array.isArray(a.types)?a.types:[];
+
+  const figure = (extra='') => `<div class="guy-stage ${extra}">
+    <div class="guy-head"></div>
+    <div class="guy-neck"></div>
+    <div class="guy-body"></div>
+    <div class="guy-leg guy-leg-l"></div>
+    <div class="guy-leg guy-leg-r"></div>
+  </div>`;
+
+  let panel='';
+  if(state.aboutPage==='age'){
+    panel=`<section class="visual-panel">
+      <div class="visual-value"><strong id="ageValue">${age}</strong><span>years</span></div>
+      <div class="figure-wrap">${figure('age-figure')}</div>
+      <input id="ageSlider" class="invisible-range" type="range" min="18" max="80" value="${age}" aria-label="Age">
+      <div class="quick-categories">
+        <button data-age-band="young">Young</button>
+        <button data-age-band="30s">30s</button>
+        <button data-age-band="40s">40s</button>
+        <button data-age-band="50plus">50+</button>
+      </div>
+    </section>`;
+  } else if(state.aboutPage==='body'){
+    panel=`<section class="visual-panel body-panel">
+      <div class="body-readout"><span id="heightValue">${height} cm</span><span id="buildValue">${build[0].toUpperCase()+build.slice(1)}</span></div>
+      <div class="figure-wrap body-gesture" id="bodyGesture">${figure('body-figure')}</div>
+      <div class="body-hint">↑ height · → build</div>
+      <input id="heightSlider" class="invisible-range" type="range" min="150" max="210" value="${height}" aria-label="Height">
+      <input id="buildSlider" class="invisible-range" type="range" min="0" max="${buildOrder.length-1}" value="${buildIndex}" aria-label="Build">
+      <div class="body-shortcuts">
+        <div class="quick-categories"><button data-height="165">Short</button><button data-height="180">Average</button><button data-height="195">Tall</button></div>
+        <div class="quick-categories build-cats">${buildOrder.map(x=>`<button data-build="${x}">${x[0].toUpperCase()+x.slice(1)}</button>`).join('')}</div>
+      </div>
+      <button class="tiny-add" id="weightToggle">+ weight</button>
+      <div class="weight-row ${a.weightExact?'show':''}" id="weightRow"><input id="weightExact" inputmode="numeric" placeholder="Weight" value="${esc(a.weightExact||'')}"><span>kg</span></div>
+    </section>`;
+  } else {
+    const current=state.typeCursor || 'twink';
+    panel=`<section class="visual-panel type-panel">
+      <div class="type-name" id="typeName">${current.toUpperCase()}</div>
+      <div class="type-carousel">
+        <button class="carousel-arrow" id="typePrev">‹</button>
+        <div class="figure-wrap type-figure-wrap">${figure('type-figure '+current)}</div>
+        <button class="carousel-arrow" id="typeNext">›</button>
+      </div>
+      <button class="select-type ${selectedTypes.includes(current)?'selected':''}" id="selectType">${selectedTypes.includes(current)?'✓ Selected':'Select '+current}</button>
+      <div class="selected-types" id="selectedTypes">${selectedTypes.map(x=>`<span>${x}</span>`).join('')}</div>
+    </section>`;
+  }
+
+  app.innerHTML=`<main class="about-visual">
+    <div class="about-top">
+      <button class="about-back" id="back">‹</button>
+      <div>ABOUT HIM</div><span></span>
+    </div>
+    <nav class="about-tabs">
+      <button data-page="age" class="${state.aboutPage==='age'?'on':''}">AGE</button>
+      <button data-page="body" class="${state.aboutPage==='body'?'on':''}">BODY</button>
+      <button data-page="type" class="${state.aboutPage==='type'?'on':''}">TYPE</button>
+    </nav>
+    <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
+    <div class="about-symbols persistent-symbols">
+      <button class="about-symbol" data-subopen="egg">🍆</button>
+      <button class="about-symbol" data-subopen="peach">🍑</button>
+      <button class="about-symbol" data-subopen="drop">💦</button>
+    </div>
+    <button class="primary about-save" id="saveAbout">SAVE</button>
+  </main>`;
+
+  document.getElementById('back').onclick=()=>{state.screen='postadd';render()};
+  document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.aboutPage=b.dataset.page;render()});
+  document.querySelectorAll('[data-subopen]').forEach(b=>b.onclick=()=>{
+    state.detailsTab='anatomy'; state.detailsReturn='about'; state.anatomySub=b.dataset.subopen;
+    state.screen='details'; render();
+  });
+
+  const save=async()=>{
+    const current=await get('people',state.selectedPersonId);
+    current.about={...(current.about||{}),...(p.about||{})};
+    await put('people',current);
+  };
+
+  if(state.aboutPage==='age'){
+    const s=document.getElementById('ageSlider'), v=document.getElementById('ageValue');
+    s.oninput=()=>{v.textContent=s.value; p.about.ageExact=s.value; p.about.ageBand=''};
+    document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=()=>{
+      p.about.ageBand=b.dataset.ageBand; p.about.ageExact='';
+      document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    });
+  }
+
+  if(state.aboutPage==='body'){
+    const hs=document.getElementById('heightSlider'), bs=document.getElementById('buildSlider');
+    const hv=document.getElementById('heightValue'), bv=document.getElementById('buildValue');
+    const body=document.querySelector('.body-figure .guy-body');
+    const apply=()=>{
+      const bi=Number(bs.value), name=buildOrder[bi];
+      hv.textContent=hs.value+' cm'; bv.textContent=name[0].toUpperCase()+name.slice(1);
+      p.about.heightExact=hs.value; p.about.buildVisual=name; p.about.build=[name];
+      const hScale=.84+(Number(hs.value)-150)/60*.28;
+      const wScale=.72+bi*.105;
+      document.querySelector('.body-figure').style.transform=`scaleY(${hScale}) scaleX(${wScale})`;
+    };
+    hs.oninput=apply; bs.oninput=apply; apply();
+    document.querySelectorAll('[data-height]').forEach(b=>b.onclick=()=>{hs.value=b.dataset.height;apply()});
+    document.querySelectorAll('[data-build]').forEach(b=>b.onclick=()=>{bs.value=buildOrder.indexOf(b.dataset.build);apply()});
+    document.getElementById('weightToggle').onclick=()=>document.getElementById('weightRow').classList.toggle('show');
+    const wr=document.getElementById('weightExact'); wr.oninput=()=>p.about.weightExact=wr.value.trim();
+
+    let sx=0,sy=0,baseH=Number(hs.value),baseB=Number(bs.value);
+    const g=document.getElementById('bodyGesture');
+    g.ontouchstart=e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;baseH=Number(hs.value);baseB=Number(bs.value)};
+    g.ontouchmove=e=>{const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+      hs.value=Math.max(150,Math.min(210,Math.round(baseH-dy/3)));
+      bs.value=Math.max(0,Math.min(buildOrder.length-1,Math.round(baseB+dx/42))); apply(); e.preventDefault();
+    };
+  }
+
+  if(state.aboutPage==='type'){
+    const types=typeOrder;
+    const move=dir=>{let i=types.indexOf(state.typeCursor||'twink'); state.typeCursor=types[(i+dir+types.length)%types.length];render()};
+    document.getElementById('typePrev').onclick=()=>move(-1);
+    document.getElementById('typeNext').onclick=()=>move(1);
+    document.getElementById('selectType').onclick=()=>{
+      const t=state.typeCursor||'twink'; p.about.types=Array.isArray(p.about.types)?p.about.types:[];
+      p.about.types=p.about.types.includes(t)?p.about.types.filter(x=>x!==t):[...p.about.types,t];
+      render();
+    };
+  }
+
+  let tx=0;
+  const swipe=document.getElementById('aboutSwipe');
+  swipe.ontouchstart=e=>tx=e.touches[0].clientX;
+  swipe.ontouchend=e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)<65 || state.aboutPage==='body') return;
+    const pages=['age','body','type']; let i=pages.indexOf(state.aboutPage);
+    if(dx<0 && i<2){state.aboutPage=pages[i+1];render()}
+    if(dx>0 && i>0){state.aboutPage=pages[i-1];render()}
+  };
+
+  document.getElementById('saveAbout').onclick=async()=>{await save();state.screen='postadd';render()};
 }
 
 async function renderDetails(){
@@ -195,10 +358,13 @@ async function renderDetails(){
  if(tab==='happened') body=chipEditor('What happened',['Kiss','Oral','Anal','Rimming','Fisting','Other'],e?.happened||[],'happened');
  if(tab==='health') body=chipEditor('Health / protection',['Condom','PrEP','DoxyPEP','No barrier','Other'],e?.health||[],'health');
  if(tab==='about') body=`<div class="field"><label>Age</label><input class="input" id="age" inputmode="numeric" placeholder="Optional" value="${esc(p.about?.age||'')}"></div><div class="field"><label>Height</label><input class="input" id="height" placeholder="e.g. 185 cm" value="${esc(p.about?.height||'')}"></div><div class="field"><label>About him</label><textarea id="aboutnote" placeholder="Anything useful later">${esc(p.about?.note||'')}</textarea></div>`;
- if(tab==='anatomy') body=`<p class="sub">Private details, only if you care. Nothing here is required.</p><div class="tabs"><button class="tab on" data-sub="egg">◇ One</button><button class="tab" data-sub="peach">◐ Two</button><button class="tab" data-sub="drop">◌ Three</button></div><div id="anatomyPanel">${anatomyEgg(p)}</div>`;
+ if(tab==='anatomy'){
+   const sub=state.anatomySub||'egg';
+   body=`<p class="sub">Private details, only if you care. Nothing here is required.</p><div class="tabs"><button class="tab ${sub==='egg'?'on':''}" data-sub="egg">🍆</button><button class="tab ${sub==='peach'?'on':''}" data-sub="peach">🍑</button><button class="tab ${sub==='drop'?'on':''}" data-sub="drop">💦</button></div><div id="anatomyPanel">${sub==='egg'?anatomyEgg(p):sub==='peach'?anatomyPeach(p):anatomyDrop(p)}</div>`;
+ }
  app.innerHTML=`<button class="linkbtn" id="back">← Back</button><h1 class="screen-title">${tab==='anatomy'?'The details':tab[0].toUpperCase()+tab.slice(1)}</h1>${body}<div style="height:16px"></div><button class="primary" id="save">SAVE</button><p class="small" style="text-align:center">🔒 On this device only</p>`;
  document.getElementById('back').onclick=()=>{state.screen=state.detailsReturn||'person';render()};
- if(tab==='anatomy') document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-sub]').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById('anatomyPanel').innerHTML=b.dataset.sub==='egg'?anatomyEgg(p):b.dataset.sub==='peach'?anatomyPeach(p):anatomyDrop(p);attachAnatomyHandlers()});
+ if(tab==='anatomy') document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{state.anatomySub=b.dataset.sub;document.querySelectorAll('[data-sub]').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById('anatomyPanel').innerHTML=b.dataset.sub==='egg'?anatomyEgg(p):b.dataset.sub==='peach'?anatomyPeach(p):anatomyDrop(p);attachAnatomyHandlers()});
  if(['position','happened','health'].includes(tab)) attachChipHandlers();
  attachAnatomyHandlers();
  document.getElementById('save').onclick=()=>saveDetails(tab,e);
@@ -226,7 +392,7 @@ async function saveDetails(tab,e){
 const selected=k=>document.querySelector(`[data-single="${k}"].on`)?.dataset.value||'';
 const rating=k=>Math.max(0,...[...document.querySelectorAll(`[data-ratekey="${k}"].on`)].map(x=>Number(x.dataset.rate)));
 
-function profileSummary(p){const bits=[];if(p.about?.age)bits.push(`${esc(p.about.age)} yrs`);if(p.about?.height)bits.push(esc(p.about.height));return bits.join(' · ')}
+function profileSummary(p){const bits=[];if(p.about?.ageExact)bits.push(`${esc(p.about.ageExact)} yrs`);else if(p.about?.ageBand)bits.push(esc(p.about.ageBand));if(p.about?.heightExact)bits.push(`${esc(p.about.heightExact)} cm`);else if(p.about?.heightBand)bits.push(esc(p.about.heightBand));return bits.join(' · ')}
 async function renderPerson(){
  const p=await get('people',state.selectedPersonId);
  const encounters=(await all('encounters')).filter(e=>e.personId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date));

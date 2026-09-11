@@ -960,3 +960,10 @@ html,body{
 
 /* Hide obsolete constructed portrait pieces if any remain in cached markup */
 .portrait-hair,.portrait-head,.portrait-neck,.portrait-shoulders{display:none!important}
+
+#buildMarker{
+  position:fixed; right:7px; top:7px; z-index:9999;
+  font:600 9px/1 system-ui,sans-serif;
+  letter-spacing:.04em; color:rgba(255,255,255,.22);
+  pointer-events:none; user-select:none;
+}

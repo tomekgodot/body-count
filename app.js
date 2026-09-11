@@ -248,7 +248,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=40" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=41" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -270,7 +270,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=40" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=41" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -291,7 +291,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=40" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=41" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -307,9 +307,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.jpg?v=40" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.jpg?v=40" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.jpg?v=40" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.jpg?v=41" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.jpg?v=41" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.jpg?v=41" alt=""></button>
     </div>
   </main>`;
 
@@ -331,11 +331,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=40`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=41`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=40`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=41`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -363,7 +363,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=40`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=41`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -377,7 +377,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=40`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=41`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -410,7 +410,7 @@ async function renderPenis(){
 
   app.innerHTML=`<main class="private-detail-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
-    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-eggplant.jpg?v=40" alt=""></section>
+    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-eggplant.jpg?v=41" alt=""></section>
 
     <section class="detail-block slider-detail">
       <div class="detail-title-row"><span>LENGTH</span></div>
@@ -520,7 +520,7 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div>
-    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-peach.jpg?v=40" alt=""></section>
+    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-peach.jpg?v=41" alt=""></section>
     ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
     ${row('FIRMNESS','firmness',[['soft','Soft'],['medium','Medium'],['firm','Firm']])}
@@ -542,36 +542,39 @@ async function renderDrops(){
   p.about ||= {}; p.about.drops ||= {};
   const d=p.about.drops;
 
-  const dropSvg=(count)=>{
-    const one=`<svg viewBox="0 0 24 32" aria-hidden="true"><path d="M12 2C8 8 4 12 4 18a8 8 0 0 0 16 0c0-6-4-10-8-16Z"/></svg>`;
-    return `<span class="drop-mark drop-${count}">${Array.from({length:count},()=>one).join('')}</span>`;
+  const sideDrop=(scale=1,rot=-34)=>`
+    <svg viewBox="0 0 34 24" aria-hidden="true" style="transform:rotate(${rot}deg) scale(${scale})">
+      <path d="M3 12C8 8 13 4 22 3c-1 7-4 12-9 15-4 2-8 1-10-2-1-1-1-3 0-4Z"/>
+    </svg>`;
+
+  const loadMark=(count)=>{
+    const configs = count===1
+      ? [[1, -34]]
+      : count===3
+        ? [[.88,-42],[1,-28],[.78,-12]]
+        : [[.72,-50],[.88,-40],[1,-28],[.84,-16],[.66,-4]];
+    return `<span class="side-drop-mark">${configs.map(([s,r])=>sideDrop(s,r)).join('')}</span>`;
   };
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div>
-    <section class="detail-hero"><img class="detail-hero-icon" src="assets/detail-drops.jpg?v=40" alt=""></section>
+    <section class="detail-hero detail-hero-safe"><img class="detail-hero-icon drops-hero-icon" src="assets/detail-drops.jpg?v=41" alt=""></section>
 
     <section class="detail-block drops-block">
-      <div class="detail-label">AMOUNT</div>
+      <div class="detail-label">LOAD</div>
       <div class="drop-options">
-        <button data-amount="low" class="${d.amount==='low'?'on':''}" aria-label="Low">${dropSvg(1)}</button>
-        <button data-amount="medium" class="${d.amount==='medium'?'on':''}" aria-label="Medium">${dropSvg(3)}</button>
-        <button data-amount="high" class="${d.amount==='high'?'on':''}" aria-label="High">${dropSvg(5)}</button>
+        <button data-amount="low" class="${d.amount==='low'?'on':''}" aria-label="Low">${loadMark(1)}</button>
+        <button data-amount="medium" class="${d.amount==='medium'?'on':''}" aria-label="Medium">${loadMark(3)}</button>
+        <button data-amount="high" class="${d.amount==='high'?'on':''}" aria-label="High">${loadMark(5)}</button>
       </div>
     </section>
 
     <section class="detail-block distance-block">
-      <div class="detail-label">DISTANCE</div>
-      <div class="distance-options">
-        <button data-distance="flow" class="${d.distance==='flow'?'on':''}">
-          <span class="distance-art flow-art"><i></i><i></i><i></i></span><small>Flow</small>
-        </button>
-        <button data-distance="short" class="${d.distance==='short'?'on':''}">
-          <span class="distance-art short-art"><i></i></span><small>Quick shot</small>
-        </button>
-        <button data-distance="long" class="${d.distance==='long'?'on':''}">
-          <span class="distance-art long-art"><i></i></span><small>Big shot</small>
-        </button>
+      <div class="detail-label">SHOT</div>
+      <div class="shot-options">
+        <button data-distance="flow" class="${d.distance==='flow'?'on':''}">Flow</button>
+        <button data-distance="short" class="${d.distance==='short'?'on':''}">Quick shot</button>
+        <button data-distance="long" class="${d.distance==='long'?'on':''}">Long shot</button>
       </div>
     </section>
   </main>`;
@@ -679,7 +682,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=4.0');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=4.1');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

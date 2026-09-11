@@ -1170,3 +1170,55 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   .live-measure strong{font-size:25px}
   .size-pills button,.detail-pills button{padding:8px 3px}
 }
+
+/* v4.1 — drops cleanup */
+.detail-hero-safe{overflow:visible}
+.drops-hero-icon{
+  object-fit:contain;
+  background:#050505;
+  padding:2px;
+  border-radius:50%;
+}
+.side-drop-mark{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  width:100%;
+  height:40px;
+  overflow:visible;
+}
+.side-drop-mark svg{
+  width:26px;
+  height:18px;
+  margin-left:-3px;
+  overflow:visible;
+}
+.side-drop-mark svg:first-child{margin-left:0}
+.side-drop-mark path{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+}
+.shot-options{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+.shot-options button{
+  min-height:54px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:16px;
+  background:#0b0b0b;
+  color:rgba(255,255,255,.62);
+  font-size:11px;
+  padding:8px 6px;
+}
+.shot-options button.on{
+  border-color:rgba(239,155,139,.42);
+  background:rgba(239,155,139,.09);
+  color:#f7e5df;
+}

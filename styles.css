@@ -548,3 +548,63 @@ html,body{
   transform:translateY(-1px);
 }
 .rating-btn:active{transform:scale(.96)}
+
+/* v2.4 — softer hand-drawn feel + inward eggplant + mood rating */
+.count-home .free-fruit{
+  opacity:.48 !important;
+  filter:saturate(.58) contrast(.88) brightness(1.09) drop-shadow(0 10px 22px rgba(0,0,0,.16)) !important;
+}
+.count-home .free-peach{
+  font-size:min(49vw,224px) !important;
+  left:5% !important;
+  top:29% !important;
+  transform:rotate(-6deg) !important;
+  animation:peachSketchBreathe 3.6s ease-in-out infinite !important;
+}
+.count-home .free-eggplant{
+  font-size:min(52vw,238px) !important;
+  right:5% !important;
+  top:17% !important;
+  transform:rotate(-28deg) scaleX(-1) !important;
+  animation:eggplantHugBreathe 3.25s ease-in-out infinite !important;
+}
+@keyframes peachSketchBreathe{
+  0%,100%{transform:rotate(-6deg) translateY(2px) scale(.985)}
+  50%{transform:rotate(-4deg) translateY(-4px) scale(1.022)}
+}
+@keyframes eggplantHugBreathe{
+  0%,100%{transform:rotate(-28deg) scaleX(-1) translateY(-1px) scale(.99)}
+  50%{transform:rotate(-25deg) scaleX(-1) translateY(4px) scale(1.018)}
+}
+
+/* mood rating */
+.quick-rating-block{margin:24px 0 30px}
+.mood-rating{
+  display:grid !important;
+  grid-template-columns:repeat(5,1fr) !important;
+  gap:8px !important;
+  margin:0 !important;
+}
+.mood-btn{
+  aspect-ratio:1;
+  min-width:0;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);
+  background:#0d0c0d;
+  font-size:28px;
+  line-height:1;
+  padding:0;
+  display:grid;
+  place-items:center;
+  opacity:.62;
+  filter:saturate(.72);
+  transition:transform .14s ease,opacity .14s ease,background .14s ease,border-color .14s ease,filter .14s ease;
+}
+.mood-btn.on{
+  opacity:1;
+  filter:saturate(1);
+  background:rgba(239,155,139,.13);
+  border-color:rgba(239,155,139,.52);
+  transform:translateY(-2px) scale(1.03);
+}
+.mood-btn:active{transform:scale(.95)}

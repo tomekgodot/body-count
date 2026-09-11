@@ -106,9 +106,15 @@ async function renderAdd(){
     </div>
 
     <div class="quick-rating-block">
-      <div class="quick-label">RATING</div>
-      <div class="quick-rating" aria-label="Rating from 1 to 5">
-        ${[1,2,3,4,5].map(n=>`<button class="rating-btn ${state.quick.rating===n?'on':''}" data-star="${n}" aria-label="Rating ${n} out of 5">${n}</button>`).join('')}
+      <div class="quick-label">HOW WAS IT?</div>
+      <div class="quick-rating mood-rating" aria-label="How was it?">
+        ${[
+          [1,'😞','Very bad'],
+          [2,'🙁','Not great'],
+          [3,'😐','Okay'],
+          [4,'🙂','Good'],
+          [5,'😄','Great']
+        ].map(([n,face,label])=>`<button class="mood-btn ${state.quick.rating===n?'on':''}" data-star="${n}" aria-label="${label}">${face}</button>`).join('')}
       </div>
     </div>
 

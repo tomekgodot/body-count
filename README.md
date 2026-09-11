@@ -79,3 +79,10 @@ A local-first prototype focused on people first, encounters second.
 ## v2.3
 - Removed the MENTAL NOTE label
 - Memory cue is now the in-field placeholder: “What you’ll remember him by…”
+
+
+## v2.4
+- Eggplant mirrored/rotated inward to hug the peach
+- Fruit artwork softened and made more translucent
+- Exact placeholder: “What you’ll remember him by…”
+- Replaced numeric rating with five satisfaction faces

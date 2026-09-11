@@ -25,6 +25,7 @@ function add(name,value){return new Promise((r,j)=>{const q=store(name,'readwrit
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
 const fmt=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(new Date(d));
+const dateValue=d=>{const x=new Date(d||Date.now()),off=x.getTimezoneOffset();return new Date(x.getTime()-off*60000).toISOString().slice(0,10)};
 const displayName=p=>p?.name?.trim()||`Mystery #${p?.id}`;
 const avgRating=es=>{const r=es.filter(e=>e.rating>0);return r.length?(r.reduce((s,e)=>s+e.rating,0)/r.length).toFixed(1):'—'};
 
@@ -42,6 +43,7 @@ async function render(){
   if(state.screen==='you') return renderPlaceholder('You','Privacy, health, backup and settings will live here.','you');
   if(state.screen==='details') return renderDetails();
   if(state.screen==='encounter') return renderEncounter();
+  if(state.screen==='encounterEdit') return renderEncounterEdit();
 }
 function nav(active='home'){
   return `<nav class="bottom-nav">
@@ -122,12 +124,6 @@ async function renderAdd(){
       <textarea id="memory" maxlength="60" placeholder="What you’ll remember him by…">${esc(state.quick.memory||'')}</textarea>
     </div>
 
-    <div class="quick-rating-block">
-      <div class="quick-rating star-rating-wide" aria-label="Rating from 1 to 5">
-        ${[1,2,3,4,5].map(n=>`<button class="star-wide-btn ${n<=Number(state.quick.rating||0)?'on':''}" data-star="${n}" aria-label="Rating ${n} out of 5">★</button>`).join('')}
-      </div>
-    </div>
-
     <button class="primary quick-save" id="save" ${mode==='existing'&&!selected?'disabled':''}>ADD</button>
   </section>`;
 
@@ -135,7 +131,6 @@ async function renderAdd(){
 
   document.getElementById('existingLink')?.addEventListener('click',()=>{
     state.quick={
-      rating:state.quick.rating||0,
       name:document.getElementById('name')?.value||'',
       memory:document.getElementById('memory')?.value||'',
       mode:'existing'
@@ -145,7 +140,6 @@ async function renderAdd(){
 
   document.getElementById('newLink')?.addEventListener('click',()=>{
     state.quick={
-      rating:state.quick.rating||0,
       name:state.quick.name||'',
       memory:document.getElementById('memory')?.value||'',
       mode:'new'
@@ -156,13 +150,6 @@ async function renderAdd(){
 
   document.querySelectorAll('[data-pick-person]').forEach(b=>b.onclick=()=>{
     state.quick.personId=Number(b.dataset.pickPerson);
-    state.quick.memory=document.getElementById('memory').value;
-    renderAdd();
-  });
-
-  document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{
-    state.quick.rating=Number(b.dataset.star);
-    state.quick.name=document.getElementById('name')?.value||state.quick.name||'';
     state.quick.memory=document.getElementById('memory').value;
     renderAdd();
   });
@@ -180,7 +167,7 @@ async function saveQuick(){
     const name=(document.getElementById('name')?.value||'').trim();
     personId=await add('people',{name,createdAt:new Date().toISOString(),about:{}});
   }
-  const encounterId=await add('encounters',{personId,date:new Date().toISOString(),memory,rating:state.quick.rating||0,position:[],happened:[],health:[],notes:''});
+  const encounterId=await add('encounters',{personId,date:new Date().toISOString(),memory,rating:0,position:[],happened:[],health:[],notes:''});
   const p=await get('people',personId);
   if(memory){p.lastMemory=memory;await put('people',p)}
   state.selectedPersonId=personId;state.selectedEncounterId=encounterId;state.lastAddMode=mode;state.detailsReturn='postadd';state.screen='postadd';render();
@@ -196,13 +183,13 @@ async function renderPostAdd(){
       ${p.lastMemory?`<p>${esc(p.lastMemory)}</p>`:''}
     </div>
     <div class="postadd-two">
-      <button class="postadd-choice" id="aboutChoice"><span>ABOUT HIM</span><b>›</b></button>
-      <button class="postadd-choice" id="encounterChoice"><span>ENCOUNTER</span><b>›</b></button>
+      <button class="postadd-choice" id="aboutChoice"><span>WHO</span><b>›</b></button>
+      <button class="postadd-choice" id="encounterChoice"><span>WHAT · WHEN · HOW</span><b>›</b></button>
     </div>
     <button class="postadd-done" id="done">DONE</button>
   </main>`;
   document.getElementById('aboutChoice').onclick=()=>{state.screen='about';render()};
-  document.getElementById('encounterChoice').onclick=()=>{state.detailsTab='happened';state.detailsReturn='postadd';state.screen='details';render()};
+  document.getElementById('encounterChoice').onclick=()=>{state.detailsReturn='postadd';state.screen='encounterEdit';render()};
   document.getElementById('done').onclick=()=>{state.screen='person';render()};
 }
 
@@ -261,7 +248,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=49" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=50" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -283,7 +270,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=49" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=50" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -304,7 +291,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=49" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=50" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -312,7 +299,7 @@ async function renderAboutHim(){
   }
 
   app.innerHTML=`<main class="about-visual">
-    <div class="about-top"><button class="about-back" id="back">‹</button><div>ABOUT HIM</div><span></span></div>
+    <div class="about-top"><button class="about-back" id="back">‹</button><div>WHO</div><span></span></div>
     <nav class="about-tabs">
       <button data-page="age" class="${state.aboutPage==='age'?'on':''}">AGE</button>
       <button data-page="body" class="${state.aboutPage==='body'?'on':''}">BODY</button>
@@ -320,9 +307,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=49" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=49" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=49" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=50" alt=""></button>
     </div>
   </main>`;
 
@@ -344,11 +331,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=49`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=50`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=49`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=50`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -376,7 +363,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=49`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=50`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -390,7 +377,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=49`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=50`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -423,9 +410,9 @@ async function renderPenis(){
 
   app.innerHTML=`<main class="private-detail-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=49" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=49" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=49" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=50" alt=""></button>
     </nav>
 <section class="detail-block slider-detail">
       <div class="detail-title-row"><span>LENGTH</span></div>
@@ -536,9 +523,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=49" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=49" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=49" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=50" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -578,9 +565,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=49" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=49" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=49" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=50" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -614,6 +601,81 @@ document.getElementById('backDrops').onclick=async()=>{await save();state.screen
     document.querySelectorAll('[data-distance]').forEach(x=>x.classList.toggle('on',x===b));
     await save();
   });
+}
+
+
+async function renderEncounterEdit(){
+  const p=await get('people',state.selectedPersonId);
+  const e=state.selectedEncounterId?await get('encounters',state.selectedEncounterId):null;
+  if(!e) return;
+  e.happened ||= [];
+  e.activityDetails ||= {};
+  e.otherActivity ||= '';
+
+  const activities=[['Kiss','KISS'],['Oral','ORAL'],['Anal','ANAL'],['Rim','RIM'],['Other','OTHER']];
+  const detailOptions={
+    Oral:[['i-sucked','I sucked'],['he-sucked','He sucked'],['69','69']],
+    Anal:[['top','I topped'],['bottom','I bottomed'],['switch','We switched']],
+    Rim:[['i-rimmed','I rimmed'],['he-rimmed','He rimmed'],['both','Both']]
+  };
+  const detailHTML=key=>{
+    if(!e.happened.includes(key)||!detailOptions[key]) return '';
+    const cur=e.activityDetails[key]||'';
+    return `<div class="encounter-subchoices">${detailOptions[key].map(([v,l])=>`<button class="${cur===v?'on':''}" data-activity-detail="${key}" data-detail-value="${v}">${l}</button>`).join('')}</div>`;
+  };
+
+  app.innerHTML=`<main class="encounter-edit screen-enter">
+    <div class="about-top"><button class="about-back" id="backEncounterEdit">‹</button><div>ENCOUNTER</div><span></span></div>
+    <section class="enc-block">
+      <div class="enc-kicker">WHAT</div>
+      <div class="enc-activity-grid">${activities.map(([k,l])=>`<button class="enc-activity ${e.happened.includes(k)?'on':''}" data-activity="${k}">${l}</button>`).join('')}</div>
+      <div id="encDetails"></div>
+    </section>
+    <section class="enc-block">
+      <div class="enc-kicker">WHEN</div>
+      <input class="enc-date" id="encDate" type="date" value="${dateValue(e.date)}">
+    </section>
+    <section class="enc-block">
+      <div class="enc-kicker">HOW</div>
+      <div class="enc-rating">${[1,2,3,4,5].map(n=>`<button class="${n<=Number(e.rating||0)?'on':''}" data-enc-rating="${n}">★</button>`).join('')}</div>
+    </section>
+    <p class="enc-autosave">Everything saves as you go.</p>
+  </main>`;
+
+  const save=()=>put('encounters',e);
+  const redraw=()=>{
+    const h=document.getElementById('encDetails');
+    h.innerHTML=detailHTML('Oral')+detailHTML('Anal')+detailHTML('Rim')+
+      (e.happened.includes('Other')?`<input class="enc-other" id="otherActivity" maxlength="80" placeholder="What else?" value="${esc(e.otherActivity)}">`:'');
+    document.querySelectorAll('[data-activity-detail]').forEach(b=>b.onclick=async()=>{
+      const k=b.dataset.activityDetail,v=b.dataset.detailValue;
+      e.activityDetails[k]=e.activityDetails[k]===v?'':v;
+      await save(); redraw();
+    });
+    document.getElementById('otherActivity')?.addEventListener('input',ev=>{e.otherActivity=ev.target.value;save()});
+  };
+
+  document.getElementById('backEncounterEdit').onclick=async()=>{
+    const other=document.getElementById('otherActivity'); if(other)e.otherActivity=other.value.trim();
+    await save(); state.screen=state.detailsReturn==='person'?'person':'postadd'; render();
+  };
+  document.querySelectorAll('[data-activity]').forEach(b=>b.onclick=async()=>{
+    const k=b.dataset.activity;
+    const other=document.getElementById('otherActivity'); if(other)e.otherActivity=other.value;
+    if(e.happened.includes(k)){e.happened=e.happened.filter(x=>x!==k);delete e.activityDetails[k]}
+    else e.happened.push(k);
+    await save(); b.classList.toggle('on',e.happened.includes(k)); redraw();
+  });
+  document.getElementById('encDate').onchange=async ev=>{
+    const old=new Date(e.date||Date.now()), [y,m,d]=ev.target.value.split('-').map(Number);
+    old.setFullYear(y,m-1,d); e.date=old.toISOString(); await save();
+  };
+  document.querySelectorAll('[data-enc-rating]').forEach(b=>b.onclick=async()=>{
+    const n=Number(b.dataset.encRating); e.rating=e.rating===n?0:n;
+    document.querySelectorAll('[data-enc-rating]').forEach(x=>x.classList.toggle('on',Number(x.dataset.encRating)<=e.rating));
+    await save();
+  });
+  redraw();
 }
 
 async function renderDetails(){
@@ -685,7 +747,7 @@ async function renderEncounter(){
  <div class="section-title"><h2>Add / edit</h2><span>this encounter</span></div><div class="encounter-actions"><button class="secondary" data-edit="position">Position</button><button class="secondary" data-edit="happened">What happened</button><button class="secondary" data-edit="health">Health</button></div>
  <p class="small" style="text-align:center;margin-top:16px">🔒 Stored on this device</p>`;
  document.getElementById('back').onclick=()=>{state.screen='person';render()};
- document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{state.detailsTab=b.dataset.edit;state.detailsReturn='encounter';state.screen='details';render()});
+ document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{state.detailsReturn='person';state.screen='encounterEdit';render()});
 }
 
 async function renderCollection(){
@@ -705,7 +767,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=4.9');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=5.0');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

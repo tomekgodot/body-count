@@ -1,20 +1,19 @@
-# Body Count PWA prototype
+# Body Count PWA v1.3
 
-Local-first prototype. No backend, no account, no analytics. Data is stored in IndexedDB in the browser on the current device.
+A local-first prototype focused on people first, encounters second.
 
-## Run locally
-Because service workers require http(s), run a local server from this folder, for example:
-
-```bash
-python -m http.server 8080
-```
-
-Then open http://localhost:8080.
-
-## Current flow
-Home → Add to the Count → optional detail categories → person profile / collection.
+## v1.3
+- Home "Latest additions" now means people, not encounters.
+- Collection has search by name / Mental Note.
+- Person profile is now a real hub: identity, Mental Note, average rating, repeat count, optional detail modules, and encounter history.
+- Encounters open into their own compact detail view.
+- Optional details can be edited later from the person profile, not only immediately after adding someone.
+- Existing local IndexedDB data is preserved.
+- No backend, no account, no analytics.
 
 
-## v1.1
-- Quick Add now uses **Mental note** with the placeholder “The one thing you’ll remember…”
-- Mental note is capped at 60 characters to keep logging fast.
+## v1.4
+- Shazam-style home: one central BC action only
+- New bottom nav: Count / People / Insights / You
+- Brand palette and BC artwork integrated as the visual anchor
+- No latest additions or stats on the first screen

@@ -1238,62 +1238,50 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
 }
 .load-text-options{margin-top:10px}
 
-/* v4.3 — standalone private icons + shared tab navigation */
+/* v4.4 — repaired About Him interactions and simpler standalone icons */
 .persistent-symbols{
-  width:min(90%,390px);
-  gap:12px;
+  width:min(88%,370px);
+  gap:14px;
 }
 .art-symbol{
-  overflow:visible!important;
+  border:0!important;
   background:transparent!important;
-  border-radius:50%;
+  padding:0!important;
+  overflow:visible!important;
 }
 .art-symbol img{
   width:100%;
   height:100%;
   object-fit:contain!important;
-  transform:none!important;
-  border-radius:50%;
   display:block;
+  border-radius:50%;
 }
 
 .private-tabs{
   width:min(100%,430px);
-  margin:2px auto 12px;
+  margin:4px auto 14px;
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:20px;
-  overflow:hidden;
-  background:#090909;
+  gap:8px;
 }
 .private-tabs button{
-  appearance:none;
-  border:0;
-  background:transparent;
-  padding:7px 12px;
-  min-height:72px;
-  position:relative;
-}
-.private-tabs button + button{
-  border-left:1px solid rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.10);
+  background:#0b0b0b;
+  border-radius:18px;
+  min-height:66px;
+  padding:5px;
 }
 .private-tabs button.on{
-  background:linear-gradient(180deg,rgba(239,176,164,.17),rgba(239,176,164,.08));
-  box-shadow:inset 0 0 0 1px rgba(239,176,164,.25);
+  border-color:rgba(239,155,139,.48);
+  background:rgba(239,155,139,.10);
+  box-shadow:0 0 0 1px rgba(239,155,139,.08) inset;
 }
 .private-tabs img{
-  width:54px;
-  height:54px;
+  width:52px;
+  height:52px;
+  object-fit:contain;
   display:block;
   margin:auto;
-  object-fit:contain;
+  opacity:.62;
 }
-.private-tabs button:not(.on) img{
-  opacity:.58;
-  transform:scale(.92);
-}
-.private-tabs button.on img{
-  opacity:1;
-  transform:scale(1);
-}
+.private-tabs button.on img{opacity:1}

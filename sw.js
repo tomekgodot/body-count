@@ -1,15 +1,26 @@
-const CACHE='body-count-v3.3.1';
+const CACHE='body-count-v3.4';
 const ASSETS=[
 './',
 './index.html',
-'./styles.css?v=3.3.1',
-'./app.js?v=3.3.1',
-'./manifest.webmanifest?v=3.3.1',
+'./styles.css?v=3.4',
+'./app.js?v=3.4',
+'./manifest.webmanifest?v=3.4',
 './icon.svg',
 './brand-mark.png',
-'./assets/age-portrait.jpg?v=331',
-'./assets/body-figure.jpg?v=331',
-'./assets/type-portrait.jpg?v=331'
+  './assets/age-young.jpg?v=34',
+  './assets/age-30s.jpg?v=34',
+  './assets/age-middle.jpg?v=34',
+  './assets/age-older.jpg?v=34',
+  './assets/body-slim.jpg?v=34',
+  './assets/body-average.jpg?v=34',
+  './assets/body-athletic.jpg?v=34',
+  './assets/body-big.jpg?v=34',
+  './assets/type-twink.jpg?v=34',
+  './assets/type-twonk.jpg?v=34',
+  './assets/type-otter.jpg?v=34',
+  './assets/type-average.jpg?v=34',
+  './assets/type-bear.jpg?v=34',
+  './assets/type-daddy.jpg?v=34'
 ];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

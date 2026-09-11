@@ -967,3 +967,12 @@ html,body{
   letter-spacing:.04em; color:rgba(255,255,255,.22);
   pointer-events:none; user-select:none;
 }
+
+/* v3.4 — real state assets, no UI baked into images */
+.age-photo-wrap{background:#070707}
+.age-photo{object-fit:cover;object-position:center center;border-radius:24px}
+.body-photo{object-fit:contain!important;object-position:center bottom!important;background:#070707}
+.type-photo{object-fit:cover!important;object-position:center center!important;filter:none!important;transform:none!important}
+.wheel-face.twink .type-photo,.wheel-face.twonk .type-photo,.wheel-face.otter .type-photo,
+.wheel-face.otter-daddy .type-photo,.wheel-face.daddy .type-photo,.wheel-face.daddy-bear .type-photo,
+.wheel-face.bear .type-photo,.wheel-face.young-bear .type-photo{filter:none!important;transform:none!important}

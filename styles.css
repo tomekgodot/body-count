@@ -1015,3 +1015,20 @@ html,body{
   .detail-pills.four{grid-template-columns:repeat(2,1fr)}
   .curve-grid{grid-template-columns:repeat(5,1fr);gap:4px}
 }
+
+/* v3.7 — continuous measurement controls */
+.live-measure{min-height:44px;display:flex;align-items:baseline;justify-content:center;gap:5px;margin:1px 0 7px}
+.live-measure strong{font-size:30px;font-weight:650}.live-measure span{font-size:11px;color:rgba(255,255,255,.38)}
+.live-measure b{margin-left:8px;font-size:13px;font-weight:600;color:#efb0a4}
+.measure-slider{width:100%;accent-color:#ef9b8b;margin:4px 0 11px}
+.size-pills{display:grid;gap:6px}
+.size-pills.five{grid-template-columns:repeat(5,1fr)}
+.size-pills.four{grid-template-columns:repeat(4,1fr)}
+.size-pills button{border:1px solid rgba(255,255,255,.12);background:#0b0b0b;color:rgba(255,255,255,.62);border-radius:15px;padding:9px 3px;font-size:11px}
+.size-pills button.on,.size-pills button.soft-on{color:#f7e5df;border-color:rgba(239,155,139,.42);background:rgba(239,155,139,.10)}
+.size-pills button.soft-on{background:rgba(239,155,139,.055)}
+.measure-note{text-align:right;margin-top:5px;font-size:9px;color:rgba(255,255,255,.24);letter-spacing:.04em}
+.curve-grid.three{grid-template-columns:repeat(3,1fr);gap:9px}
+.curve-grid.three button{padding:8px 5px}
+.curve-grid svg{width:54px;height:30px;overflow:visible}
+.curve-grid svg path{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}

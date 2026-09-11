@@ -102,8 +102,7 @@ async function renderAdd(){
     `}
 
     <div class="quick-field mental-note-field">
-      <label class="quick-label" for="memory">MENTAL NOTE</label>
-      <textarea id="memory" maxlength="60" placeholder="The one thing you’ll remember…">${esc(state.quick.memory||'')}</textarea>
+      <textarea id="memory" maxlength="60" placeholder="What you’ll remember him by…">${esc(state.quick.memory||'')}</textarea>
     </div>
 
     <div class="quick-rating-block">

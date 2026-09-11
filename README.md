@@ -74,3 +74,8 @@ A local-first prototype focused on people first, encounters second.
 - Mirrored eggplant so the fruit composition closes around the center
 - Added explicit MENTAL NOTE label
 - Replaced star rating with a clear 1–5 numeric rating control
+
+
+## v2.3
+- Removed the MENTAL NOTE label
+- Memory cue is now the in-field placeholder: “What you’ll remember him by…”

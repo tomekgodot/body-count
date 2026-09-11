@@ -1,7 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-<defs><linearGradient id="s" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0d6ca"/><stop offset="1" stop-color="#c98e82"/></linearGradient></defs>
-<circle cx="60" cy="60" r="53" fill="#090909" stroke="#c79b8c" stroke-width="2"/>
-<path d="M58 34c5 1 10-1 14-5 2 5 0 10-4 14" fill="none" stroke="#b9a56e" stroke-width="3.5" stroke-linecap="round"/>
-<path d="M61 41c-10 2-20 8-27 18-8 12-8 24 0 32 8 8 21 8 32 3 14-6 25-19 25-33 0-13-11-22-23-21-2 0-5 0-7 1Z" fill="none" stroke="url(#s)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M47 52c-8 7-13 17-13 27" fill="none" stroke="#f4ded5" stroke-width="2.2" stroke-linecap="round" opacity=".8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+
+<defs>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f9e4d4"/>
+    <stop offset=".48" stop-color="#e9b99d"/>
+    <stop offset="1" stop-color="#b77a69"/>
+  </linearGradient>
+  <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="3.8" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <radialGradient id="bg" cx="50%" cy="45%" r="60%">
+    <stop offset="0" stop-color="#17110e"/>
+    <stop offset="1" stop-color="#080808"/>
+  </radialGradient>
+</defs>
+<circle cx="80" cy="80" r="52" fill="url(#bg)" stroke="url(#gold)" stroke-width="1.8" opacity=".98" filter="url(#glow)"/>
+<g fill="none" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+  <path d="M70 52c5-2 9-6 11-12 4 5 5 10 3 15 5-1 10-1 14 2-5 5-11 7-17 6" stroke-width="2.2"/>
+  <path d="M80 61c-13 4-23 14-27 26-4 12-1 22 8 28 9 7 22 6 32 0 13-8 22-21 22-34 0-12-8-21-19-23-6-1-11 0-16 3Z" stroke-width="3"/>
+  <path d="M70 69c-7 6-12 14-13 22" stroke-width="1.5" opacity=".72"/>
+</g>
 </svg>

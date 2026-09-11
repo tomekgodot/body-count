@@ -1351,3 +1351,29 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   width:58px!important;height:58px!important;object-fit:contain!important;
   border-radius:0!important;transform:none!important;filter:none!important
 }
+
+/* v4.7 — truly standalone private icons with safe internal margins */
+.art-symbol{
+  overflow:visible!important;
+  border-radius:0!important;
+}
+.art-symbol img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  border-radius:0!important;
+  transform:none!important;
+  filter:none!important;
+}
+.private-tabs button{
+  overflow:visible!important;
+  padding:4px 8px!important;
+}
+.private-tabs img{
+  width:62px!important;
+  height:62px!important;
+  object-fit:contain!important;
+  border-radius:0!important;
+  transform:none!important;
+  filter:none!important;
+}

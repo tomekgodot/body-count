@@ -210,7 +210,7 @@ async function renderAboutHim(){
   const heightBand=a.heightExact?heightBandFor(height):(a.heightBand||'medium');
 
   const weight=Number(a.weightExact||80);
-  const builds=['slim','average','athletic','stocky','chubby'];
+  const builds=['slim','average','athletic','big'];
   const build=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'average';
 
   const typeAnchors=[
@@ -256,19 +256,23 @@ async function renderAboutHim(){
     panel=`<section class="visual-panel body-panel-v3">
       <div class="body-visual-grid">
         <div class="height-control">
-          <div class="axis-label tall">Tall</div>
-          <input id="heightSlider" class="vertical-range" type="range" min="150" max="210" value="${height}" orient="vertical" aria-label="Exact height">
-          <div class="axis-label medium">Medium</div>
-          <div class="axis-label short">Short</div>
+          <div class="height-label-rail">
+            <button class="axis-label tall">Tall</button>
+            <button class="axis-label medium">Medium</button>
+            <button class="axis-label short">Short</button>
+          </div>
+          <div class="height-slider-rail">
+            <input id="heightSlider" class="vertical-range" type="range" min="150" max="210" value="${height}" orient="vertical" aria-label="Exact height">
+          </div>
         </div>
         <div class="body-center">
-          <div class="mode-value body-main-value"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong></div>
+          <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
           <div class="figure-wrap body-figure-wrap">${figure('body-figure')}</div>
         </div>
       </div>
       <div class="weight-block">
         <div class="mode-value weight-value"><strong id="weightValue">${exactW?weight+' kg':'Weight'}</strong></div>
-        <input id="weightSlider" class="range weight-range" type="range" min="45" max="160" value="${weight}" aria-label="Exact weight">
+        <input id="weightSlider" class="range weight-range" type="range" min="50" max="110" value="${Math.max(50,Math.min(110,weight))}" aria-label="Exact weight">
       </div>
       <div class="build-label">BUILD</div>
       <div class="quick-categories build-cats">
@@ -285,7 +289,15 @@ async function renderAboutHim(){
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
         <div class="wheel-face ${typeNow.key}" id="wheelFace">
-          <div class="face-hair"></div><div class="face-head"></div><div class="face-neck"></div>
+          <div class="portrait-hair"></div>
+          <div class="portrait-head">
+            <div class="portrait-brow brow-l"></div><div class="portrait-brow brow-r"></div>
+            <div class="portrait-eye eye-l"></div><div class="portrait-eye eye-r"></div>
+            <div class="portrait-nose"></div><div class="portrait-mouth"></div>
+            <div class="portrait-beard"></div>
+          </div>
+          <div class="portrait-neck"></div>
+          <div class="portrait-shoulders"></div>
         </div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
@@ -342,7 +354,7 @@ async function renderAboutHim(){
     };
     const paintWeight=()=>{
       const n=Number(ws.value);p.about.weightExact=String(n);wv.textContent=n+' kg';
-      document.querySelectorAll('[data-build]').forEach(x=>x.classList.remove('on'));
+      
     };
     hs.oninput=paintHeight; ws.oninput=paintWeight; hs.onchange=async()=>{paintHeight();await persist()}; ws.onchange=async()=>{paintWeight();await persist()};
     document.querySelectorAll('.axis-label').forEach(lbl=>lbl.onclick=async()=>{
@@ -352,7 +364,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.weightExact='';p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;wv.textContent=b.textContent;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -364,7 +376,7 @@ async function renderAboutHim(){
       typeAngle=normAngle(deg);typeNow=typeFromAngle(typeAngle);p.about.typeAngle=String(typeAngle);p.about.types=[typeNow.key];
       const r=116,rad=typeAngle*Math.PI/180,cx=140,cy=140;
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
-      value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;
+      value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;

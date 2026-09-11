@@ -129,3 +129,17 @@ A local-first prototype focused on people first, encounters second.
 - Removed SAVE from About Him
 - About Him now autosaves selections/changes immediately
 - Bumped service worker cache
+
+
+## v3.1
+- Height labels moved off the slider rail
+- Height and build are shown together above the figure
+- Build simplified to Slim / Average / Athletic / Big
+- Weight range changed to 50–110 kg, with 80 kg at midpoint
+
+
+## v3.2
+- TYPE now uses a single stylized central portrait only
+- Removed any thumbnail-like visual treatment around category anchors
+- Stronger archetype differentiation: blond/younger Twink, darker Otter, grey Daddy, broader fuller-bearded Bear
+- Dot remains the only moving control around the wheel

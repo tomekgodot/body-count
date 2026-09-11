@@ -792,3 +792,133 @@ html,body{
 /* v3.0.1 */
 .star-wide-btn.on{color:#f3b04f!important;opacity:1!important}
 .about-visual .about-save{display:none!important}
+
+/* v3.1 body polish */
+.body-visual-grid{grid-template-columns:86px 1fr}
+.height-control{height:285px;position:relative;display:grid;grid-template-columns:46px 40px;align-items:stretch}
+.height-label-rail{position:relative;height:100%}
+.height-slider-rail{position:relative;height:100%;display:flex;justify-content:center;align-items:center}
+.height-label-rail .axis-label{position:absolute;left:0;width:44px;padding:4px 2px;border:0;background:transparent;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.28)}
+.height-label-rail .axis-label.tall{top:5px}.height-label-rail .axis-label.medium{top:50%;transform:translateY(-50%)}.height-label-rail .axis-label.short{bottom:5px}
+.height-label-rail .axis-label.on,.height-label-rail .axis-label.soft-on{color:#f3b0a3}
+.height-slider-rail .vertical-range{position:absolute;left:50%;top:50%;width:235px;transform:translate(-50%,-50%) rotate(-90deg);margin:0}
+.body-summary{min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin-bottom:-8px;text-align:center}
+.body-summary strong{font-size:23px;font-weight:650}.body-summary span{font-size:13px;color:rgba(255,255,255,.48)}
+.build-cats{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:6px!important;width:100%!important;flex-wrap:nowrap!important}
+.build-cats button{padding:9px 5px!important;white-space:nowrap;font-size:11px!important}
+.weight-range{width:88%}
+
+/* v3.2 — single stylized central portrait for TYPE */
+.type-wheel{width:292px;height:292px}
+.wheel-track{inset:23px;border-color:rgba(239,155,139,.24)}
+.wheel-label{font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,.42)}
+.wheel-knob{
+  width:14px;height:14px;
+  background:#f1b7aa;
+  box-shadow:0 0 0 4px rgba(241,183,170,.10),0 0 14px rgba(241,183,170,.20);
+}
+.wheel-face{
+  position:absolute;left:50%;top:50%;
+  width:146px;height:172px;
+  transform:translate(-50%,-50%);
+  transition:transform .22s ease,filter .22s ease,opacity .22s ease;
+  opacity:.93;
+}
+.portrait-head{
+  position:absolute;left:43px;top:24px;width:60px;height:78px;
+  border:2px solid rgba(239,155,139,.72);
+  border-radius:46% 46% 43% 43%;
+  background:linear-gradient(180deg,rgba(239,155,139,.055),rgba(255,255,255,.012));
+  transition:.22s ease;
+}
+.portrait-hair{
+  position:absolute;left:41px;top:15px;width:64px;height:34px;
+  border-top:7px solid rgba(215,190,150,.72);
+  border-radius:50% 50% 34% 34%;
+  transform:rotate(-4deg);
+  transition:.22s ease;
+}
+.portrait-brow{position:absolute;top:25px;width:15px;height:2px;background:rgba(255,255,255,.42);border-radius:10px}
+.brow-l{left:11px;transform:rotate(-4deg)}.brow-r{right:11px;transform:rotate(4deg)}
+.portrait-eye{position:absolute;top:34px;width:5px;height:3px;border-radius:50%;background:rgba(255,255,255,.62)}
+.eye-l{left:16px}.eye-r{right:16px}
+.portrait-nose{position:absolute;left:29px;top:40px;width:2px;height:15px;background:rgba(255,255,255,.22);border-radius:10px}
+.portrait-mouth{position:absolute;left:20px;top:61px;width:20px;height:2px;background:rgba(255,255,255,.30);border-radius:10px}
+.portrait-beard{
+  position:absolute;left:8px;right:8px;bottom:2px;height:28px;
+  border-bottom:0 solid rgba(72,50,42,.62);
+  border-radius:0 0 45% 45%;
+  opacity:0;
+  transition:.22s ease;
+}
+.portrait-neck{
+  position:absolute;left:58px;top:101px;width:30px;height:34px;
+  border-left:2px solid rgba(239,155,139,.48);border-right:2px solid rgba(239,155,139,.48);
+  transition:.22s ease;
+}
+.portrait-shoulders{
+  position:absolute;left:14px;top:125px;width:118px;height:42px;
+  border-top:2px solid rgba(239,155,139,.52);
+  border-radius:50% 50% 0 0;
+  transition:.22s ease;
+}
+
+/* TWINK: younger, lighter/blond, narrower, clean-shaven */
+.wheel-face.twink{transform:translate(-50%,-50%) scale(.92)}
+.wheel-face.twink .portrait-hair{
+  border-top-color:rgba(229,207,153,.86);border-top-width:8px;
+  width:66px;left:40px;top:14px;
+}
+.wheel-face.twink .portrait-head{width:57px;left:45px;border-radius:49% 49% 45% 45%}
+.wheel-face.twink .portrait-shoulders{left:24px;width:98px}
+.wheel-face.twink .portrait-beard{opacity:0}
+
+/* TWONK: young but broader / more athletic */
+.wheel-face.twonk{transform:translate(-50%,-50%) scale(.98)}
+.wheel-face.twonk .portrait-hair{border-top-color:rgba(180,145,100,.82)}
+.wheel-face.twonk .portrait-shoulders{left:17px;width:112px}
+.wheel-face.twonk .portrait-beard{opacity:.12;border-bottom-width:3px}
+
+/* OTTER: darker hair, lean, lightly hairy/bearded */
+.wheel-face.otter,.wheel-face.otter-daddy{transform:translate(-50%,-50%) scale(.99)}
+.wheel-face.otter .portrait-hair,.wheel-face.otter-daddy .portrait-hair{
+  border-top-color:rgba(70,49,40,.92);border-top-width:6px;
+}
+.wheel-face.otter .portrait-beard{opacity:.42;border-bottom-width:5px;border-bottom-color:rgba(78,52,42,.72)}
+.wheel-face.otter .portrait-shoulders{left:16px;width:114px}
+
+/* DADDY: older, greying, firmer jaw, more facial hair */
+.wheel-face.daddy,.wheel-face.daddy-bear{transform:translate(-50%,-50%) scale(1.03)}
+.wheel-face.daddy .portrait-hair,.wheel-face.daddy-bear .portrait-hair{
+  border-top-color:rgba(168,166,160,.88);border-top-width:6px;
+}
+.wheel-face.daddy .portrait-head,.wheel-face.daddy-bear .portrait-head{
+  width:63px;left:42px;border-radius:43% 43% 39% 39%;
+}
+.wheel-face.daddy .portrait-beard{opacity:.58;border-bottom-width:7px;border-bottom-color:rgba(135,133,128,.72)}
+.wheel-face.daddy .portrait-brow,.wheel-face.daddy-bear .portrait-brow{background:rgba(220,220,216,.48)}
+.wheel-face.daddy .portrait-shoulders{left:12px;width:122px}
+
+/* BEAR: larger, darker, fuller beard/hair and broader frame */
+.wheel-face.bear,.wheel-face.young-bear{transform:translate(-50%,-50%) scale(1.10)}
+.wheel-face.bear .portrait-hair,.wheel-face.young-bear .portrait-hair{
+  border-top-color:rgba(57,40,33,.94);border-top-width:9px;
+}
+.wheel-face.bear .portrait-head{
+  width:68px;height:80px;left:39px;border-radius:44% 44% 42% 42%;
+}
+.wheel-face.bear .portrait-beard,.wheel-face.daddy-bear .portrait-beard{
+  opacity:.90;border-bottom-width:11px;border-bottom-color:rgba(61,42,35,.88);
+}
+.wheel-face.bear .portrait-shoulders,.wheel-face.daddy-bear .portrait-shoulders{
+  left:4px;width:138px;border-top-width:3px;
+}
+.wheel-face.young-bear .portrait-beard{opacity:.72;border-bottom-width:8px;border-bottom-color:rgba(72,49,39,.80)}
+.wheel-face.daddy-bear .portrait-hair{border-top-color:rgba(126,122,118,.90)}
+.wheel-face.daddy-bear .portrait-head{width:67px;left:40px}
+
+/* Transitional archetype */
+.wheel-face.otter-daddy .portrait-hair{border-top-color:rgba(107,95,88,.90)}
+.wheel-face.otter-daddy .portrait-beard{opacity:.58;border-bottom-width:7px;border-bottom-color:rgba(100,83,72,.78)}
+
+.face-head,.face-neck,.face-hair{display:none!important}

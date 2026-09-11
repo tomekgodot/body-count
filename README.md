@@ -24,3 +24,10 @@ A local-first prototype focused on people first, encounters second.
 - Added a pulsing + action badge and a subtle breathing animation.
 - Added a single CTA label: ADD SOMEONE.
 - Tap feedback contracts the button and fades the + before Quick Add.
+
+
+## v1.6
+- Home now uses only peach + eggplant, no BC letters.
+- The main circle breathes slowly; the + pulses faster.
+- Clear “Tap to add someone” hint points to the action.
+- Softer blur/scale transition into Quick Add.

@@ -52,20 +52,23 @@ function attachNav(){document.querySelectorAll('[data-nav]').forEach(b=>b.onclic
 async function renderHome(){
   app.innerHTML=`<main class="count-home" aria-label="Body Count home">
     <div class="count-cta-wrap">
-      <button class="bc-action" id="addBtn" aria-label="Add someone">
+      <button class="bc-action" id="addBtn" aria-label="Tap to add someone">
         <span class="bc-action-halo" aria-hidden="true"></span>
-        <span class="bc-action-core">
-          <img src="brand-mark.png" alt="" class="bc-action-image">
+        <span class="bc-action-core" aria-hidden="true">
+          <span class="fruit fruit-peach">🍑</span>
+          <span class="fruit fruit-eggplant">🍆</span>
         </span>
         <span class="bc-plus" aria-hidden="true">+</span>
+        <span class="tap-hint" aria-hidden="true"><span class="tap-arrow">↖</span> Tap to add someone</span>
       </button>
-      <div class="count-cta-label">ADD SOMEONE</div>
     </div>
   </main>${nav('home')}`;
   document.getElementById('addBtn').onclick=()=>{
     const btn=document.getElementById('addBtn');
+    const home=document.querySelector('.count-home');
     btn.classList.add('pressed');
-    setTimeout(()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()},220);
+    home?.classList.add('leaving');
+    setTimeout(()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()},360);
   };
   attachNav();
 }
@@ -79,7 +82,7 @@ async function renderAdd(){
   const people=(await all('people')).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
   const mode=state.quick.mode||'new';
   const selected=state.quick.personId?people.find(p=>p.id===state.quick.personId):null;
-  app.innerHTML=`<button class="linkbtn" id="back">← Back</button><h1 class="screen-title">Add to the count</h1><p class="sub">New guy by default. Been here before? Add another time to someone already in your count.</p>
+  app.innerHTML=`<section class="add-screen screen-enter"><button class="linkbtn" id="back">← Back</button><h1 class="screen-title">Add to the count</h1><p class="sub">New guy by default. Been here before? Add another time to someone already in your count.</p>
   <div class="mode-switch">
     <button class="mode-btn ${mode==='new'?'on':''}" data-mode="new">NEW GUY</button>
     <button class="mode-btn ${mode==='existing'?'on':''}" data-mode="existing">ALREADY IN MY COUNT</button>
@@ -88,7 +91,7 @@ async function renderAdd(){
   <div class="field"><label>Mental note</label><textarea id="memory" maxlength="60" placeholder="The one thing you’ll remember…">${esc(state.quick.memory||'')}</textarea></div>
   <div class="field"><label>Rating</label><div class="stars">${[1,2,3,4,5].map(n=>`<button class="star ${state.quick.rating>=n?'on':''}" data-star="${n}">★</button>`).join('')}</div><div class="small" style="margin-top:7px">Optional, like everything else here.</div></div>
   <button class="primary" id="save" ${mode==='existing'&&!selected?'disabled':''}>${mode==='new'?'ADD TO THE COUNT':'ADD ANOTHER TIME'}</button>
-  <p class="small" style="text-align:center;margin-top:13px">🔒 Stored locally on this device</p>`;
+  <p class="small" style="text-align:center;margin-top:13px">🔒 Stored locally on this device</p></section>`;
   document.getElementById('back').onclick=()=>{state.screen='home';render()};
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.quick={rating:state.quick.rating||0,name:document.getElementById('name')?.value||'',memory:document.getElementById('memory')?.value||'',mode:b.dataset.mode};renderAdd()});
   document.querySelectorAll('[data-pick-person]').forEach(b=>b.onclick=()=>{state.quick.personId=Number(b.dataset.pickPerson);state.quick.memory=document.getElementById('memory').value;renderAdd()});

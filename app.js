@@ -63,7 +63,7 @@ async function renderHome(){
 function renderAdd(){
   app.innerHTML=`<button class="linkbtn" id="back">← Back</button><h1 class="screen-title">Add to the count</h1><p class="sub">Three things. All optional. Done in seconds.</p>
   <div class="field"><label>Name / nickname</label><input class="input" id="name" placeholder="Alex, gym guy, ???" value="${esc(state.quick.name||'')}"></div>
-  <div class="field"><label>How will you remember him?</label><textarea id="memory" placeholder="Finnish guy, beard, Kallio…">${esc(state.quick.memory||'')}</textarea></div>
+  <div class="field"><label>Mental note</label><textarea id="memory" maxlength="60" placeholder="The one thing you’ll remember…">${esc(state.quick.memory||'')}</textarea></div>
   <div class="field"><label>Rating</label><div class="stars">${[1,2,3,4,5].map(n=>`<button class="star ${state.quick.rating>=n?'on':''}" data-star="${n}">★</button>`).join('')}</div><div class="small" style="margin-top:7px">Tap again later if you change your mind.</div></div>
   <button class="primary" id="save">ADD TO THE COUNT</button>
   <p class="small" style="text-align:center;margin-top:13px">🔒 Stored locally on this device</p>`;

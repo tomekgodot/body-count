@@ -13,3 +13,8 @@ Then open http://localhost:8080.
 
 ## Current flow
 Home → Add to the Count → optional detail categories → person profile / collection.
+
+
+## v1.1
+- Quick Add now uses **Mental note** with the placeholder “The one thing you’ll remember…”
+- Mental note is capped at 60 characters to keep logging fast.

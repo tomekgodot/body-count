@@ -101,12 +101,16 @@ async function renderAdd(){
       ${people.length ? `<div class="people-picker quick-picker">${people.map(p=>`<button class="pick-person ${selected?.id===p.id?'on':''}" data-pick-person="${p.id}"><b>${esc(displayName(p))}</b><span>${esc(p.lastMemory||`#${String(p.id).padStart(3,'0')}`)}</span></button>`).join('')}</div>` : `<div class="quick-empty">Nobody here yet.</div>`}
     `}
 
-    <div class="quick-field">
+    <div class="quick-field mental-note-field">
+      <label class="quick-label" for="memory">MENTAL NOTE</label>
       <textarea id="memory" maxlength="60" placeholder="The one thing you’ll remember…">${esc(state.quick.memory||'')}</textarea>
     </div>
 
-    <div class="quick-rating" aria-label="Rating">
-      ${[1,2,3,4,5].map(n=>`<button class="star ${state.quick.rating>=n?'on':''}" data-star="${n}" aria-label="${n} star${n>1?'s':''}">★</button>`).join('')}
+    <div class="quick-rating-block">
+      <div class="quick-label">RATING</div>
+      <div class="quick-rating" aria-label="Rating from 1 to 5">
+        ${[1,2,3,4,5].map(n=>`<button class="rating-btn ${state.quick.rating===n?'on':''}" data-star="${n}" aria-label="Rating ${n} out of 5">${n}</button>`).join('')}
+      </div>
     </div>
 
     <button class="primary quick-save" id="save" ${mode==='existing'&&!selected?'disabled':''}>ADD</button>

@@ -68,3 +68,9 @@ A local-first prototype focused on people first, encounters second.
 - Fixed bottom navigation alignment and spacing
 - Simplified Quick Add to name, memory, rating and one ADD action
 - Repeat encounter moved behind a subtle 'Already in your count?' link
+
+
+## v2.2
+- Mirrored eggplant so the fruit composition closes around the center
+- Added explicit MENTAL NOTE label
+- Replaced star rating with a clear 1–5 numeric rating control

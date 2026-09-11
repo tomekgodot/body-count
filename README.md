@@ -114,3 +114,11 @@ A local-first prototype focused on people first, encounters second.
 - BODY combines height and build, including two-dimensional touch gesture
 - TYPE is a selectable visual carousel with multi-select
 - 🍆 🍑 💦 stay persistently available below the visual editor
+
+
+## v3.0
+- Cumulative star rating fill
+- Age exact/category modes with contextual category highlight
+- Vertical height control and horizontal exact weight
+- Build as categorical alternative to exact weight
+- Circular continuous TYPE wheel with blended archetypes

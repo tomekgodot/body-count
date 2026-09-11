@@ -51,15 +51,15 @@ function attachNav(){document.querySelectorAll('[data-nav]').forEach(b=>b.onclic
 
 async function renderHome(){
   app.innerHTML=`<main class="count-home" aria-label="Body Count home">
+    <div class="home-brand">BODY COUNT</div>
     <div class="count-cta-wrap">
-      <button class="bc-action" id="addBtn" aria-label="Tap to add someone">
+      <button class="bc-action" id="addBtn" aria-label="Add someone">
         <span class="bc-action-halo" aria-hidden="true"></span>
         <span class="bc-action-core" aria-hidden="true">
           <span class="fruit fruit-peach">🍑</span>
           <span class="fruit fruit-eggplant">🍆</span>
         </span>
         <span class="bc-plus" aria-hidden="true">+</span>
-        <span class="tap-hint" aria-hidden="true"><span class="tap-arrow">↖</span> Tap to add someone</span>
       </button>
     </div>
   </main>${nav('home')}`;

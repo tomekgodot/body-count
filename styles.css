@@ -64,13 +64,18 @@ button{cursor:pointer}
 }
 .count-home{
   min-height:calc(100vh - 132px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  display:grid;
-  place-items:center;
-  padding:24px 8px 42px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:12px 8px 42px;
   transition:opacity .28s ease,transform .34s cubic-bezier(.2,.8,.2,1),filter .28s ease;
 }
+.home-brand{
+  width:100%;text-align:center;margin-top:2px;
+  font-size:22px;font-weight:900;letter-spacing:.16em;color:var(--ink);
+}
 .count-home.leaving{opacity:0;transform:scale(1.045);filter:blur(8px)}
-.count-cta-wrap{display:flex;flex-direction:column;align-items:center;width:100%}
+.count-cta-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;padding-bottom:8px}
 .bc-action{
   width:min(74vw,350px);
   aspect-ratio:1;
@@ -94,9 +99,13 @@ button{cursor:pointer}
   background:radial-gradient(circle at 34% 26%,#2d2230 0,#1d1722 38%,#151119 76%);
   box-shadow:0 28px 70px rgba(44,22,43,.20),0 10px 28px rgba(44,22,43,.15),inset 0 0 0 1px rgba(255,255,255,.09)
 }
-.fruit{position:absolute;display:block;line-height:1;filter:drop-shadow(0 12px 18px rgba(0,0,0,.22));user-select:none;-webkit-user-select:none}
-.fruit-peach{font-size:min(34vw,160px);left:8%;top:26%;transform:rotate(-9deg);animation:peachFloat 3.35s ease-in-out infinite}
-.fruit-eggplant{font-size:min(37vw,174px);right:4%;top:20%;transform:rotate(22deg);animation:eggplantFloat 3.35s ease-in-out infinite}
+.fruit{
+  position:absolute;display:block;line-height:1;user-select:none;-webkit-user-select:none;
+  opacity:.58;filter:saturate(.72) contrast(.92) brightness(1.08) drop-shadow(0 9px 14px rgba(0,0,0,.14));
+  mix-blend-mode:screen;
+}
+.fruit-peach{font-size:min(42vw,196px);left:-1%;top:23%;transform:rotate(-8deg);animation:peachFloat 3.35s ease-in-out infinite}
+.fruit-eggplant{font-size:min(45vw,210px);right:-5%;top:16%;transform:rotate(21deg);animation:eggplantFloat 3.35s ease-in-out infinite}
 .bc-action-halo{
   position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(124,85,127,.16);
   box-shadow:0 0 0 0 rgba(239,155,139,.17);animation:bcHalo 3.35s ease-in-out infinite;pointer-events:none
@@ -108,17 +117,8 @@ button{cursor:pointer}
   font-size:42px;font-weight:350;line-height:1;padding-bottom:5px;animation:bcPlusPulse 1.7s ease-in-out infinite;
   transition:transform .16s ease,opacity .16s ease
 }
-.tap-hint{
-  position:absolute;right:-1%;bottom:-7%;z-index:5;white-space:nowrap;
-  font-size:13px;font-weight:800;letter-spacing:.01em;color:var(--ink);
-  background:rgba(255,249,244,.92);border:1px solid rgba(228,217,213,.95);backdrop-filter:blur(10px);
-  padding:9px 12px;border-radius:999px;box-shadow:0 8px 22px rgba(44,22,43,.08);
-  animation:hintFloat 3.35s ease-in-out infinite
-}
-.tap-arrow{display:inline-block;margin-right:3px;color:var(--accent2);font-size:15px}
 .bc-action:active,.bc-action.pressed{animation:none;transform:scale(.93);filter:saturate(.96) brightness(.99)}
 .bc-action.pressed .bc-plus{transform:scale(.45);opacity:0}
-.bc-action.pressed .tap-hint{opacity:0;transform:translateY(8px)}
 .bc-action.pressed .bc-action-halo{animation:none;opacity:.15;transform:scale(.94)}
 .bc-action.pressed .fruit{filter:blur(2px) drop-shadow(0 10px 14px rgba(0,0,0,.18))}
 .screen-enter{animation:screenEnter .48s cubic-bezier(.18,.82,.2,1) both;transform-origin:50% 42%}
@@ -128,9 +128,8 @@ button{cursor:pointer}
 @keyframes bcPlusPulse{0%,100%{transform:scale(1);box-shadow:0 10px 24px rgba(56,28,43,.18),0 0 0 0 rgba(239,155,139,.22)}50%{transform:scale(1.11);box-shadow:0 12px 28px rgba(56,28,43,.20),0 0 0 11px rgba(239,155,139,0)}}
 @keyframes peachFloat{0%,100%{transform:rotate(-9deg) translateY(0) scale(1)}50%{transform:rotate(-7deg) translateY(-3px) scale(1.015)}}
 @keyframes eggplantFloat{0%,100%{transform:rotate(22deg) translateY(0) scale(1)}50%{transform:rotate(20deg) translateY(3px) scale(.99)}}
-@keyframes hintFloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-2px);opacity:1}}
 .bottom-nav{grid-template-columns:repeat(4,1fr);padding-top:8px;background:rgba(245,239,233,.9)}
 .navbtn{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9px;font-weight:750;letter-spacing:.08em;padding:7px 2px 5px}
 .navbtn.active{background:transparent;color:var(--ink)}
 .nav-ico{font-size:20px;line-height:1;font-weight:500;letter-spacing:0}
-@media (prefers-reduced-motion:reduce){.bc-action,.bc-action-halo,.bc-plus,.fruit,.tap-hint,.screen-enter{animation:none!important;transition:none}.count-home{transition:none}}
+@media (prefers-reduced-motion:reduce){.bc-action,.bc-action-halo,.bc-plus,.fruit,.screen-enter{animation:none!important;transition:none}.count-home{transition:none}}

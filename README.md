@@ -31,3 +31,10 @@ A local-first prototype focused on people first, encounters second.
 - The main circle breathes slowly; the + pulses faster.
 - Clear “Tap to add someone” hint points to the action.
 - Softer blur/scale transition into Quick Add.
+
+
+## v1.7
+- Home title BODY COUNT
+- Removed tap hint
+- Softer, larger fruit artwork inside the breathing action
+- Faster service-worker takeover during development

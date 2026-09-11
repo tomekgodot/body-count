@@ -53,3 +53,10 @@ A local-first prototype focused on people first, encounters second.
 - Light BODY COUNT wordmark at top
 - Dark translucent four-item bottom navigation
 - Peach, eggplant and pulsing plus float directly on the black canvas
+
+
+## v2.0
+- Removed the legacy circular action background completely
+- Switched the entire app to a consistent dark theme
+- Fruits and plus float directly on the black canvas
+- Dark cards, inputs, navigation and detail screens

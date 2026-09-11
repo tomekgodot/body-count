@@ -261,3 +261,85 @@ button{cursor:pointer}
 .count-home + .bottom-nav .nav-ico{
   color:inherit;
 }
+
+/* v2.0 — true dark app + no legacy action circle */
+:root{
+  --bg:#050505;
+  --card:#111011;
+  --ink:#f7f1ec;
+  --muted:#a99fa4;
+  --line:rgba(255,255,255,.10);
+  --accent:#ef9b8b;
+  --accent2:#7c557f;
+}
+html,body{
+  background:#050505 !important;
+  color:var(--ink) !important;
+}
+#app{
+  background:#050505;
+}
+.card,.field,.people-picker,.pick-person,.mode-switch{
+  background:#111011;
+  color:var(--ink);
+  border-color:var(--line);
+}
+.input,textarea,input,select{
+  background:#0d0c0d !important;
+  color:var(--ink) !important;
+  border-color:var(--line) !important;
+}
+.sub,.small,.privacy-pill{
+  color:var(--muted) !important;
+}
+.topbar,.add-screen,.screen-enter{
+  background:transparent;
+}
+.bottom-nav{
+  background:rgba(5,5,5,.94) !important;
+  border-top:1px solid rgba(255,255,255,.09) !important;
+}
+.navbtn{
+  color:rgba(247,241,236,.52) !important;
+}
+.navbtn.active{
+  color:#f7f1ec !important;
+}
+.primary{
+  background:#f2a08f !important;
+  color:#1d1117 !important;
+}
+.linkbtn{
+  color:#f7f1ec !important;
+}
+
+/* kill all old circular container visuals */
+.bc-action-free,
+.count-home .bc-action-free{
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.bc-action-free::before,
+.count-home .bc-action-free::before{
+  display:none !important;
+  content:none !important;
+}
+.bc-action-free .bc-action-core,
+.count-home .bc-action-core{
+  display:none !important;
+}
+.bc-action-free{
+  overflow:visible !important;
+}
+
+/* ensure fruits float directly on canvas */
+.count-home .free-fruit{
+  opacity:.82;
+  mix-blend-mode:normal;
+}
+.count-home .free-halo{
+  opacity:.55;
+  background:radial-gradient(ellipse at center,rgba(239,155,139,.08),rgba(124,85,127,.06) 46%,transparent 74%);
+  filter:blur(34px);
+}

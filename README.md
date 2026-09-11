@@ -45,3 +45,11 @@ A local-first prototype focused on people first, encounters second.
 - Peach + eggplant form one large tappable composition
 - Independent breathing motion and faster pulsing + badge
 - BODY COUNT remains at the top
+
+
+## v1.9
+- COUNT home is now full black, edge to edge
+- No circle/container behind the fruit composition
+- Light BODY COUNT wordmark at top
+- Dark translucent four-item bottom navigation
+- Peach, eggplant and pulsing plus float directly on the black canvas

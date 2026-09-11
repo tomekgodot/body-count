@@ -1285,3 +1285,57 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   opacity:.62;
 }
 .private-tabs button.on img{opacity:1}
+
+/* v4.5 — refined premium private icons + visible local privacy */
+.art-symbol img,.private-tabs img{filter:none}
+.private-tabs button.on{
+  border-color:rgba(222,171,151,.52);
+  background:linear-gradient(180deg,rgba(222,171,151,.10),rgba(222,171,151,.045));
+}
+.home-privacy{
+  position:absolute;
+  left:50%;
+  bottom:86px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:0;
+  background:transparent;
+  color:rgba(255,255,255,.48);
+  font-size:11px;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  padding:10px 12px;
+}
+.home-privacy:active{opacity:.7}
+.privacy-lock{
+  width:18px;height:18px;border:1px solid rgba(255,255,255,.22);border-radius:50%;
+  display:grid;place-items:center;font-size:9px;color:#d9b2a4
+}
+.privacy-info-mark{
+  width:16px;height:16px;border:1px solid rgba(255,255,255,.22);border-radius:50%;
+  display:grid;place-items:center;font-family:serif;font-size:10px
+}
+.privacy-modal-backdrop{
+  position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);
+  display:grid;place-items:center;padding:24px;backdrop-filter:blur(9px)
+}
+.privacy-modal-backdrop[hidden]{display:none}
+.privacy-modal{
+  width:min(100%,360px);position:relative;text-align:center;
+  background:linear-gradient(180deg,#151311,#0c0b0a);
+  border:1px solid rgba(222,171,151,.22);border-radius:24px;
+  padding:28px 24px 24px;box-shadow:0 24px 70px rgba(0,0,0,.55)
+}
+.privacy-close{
+  position:absolute;right:12px;top:10px;border:0;background:transparent;
+  color:rgba(255,255,255,.55);font-size:24px;padding:6px
+}
+.privacy-modal-icon{
+  width:42px;height:42px;margin:0 auto 12px;border:1px solid rgba(222,171,151,.38);
+  border-radius:50%;display:grid;place-items:center;color:#d9b2a4
+}
+.privacy-modal h2{margin:0 0 10px;font-size:21px;font-weight:650}
+.privacy-modal p{margin:0;color:rgba(255,255,255,.68);font-size:13px;line-height:1.5}
+.privacy-modal .privacy-small{margin-top:12px;color:rgba(255,255,255,.38);font-size:11px}

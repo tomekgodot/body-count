@@ -143,3 +143,11 @@ A local-first prototype focused on people first, encounters second.
 - Removed any thumbnail-like visual treatment around category anchors
 - Stronger archetype differentiation: blond/younger Twink, darker Otter, grey Daddy, broader fuller-bearded Bear
 - Dot remains the only moving control around the wheel
+
+
+## v3.3
+- Replaced line-art AGE/BODY/TYPE placeholders with generated visual assets
+- AGE uses a real portrait visual and subtly changes with exact age
+- BODY uses a full-body visual that responds to height
+- TYPE keeps one central portrait only; the wheel changes its styling by archetype
+- No extra thumbnails around the TYPE wheel

@@ -245,7 +245,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap">${figure('age-figure')}</div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-portrait.jpg" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -267,7 +267,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap">${figure('body-figure')}</div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-figure.jpg" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -288,17 +288,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace">
-          <div class="portrait-hair"></div>
-          <div class="portrait-head">
-            <div class="portrait-brow brow-l"></div><div class="portrait-brow brow-r"></div>
-            <div class="portrait-eye eye-l"></div><div class="portrait-eye eye-r"></div>
-            <div class="portrait-nose"></div><div class="portrait-mouth"></div>
-            <div class="portrait-beard"></div>
-          </div>
-          <div class="portrait-neck"></div>
-          <div class="portrait-shoulders"></div>
-        </div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-portrait.jpg" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -331,8 +321,8 @@ async function renderAboutHim(){
       v.textContent=n;u.textContent='years';p.about.ageExact=String(n);p.about.ageBand=band;
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
-      const fig=document.querySelector('.age-figure');
-      if(fig){const maturity=(n-18)/62;fig.style.setProperty('--age-maturity',maturity.toFixed(2))}
+      const fig=document.getElementById('agePortrait');
+      if(fig){const maturity=(n-18)/62;fig.style.filter=`grayscale(${Math.max(0,maturity-.45)*.35}) contrast(${1+maturity*.04})`;fig.style.transform=`scale(${1+maturity*.025})`}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
@@ -346,10 +336,10 @@ async function renderAboutHim(){
   if(state.aboutPage==='body'){
     const hs=document.getElementById('heightSlider'),hv=document.getElementById('heightValue');
     const ws=document.getElementById('weightSlider'),wv=document.getElementById('weightValue');
-    const fig=document.querySelector('.body-figure');
+    const fig=document.getElementById('bodyPortrait');
     const paintHeight=()=>{
       const n=Number(hs.value),band=heightBandFor(n);p.about.heightExact=String(n);p.about.heightBand=band;hv.textContent=n+' cm';
-      if(fig){fig.style.transform=`scaleY(${.86+(n-150)/60*.28})`}
+      if(fig){fig.style.transform=`scaleY(${.90+(n-150)/60*.20})`}
       document.querySelectorAll('.axis-label').forEach(x=>x.classList.toggle('soft-on',x.classList.contains(band)));
     };
     const paintWeight=()=>{

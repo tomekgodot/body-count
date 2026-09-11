@@ -80,20 +80,74 @@ async function renderAdd(){
   const people=(await all('people')).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
   const mode=state.quick.mode||'new';
   const selected=state.quick.personId?people.find(p=>p.id===state.quick.personId):null;
-  app.innerHTML=`<section class="add-screen screen-enter"><button class="linkbtn" id="back">← Back</button><h1 class="screen-title">Add to the count</h1><p class="sub">New guy by default. Been here before? Add another time to someone already in your count.</p>
-  <div class="mode-switch">
-    <button class="mode-btn ${mode==='new'?'on':''}" data-mode="new">NEW GUY</button>
-    <button class="mode-btn ${mode==='existing'?'on':''}" data-mode="existing">ALREADY IN MY COUNT</button>
-  </div>
-  ${mode==='new' ? `<div class="field"><label>Name / nickname</label><input class="input" id="name" placeholder="Alex, gym guy, ???" value="${esc(state.quick.name||'')}"></div>` : `<div class="field"><label>Who?</label>${people.length ? `<div class="people-picker">${people.map(p=>`<button class="pick-person ${selected?.id===p.id?'on':''}" data-pick-person="${p.id}"><b>${esc(displayName(p))}</b><span>${esc(p.lastMemory||`#${String(p.id).padStart(3,'0')}`)}</span></button>`).join('')}</div>` : `<div class="card empty">Nobody in your count yet.</div>`}</div>`}
-  <div class="field"><label>Mental note</label><textarea id="memory" maxlength="60" placeholder="The one thing you’ll remember…">${esc(state.quick.memory||'')}</textarea></div>
-  <div class="field"><label>Rating</label><div class="stars">${[1,2,3,4,5].map(n=>`<button class="star ${state.quick.rating>=n?'on':''}" data-star="${n}">★</button>`).join('')}</div><div class="small" style="margin-top:7px">Optional, like everything else here.</div></div>
-  <button class="primary" id="save" ${mode==='existing'&&!selected?'disabled':''}>${mode==='new'?'ADD TO THE COUNT':'ADD ANOTHER TIME'}</button>
-  <p class="small" style="text-align:center;margin-top:13px">🔒 Stored locally on this device</p></section>`;
+
+  app.innerHTML=`<section class="add-screen quick-add screen-enter">
+    <div class="quick-add-head">
+      <button class="quick-close" id="back" aria-label="Back">×</button>
+      <h1>ADD SOMEONE</h1>
+      <span aria-hidden="true"></span>
+    </div>
+
+    ${mode==='new' ? `
+      <div class="quick-field">
+        <input class="quick-input" id="name" placeholder="Name / nick" value="${esc(state.quick.name||'')}" autocomplete="off">
+      </div>
+      <button class="quick-mode-link" id="existingLink">Already in your count?</button>
+    ` : `
+      <div class="quick-existing-head">
+        <span>Who?</span>
+        <button class="quick-mode-link" id="newLink">New guy instead</button>
+      </div>
+      ${people.length ? `<div class="people-picker quick-picker">${people.map(p=>`<button class="pick-person ${selected?.id===p.id?'on':''}" data-pick-person="${p.id}"><b>${esc(displayName(p))}</b><span>${esc(p.lastMemory||`#${String(p.id).padStart(3,'0')}`)}</span></button>`).join('')}</div>` : `<div class="quick-empty">Nobody here yet.</div>`}
+    `}
+
+    <div class="quick-field">
+      <textarea id="memory" maxlength="60" placeholder="The one thing you’ll remember…">${esc(state.quick.memory||'')}</textarea>
+    </div>
+
+    <div class="quick-rating" aria-label="Rating">
+      ${[1,2,3,4,5].map(n=>`<button class="star ${state.quick.rating>=n?'on':''}" data-star="${n}" aria-label="${n} star${n>1?'s':''}">★</button>`).join('')}
+    </div>
+
+    <button class="primary quick-save" id="save" ${mode==='existing'&&!selected?'disabled':''}>ADD</button>
+  </section>`;
+
   document.getElementById('back').onclick=()=>{state.screen='home';render()};
-  document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.quick={rating:state.quick.rating||0,name:document.getElementById('name')?.value||'',memory:document.getElementById('memory')?.value||'',mode:b.dataset.mode};renderAdd()});
-  document.querySelectorAll('[data-pick-person]').forEach(b=>b.onclick=()=>{state.quick.personId=Number(b.dataset.pickPerson);state.quick.memory=document.getElementById('memory').value;renderAdd()});
-  document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{state.quick.rating=Number(b.dataset.star);state.quick.name=document.getElementById('name')?.value||'';state.quick.memory=document.getElementById('memory').value;renderAdd()});
+
+  document.getElementById('existingLink')?.addEventListener('click',()=>{
+    state.quick={
+      rating:state.quick.rating||0,
+      name:document.getElementById('name')?.value||'',
+      memory:document.getElementById('memory')?.value||'',
+      mode:'existing'
+    };
+    renderAdd();
+  });
+
+  document.getElementById('newLink')?.addEventListener('click',()=>{
+    state.quick={
+      rating:state.quick.rating||0,
+      name:state.quick.name||'',
+      memory:document.getElementById('memory')?.value||'',
+      mode:'new'
+    };
+    delete state.quick.personId;
+    renderAdd();
+  });
+
+  document.querySelectorAll('[data-pick-person]').forEach(b=>b.onclick=()=>{
+    state.quick.personId=Number(b.dataset.pickPerson);
+    state.quick.memory=document.getElementById('memory').value;
+    renderAdd();
+  });
+
+  document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{
+    state.quick.rating=Number(b.dataset.star);
+    state.quick.name=document.getElementById('name')?.value||state.quick.name||'';
+    state.quick.memory=document.getElementById('memory').value;
+    renderAdd();
+  });
+
   document.getElementById('save').onclick=saveQuick;
 }
 async function saveQuick(){

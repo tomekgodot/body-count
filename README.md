@@ -60,3 +60,11 @@ A local-first prototype focused on people first, encounters second.
 - Switched the entire app to a consistent dark theme
 - Fruits and plus float directly on the black canvas
 - Dark cards, inputs, navigation and detail screens
+
+
+## v2.1
+- Symmetrical peach/eggplant home composition
+- Plus moved to the visual center
+- Fixed bottom navigation alignment and spacing
+- Simplified Quick Add to name, memory, rating and one ADD action
+- Repeat encounter moved behind a subtle 'Already in your count?' link

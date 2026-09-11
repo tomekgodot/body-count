@@ -106,7 +106,6 @@ async function renderAdd(){
     </div>
 
     <div class="quick-rating-block">
-      <div class="quick-label">HOW WAS IT?</div>
       <div class="quick-rating mood-rating" aria-label="How was it?">
         ${[
           [1,'😞','Very bad'],

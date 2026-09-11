@@ -86,3 +86,7 @@ A local-first prototype focused on people first, encounters second.
 - Fruit artwork softened and made more translucent
 - Exact placeholder: “What you’ll remember him by…”
 - Replaced numeric rating with five satisfaction faces
+
+
+## v2.5
+- Removed the HOW WAS IT? heading above the mood rating for a cleaner Quick Add screen

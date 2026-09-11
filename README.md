@@ -38,3 +38,10 @@ A local-first prototype focused on people first, encounters second.
 - Removed tap hint
 - Softer, larger fruit artwork inside the breathing action
 - Faster service-worker takeover during development
+
+
+## v1.8
+- Removed the circular container from the Home action
+- Peach + eggplant form one large tappable composition
+- Independent breathing motion and faster pulsing + badge
+- BODY COUNT remains at the top

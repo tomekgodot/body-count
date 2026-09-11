@@ -53,13 +53,11 @@ async function renderHome(){
   app.innerHTML=`<main class="count-home" aria-label="Body Count home">
     <div class="home-brand">BODY COUNT</div>
     <div class="count-cta-wrap">
-      <button class="bc-action" id="addBtn" aria-label="Add someone">
-        <span class="bc-action-halo" aria-hidden="true"></span>
-        <span class="bc-action-core" aria-hidden="true">
-          <span class="fruit fruit-peach">🍑</span>
-          <span class="fruit fruit-eggplant">🍆</span>
-        </span>
-        <span class="bc-plus" aria-hidden="true">+</span>
+      <button class="bc-action bc-action-free" id="addBtn" aria-label="Add someone">
+        <span class="free-halo" aria-hidden="true"></span>
+        <span class="free-fruit free-peach">🍑</span>
+        <span class="free-fruit free-eggplant">🍆</span>
+        <span class="bc-plus free-plus" aria-hidden="true">+</span>
       </button>
     </div>
   </main>${nav('home')}`;

@@ -133,3 +133,57 @@ button{cursor:pointer}
 .navbtn.active{background:transparent;color:var(--ink)}
 .nav-ico{font-size:20px;line-height:1;font-weight:500;letter-spacing:0}
 @media (prefers-reduced-motion:reduce){.bc-action,.bc-action-halo,.bc-plus,.fruit,.screen-enter{animation:none!important;transition:none}.count-home{transition:none}}
+
+/* v1.8 — one borderless add composition */
+.bc-action-free{
+  width:min(84vw,390px);
+  background:transparent;
+  border-radius:0;
+  animation:none;
+  overflow:visible;
+}
+.bc-action-free::before{display:none}
+.free-halo{
+  position:absolute;left:13%;right:13%;top:19%;bottom:15%;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(239,155,139,.18),rgba(124,85,127,.10) 44%,transparent 72%);
+  filter:blur(24px);animation:freeHalo 3.5s ease-in-out infinite;pointer-events:none
+}
+.free-fruit{
+  position:absolute;display:block;line-height:1;user-select:none;-webkit-user-select:none;
+  opacity:.74;filter:saturate(.76) contrast(.94) brightness(1.06) drop-shadow(0 16px 22px rgba(45,25,42,.14));
+  transition:filter .2s ease,opacity .2s ease;
+}
+.free-peach{
+  font-size:min(48vw,220px);left:1%;top:31%;
+  transform:rotate(-10deg);
+  animation:freePeachBreathe 3.55s ease-in-out infinite;
+}
+.free-eggplant{
+  font-size:min(52vw,238px);right:-1%;top:12%;
+  transform:rotate(24deg);
+  animation:freeEggplantBreathe 3.2s ease-in-out infinite;
+}
+.free-plus{
+  right:11%;bottom:17%;width:66px;height:66px;
+  border:4px solid var(--bg);
+  z-index:8;
+}
+.bc-action-free:active,.bc-action-free.pressed{transform:scale(.95)}
+.bc-action-free.pressed .free-fruit{filter:blur(3px) saturate(.7);opacity:.42}
+.bc-action-free.pressed .free-plus{transform:scale(.42);opacity:0}
+.bc-action-free.pressed .free-halo{opacity:0}
+@keyframes freePeachBreathe{
+  0%,100%{transform:rotate(-10deg) translateY(2px) scale(.985)}
+  50%{transform:rotate(-8deg) translateY(-4px) scale(1.025)}
+}
+@keyframes freeEggplantBreathe{
+  0%,100%{transform:rotate(24deg) translateY(-1px) scale(.99)}
+  50%{transform:rotate(21deg) translateY(4px) scale(1.018)}
+}
+@keyframes freeHalo{
+  0%,100%{transform:scale(.94);opacity:.5}
+  50%{transform:scale(1.07);opacity:.95}
+}
+@media (prefers-reduced-motion:reduce){
+  .free-fruit,.free-halo{animation:none!important}
+}

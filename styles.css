@@ -1339,3 +1339,15 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
 .privacy-modal h2{margin:0 0 10px;font-size:21px;font-weight:650}
 .privacy-modal p{margin:0;color:rgba(255,255,255,.68);font-size:13px;line-height:1.5}
 .privacy-modal .privacy-small{margin-top:12px;color:rgba(255,255,255,.38);font-size:11px}
+
+/* v4.6 — premium standalone private-detail icons */
+.art-symbol{overflow:visible!important;border-radius:0!important}
+.art-symbol img{
+  width:100%!important;height:100%!important;object-fit:contain!important;
+  border-radius:0!important;transform:none!important;filter:none!important
+}
+.private-tabs button{overflow:visible!important}
+.private-tabs img{
+  width:58px!important;height:58px!important;object-fit:contain!important;
+  border-radius:0!important;transform:none!important;filter:none!important
+}

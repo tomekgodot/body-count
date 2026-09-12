@@ -2140,3 +2140,135 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   white-space:nowrap;
   text-align:center;
 }
+
+/* v5.9 — lighter Encounter editor */
+.encounter-editor{
+  font-family:inherit!important;
+}
+.encounter-top{
+  display:grid;
+  grid-template-columns:40px 1fr 40px;
+  align-items:center;
+  margin-bottom:30px;
+}
+.encounter-title{
+  font-family:inherit!important;
+  font-size:28px!important;
+  line-height:1!important;
+  font-weight:650!important;
+  letter-spacing:-.035em!important;
+  text-transform:none!important;
+  text-align:center;
+}
+.enc-section{
+  margin-bottom:30px!important;
+}
+.enc-section-title{
+  font-family:inherit!important;
+  font-size:17px!important;
+  line-height:1.15!important;
+  font-weight:650!important;
+  letter-spacing:-.02em!important;
+  text-transform:none!important;
+  color:rgba(255,255,255,.92)!important;
+  margin-bottom:14px!important;
+}
+
+/* Oral / Anal / Rim belong to one compact row. */
+.activity-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+  width:100%;
+  align-items:start;
+}
+.activity-unit{
+  min-width:0;
+  width:100%;
+}
+.activity-tile{
+  width:100%!important;
+  min-height:46px!important;
+  padding:0 5px!important;
+  border-radius:14px!important;
+  font-size:11px!important;
+  letter-spacing:.055em!important;
+}
+.activity-subrow{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:6px!important;
+  margin-top:7px!important;
+}
+.activity-sub{
+  width:100%;
+  min-height:34px!important;
+  padding:6px 3px!important;
+  border-radius:11px!important;
+  font-size:10px!important;
+  line-height:1.1!important;
+}
+.other-unit{
+  margin-top:9px!important;
+}
+.other-tile{
+  min-height:42px!important;
+  border-radius:14px!important;
+  font-size:11px!important;
+}
+.enc-other{
+  margin-top:8px!important;
+}
+
+/* Keep protection compact; only typography becomes consistent. */
+.protection-grid{
+  gap:7px!important;
+}
+.protection-chip{
+  font-family:inherit!important;
+}
+
+/* The wheel picker stays as-is; only surrounding heading rhythm is lighter. */
+.when-section .precision-chips{
+  margin-bottom:12px!important;
+}
+
+/* Rating is intentionally quieter and fully tappable. */
+.how-section{
+  position:relative;
+}
+.enc-stars{
+  position:relative!important;
+  z-index:5!important;
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:center!important;
+  pointer-events:auto!important;
+}
+.enc-stars button{
+  position:relative!important;
+  z-index:6!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  border:0!important;
+  background:transparent!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:44px!important;
+  padding:4px 0!important;
+  margin:0!important;
+  font-family:inherit!important;
+  font-size:27px!important;
+  font-weight:400!important;
+  line-height:1!important;
+  color:rgba(255,255,255,.18)!important;
+  text-align:center!important;
+  cursor:pointer!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+.enc-stars button.on{
+  color:#efbd86!important;
+}

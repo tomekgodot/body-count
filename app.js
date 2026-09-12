@@ -7,7 +7,7 @@ async function ensureFirstEncounter(personId){
   const e={id:uid(),personId,date:today,when:{precision:'exact',date:today},happened:[],happenedDetails:{},rating:0,createdAt:Date.now()};
   await put('encounters',e); return e;
 }
-const DB_NAME='bodycount-db';
+const DB_NAME='bodycount-db-v2';
 const DB_VERSION=1;
 const app=document.getElementById('app');
 let db;
@@ -80,30 +80,26 @@ async function renderHome(){
   app.innerHTML=`<main class="count-home">
     <div class="count-brand">BODY COUNT</div>
 
-    <div class="count-hero">
-      <div class="count-number" id="countNumber">0</div>
-      <button class="count-add" id="countAdd" aria-label="Add a person">+</button>
+    <div class="count-center">
+      <div class="count-lockup">
+        <div class="count-number" id="countNumber">0</div>
+        <button class="count-add" id="countAdd" aria-label="Add a person">+</button>
+      </div>
     </div>
 
-    <nav class="bottom-nav">
-      <button class="on" data-nav="count">COUNT</button>
-      <button data-nav="people">PEOPLE</button>
-      <button data-nav="insights">INSIGHTS</button>
-      <button data-nav="you">YOU</button>
-    </nav>
+    ${nav('home')}
   </main>`;
 
   const number=document.getElementById('countNumber');
   if(count===0){
     number.textContent='0';
   }else{
-    const duration=1150;
+    const duration=1100;
     const start=performance.now();
     const tick=now=>{
       const t=Math.min(1,(now-start)/duration);
       const eased=1-Math.pow(1-t,3);
-      const value=Math.min(count,Math.floor(eased*count));
-      number.textContent=String(value);
+      number.textContent=String(Math.min(count,Math.floor(eased*count)));
       if(t<1) requestAnimationFrame(tick);
       else number.textContent=String(count);
     };
@@ -113,15 +109,12 @@ async function renderHome(){
   document.getElementById('countAdd').onclick=()=>{
     state.selectedPersonId=null;
     state.selectedEncounterId=null;
-    state.screen='quick';
+    state.quick={mode:'new',name:'',memory:''};
+    state.screen='add';
     render();
   };
 
-  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{
-    const n=b.dataset.nav;
-    state.screen=n==='count'?'home':n;
-    render();
-  });
+  attachNav();
 }
 
 function renderPlaceholder(title,copy,active){
@@ -277,7 +270,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=56" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=57" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -299,7 +292,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=56" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=57" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -320,7 +313,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=56" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=57" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -336,9 +329,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=56" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=56" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=56" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=57" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=57" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=57" alt=""></button>
     </div>
   </main>`;
 
@@ -363,11 +356,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=56`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=57`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=56`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=57`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -395,7 +388,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=56`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=57`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -409,7 +402,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=56`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=57`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -443,9 +436,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=56" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=56" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=56" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=57" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=57" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=57" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -522,9 +515,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=56" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=56" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=56" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=57" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=57" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=57" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -565,9 +558,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=56" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=56" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=56" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=57" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=57" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=57" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -916,7 +909,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=5.6');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=5.7');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

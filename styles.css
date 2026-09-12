@@ -2053,3 +2053,72 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   line-height:1!important;
   text-align:center;
 }
+
+/* v5.7 — centered count home fixes */
+.count-home{
+  position:relative;
+  min-height:100dvh;
+  width:100%;
+  overflow:hidden;
+  box-sizing:border-box;
+  padding:0 0 calc(76px + env(safe-area-inset-bottom));
+}
+.count-brand{
+  position:absolute;
+  top:calc(22px + env(safe-area-inset-top));
+  left:0;right:0;
+  z-index:2;
+  text-align:center;
+}
+.count-center{
+  position:absolute;
+  inset:0 0 calc(76px + env(safe-area-inset-bottom)) 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.count-lockup{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:180px;
+  min-height:180px;
+  pointer-events:auto;
+}
+.count-number{
+  font-size:clamp(150px,48vw,230px)!important;
+  line-height:.82!important;
+  font-weight:880!important;
+  letter-spacing:-.09em!important;
+  text-align:center;
+}
+.count-add{
+  position:absolute!important;
+  right:-2px!important;
+  bottom:-8px!important;
+  width:62px!important;
+  height:62px!important;
+  margin:0!important;
+  z-index:4;
+}
+.count-home .bottom-nav{
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  transform:none!important;
+  margin:0!important;
+  z-index:100!important;
+}
+.count-home .bottom-nav .navbtn{
+  min-width:0!important;
+  width:100%!important;
+  padding-left:2px!important;
+  padding-right:2px!important;
+}

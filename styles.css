@@ -2573,3 +2573,59 @@ body.modal-open{overflow:hidden}
   bottom:20%!important;
   z-index:8!important;
 }
+
+/* v6.4 — bold upright numerals from new reference */
+.count-brand-wrap{
+  top:calc(19px + env(safe-area-inset-top))!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  text-align:center!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+}
+.count-brand{
+  width:100%!important;
+  text-align:center!important;
+  font-size:21px!important;
+}
+.home-privacy{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0 auto!important;
+  padding:0!important;
+  text-align:center!important;
+  font-size:9.5px!important;
+  line-height:1.2!important;
+}
+
+/* Bold, upright, rounded geometric numerals — no vertical stretching. */
+.count-lockup{
+  width:min(94vw,440px)!important;
+  height:min(62vh,500px)!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+.count-number{
+  font-family:"Arial Black","Avenir Next","Helvetica Neue","SF Pro Display",-apple-system,BlinkMacSystemFont,Arial,sans-serif!important;
+  font-size:clamp(300px,88vw,455px)!important;
+  font-weight:800!important;
+  line-height:.82!important;
+  letter-spacing:-.055em!important;
+  font-stretch:normal!important;
+  transform:none!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+  -webkit-font-smoothing:antialiased!important;
+  text-rendering:geometricPrecision!important;
+}
+
+/* Keep the plus slightly overlapping the lower-right edge of the number. */
+.count-add{
+  right:9%!important;
+  bottom:14%!important;
+  z-index:8!important;
+}

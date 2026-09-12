@@ -292,11 +292,14 @@ async function renderAboutHim(){
       </div>
     </section>
 
-    <div class="about-symbols persistent-symbols about-minimal-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=80" alt=""></button>
-    </div>
+    <section class="about-minimal-section spicy-details-section">
+      <div class="about-minimal-label">SPICY DETAILS</div>
+      <div class="about-symbols persistent-symbols about-minimal-symbols">
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=81" alt=""></button>
+      </div>
+    </section>
   </main>`;
 
   const persist=async()=>{
@@ -353,6 +356,8 @@ async function renderPenis(){
   p.about ||= {};
   p.about.penis ||= {};
   const d=p.about.penis;
+  if(d.girth==='Massive') d.girth='Thick';
+  if('veins' in d) delete d.veins;
   if(!d.curveVertical && ['Curved up','Straight','Curved down'].includes(d.curve)) d.curveVertical=d.curve;
   if(d.curve==='Sideways' && !d.sideways) d.sideways=true;
 
@@ -367,15 +372,14 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=80" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=81" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
-    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Thick','Thick'],['Massive','Massive']])}
+    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Thick','Thick']])}
     ${row('FORESKIN','foreskin',[['Cut','Cut'],['Uncut','Uncut']])}
-    ${row('VEINS','veins',[['Smooth','Smooth'],['Veiny','Veiny']])}
 
     <section class="detail-block compact-choice-block">
       <div class="detail-label">SHAPE</div>
@@ -452,9 +456,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=80" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=81" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -497,9 +501,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=80" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=81" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -920,7 +924,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=8.0');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=8.1');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

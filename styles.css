@@ -3271,3 +3271,16 @@ body.modal-open{
   margin-top:6px!important;
   padding:14px 0 0!important;
 }
+
+/* v8.1 — Spicy Details is a normal titled About Him section */
+.spicy-details-section{
+  padding-bottom:8px!important;
+}
+.spicy-details-section .about-minimal-label{
+  margin-bottom:12px!important;
+}
+.spicy-details-section .about-minimal-symbols{
+  position:static!important;
+  margin-top:0!important;
+  padding-top:0!important;
+}

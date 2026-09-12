@@ -3164,3 +3164,47 @@ body.modal-open{
 .about-one-options button.on{border-color:rgba(239,189,134,.48);background:rgba(239,189,134,.07);color:#f1c18e;box-shadow:0 0 14px rgba(239,189,134,.07)}
 .type-options{margin-top:14px}
 .about-one-symbols{position:static!important;margin-top:3px!important;padding:12px 0 0!important}
+
+/* v7.9 — discreet direct numeric entry, no preselected About Him values */
+.about-one-heading.input-heading{
+  align-items:center;
+  margin-bottom:12px;
+}
+.about-number-input{
+  width:56px;
+  height:32px;
+  padding:0 7px;
+  border:1px solid rgba(239,189,134,.24);
+  border-radius:9px;
+  outline:none;
+  background:rgba(255,255,255,.018);
+  color:#f1c18e;
+  font:600 15px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  text-align:center;
+  box-shadow:none;
+  -moz-appearance:textfield;
+}
+.about-number-input::-webkit-outer-spin-button,
+.about-number-input::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
+}
+.about-number-input::placeholder{
+  color:rgba(241,193,142,.34);
+}
+.about-number-input:focus{
+  border-color:rgba(239,189,134,.48);
+  box-shadow:0 0 12px rgba(239,189,134,.07);
+}
+.about-number-wrap{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.about-number-wrap em{
+  font-style:normal;
+  font-size:10px;
+  font-weight:650;
+  letter-spacing:.06em;
+  color:rgba(255,255,255,.34);
+}

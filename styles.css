@@ -2122,3 +2122,21 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   padding-left:2px!important;
   padding-right:2px!important;
 }
+
+/* v5.8 — taller, slimmer hero numeral */
+.count-lockup{
+  min-width:min(82vw,360px)!important;
+  min-height:min(54vh,430px)!important;
+}
+.count-number{
+  font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue Condensed","Aptos Narrow",Arial,sans-serif!important;
+  font-size:clamp(230px,72vw,390px)!important;
+  font-weight:300!important;
+  line-height:.76!important;
+  letter-spacing:-.085em!important;
+  font-stretch:condensed;
+  transform:scaleX(.72) scaleY(1.12);
+  transform-origin:center center;
+  white-space:nowrap;
+  text-align:center;
+}

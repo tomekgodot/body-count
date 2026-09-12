@@ -2795,3 +2795,46 @@ body.modal-open{overflow:hidden}
   right:3%!important;
   bottom:17%!important;
 }
+
+/* v6.8 — fix privacy caption centering only */
+.count-brand-wrap{
+  position:absolute!important;
+  top:calc(18px + env(safe-area-inset-top))!important;
+  left:50%!important;
+  right:auto!important;
+  width:max-content!important;
+  max-width:92vw!important;
+  transform:translateX(-50%)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  text-align:center!important;
+}
+.count-brand{
+  width:auto!important;
+  max-width:100%!important;
+  margin:0!important;
+  text-align:center!important;
+}
+.home-privacy-row{
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  width:auto!important;
+  max-width:100%!important;
+  margin:7px 0 0!important;
+  padding:0!important;
+  transform:none!important;
+  align-self:center!important;
+  text-align:center!important;
+}
+.home-privacy{
+  display:block!important;
+  width:auto!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}

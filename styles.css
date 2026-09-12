@@ -2752,3 +2752,46 @@ body.modal-open{overflow:hidden}
 .count-number{
   font-weight:650!important;
 }
+
+/* v6.7 — digit-count-aware hero spacing */
+.count-number{
+  font-weight:620!important; /* only a touch lighter than v6.6 */
+}
+
+/* One digit: preserve the current composition. */
+.count-digits-1 .count-number{
+  font-size:clamp(330px,98vw,520px)!important;
+  font-weight:620!important;
+  letter-spacing:-.065em!important;
+  transform:scaleX(.66)!important;
+}
+.count-digits-1 .count-add{
+  right:10%!important;
+  bottom:17%!important;
+}
+
+/* Two digits: a little lighter, visible breathing room, shifted left from the +. */
+.count-digits-2 .count-number{
+  font-size:clamp(250px,72vw,390px)!important;
+  font-weight:580!important;
+  letter-spacing:.055em!important;
+  transform:translateX(-7%) scaleX(.72)!important;
+  transform-origin:center center!important;
+}
+.count-digits-2 .count-add{
+  right:5%!important;
+  bottom:17%!important;
+}
+
+/* Three digits: narrower and slightly smaller, with real inter-digit spacing. */
+.count-digits-3 .count-number{
+  font-size:clamp(205px,56vw,315px)!important;
+  font-weight:550!important;
+  letter-spacing:.045em!important;
+  transform:translateX(-8%) scaleX(.64)!important;
+  transform-origin:center center!important;
+}
+.count-digits-3 .count-add{
+  right:3%!important;
+  bottom:17%!important;
+}

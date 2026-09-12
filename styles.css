@@ -2893,3 +2893,71 @@ body.modal-open{overflow:hidden}
 .home-privacy-slogan:active{
   opacity:.65!important;
 }
+
+/* v7.0 — compact floating privacy bubble */
+.privacy-modal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:500!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  pointer-events:none!important;
+}
+.privacy-modal[hidden]{
+  display:none!important;
+}
+.privacy-backdrop{
+  position:absolute!important;
+  inset:0!important;
+  border:0!important;
+  background:transparent!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  pointer-events:auto!important;
+}
+.privacy-sheet{
+  position:relative!important;
+  width:min(82vw,340px)!important;
+  margin:0!important;
+  padding:18px 18px 16px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:18px!important;
+  background:rgba(20,20,20,.96)!important;
+  color:#fff!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.38)!important;
+  transform:translateY(-9vh)!important;
+  pointer-events:auto!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+}
+.privacy-sheet h2{
+  margin:0 30px 8px 0!important;
+  font-size:18px!important;
+  line-height:1.1!important;
+  letter-spacing:-.025em!important;
+  font-weight:650!important;
+}
+.privacy-sheet p{
+  margin:0!important;
+  font-size:12.5px!important;
+  line-height:1.45!important;
+  color:rgba(255,255,255,.72)!important;
+}
+.privacy-sheet .privacy-note{
+  margin-top:9px!important;
+  font-size:11px!important;
+  line-height:1.4!important;
+  color:rgba(255,255,255,.43)!important;
+}
+.privacy-close{
+  top:10px!important;
+  right:10px!important;
+  width:28px!important;
+  height:28px!important;
+  font-size:18px!important;
+  background:rgba(255,255,255,.055)!important;
+}
+body.modal-open{
+  overflow:auto!important;
+}

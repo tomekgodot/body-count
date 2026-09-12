@@ -3089,3 +3089,32 @@ body.modal-open{
     animation:count-number-pulse-v73 2.25s ease-in-out infinite!important;
   }
 }
+
+/* v7.6 — explicit Done buttons for detail flows */
+.flow-done{
+  display:block!important;
+  width:100%!important;
+  min-height:52px!important;
+  margin:22px 0 calc(24px + env(safe-area-inset-bottom))!important;
+  padding:0 18px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:16px!important;
+  background:rgba(255,255,255,.92)!important;
+  color:#111!important;
+  font:700 13px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif!important;
+  letter-spacing:.09em!important;
+  text-align:center!important;
+  cursor:pointer!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.flow-done:active{
+  transform:scale(.985)!important;
+  opacity:.88!important;
+}
+.private-detail-screen,
+.encounter-editor{
+  padding-bottom:max(18px,env(safe-area-inset-bottom))!important;
+}
+.encounter-flow-done{
+  margin-top:26px!important;
+}

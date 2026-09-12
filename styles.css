@@ -3033,3 +3033,59 @@ body.modal-open{
 @media (prefers-reduced-motion:reduce){
   .count-number.count-settled{animation:none!important;}
 }
+
+/* v7.3 — larger Modern numerals, larger overlapping +, clearly visible count pulse */
+.count-digits-1 .count-number{
+  font-size:clamp(375px,111vw,575px)!important;
+}
+.count-digits-2 .count-number{
+  font-size:clamp(288px,84vw,438px)!important;
+}
+.count-digits-3 .count-number{
+  font-size:clamp(228px,63vw,348px)!important;
+}
+
+/* Make the add control more intentional and overlap the number field more. */
+.count-add{
+  width:76px!important;
+  height:76px!important;
+  font-size:45px!important;
+  line-height:1!important;
+}
+.count-digits-1 .count-add{
+  right:13%!important;
+  bottom:14%!important;
+}
+.count-digits-2 .count-add{
+  right:8%!important;
+  bottom:14%!important;
+}
+.count-digits-3 .count-add{
+  right:5%!important;
+  bottom:14%!important;
+}
+
+/* More visible, still gentle pulse once the counter reaches its final value.
+   Using opacity + glow avoids disturbing the carefully tuned numeral geometry. */
+.count-number.count-settled{
+  animation:count-number-pulse-v73 2.25s ease-in-out infinite!important;
+  will-change:opacity,filter;
+}
+@keyframes count-number-pulse-v73{
+  0%,100%{
+    opacity:1;
+    filter:brightness(1) drop-shadow(0 0 0 rgba(255,255,255,0));
+  }
+  50%{
+    opacity:.74;
+    filter:brightness(1.16) drop-shadow(0 0 13px rgba(255,255,255,.16));
+  }
+}
+
+/* Keep this subtle brightness pulse even when system Reduce Motion is enabled:
+   there is no positional movement. */
+@media (prefers-reduced-motion:reduce){
+  .count-number.count-settled{
+    animation:count-number-pulse-v73 2.25s ease-in-out infinite!important;
+  }
+}

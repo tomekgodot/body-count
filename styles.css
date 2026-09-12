@@ -3208,3 +3208,66 @@ body.modal-open{
   letter-spacing:.06em;
   color:rgba(255,255,255,.34);
 }
+
+/* v8.0 — About Him reduced to four quick category choices */
+.about-minimal{
+  min-height:100dvh;
+  padding:calc(16px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom));
+  background:#050505;
+  color:#fff;
+}
+.about-minimal-top{
+  display:grid;
+  grid-template-columns:40px 1fr 40px;
+  align-items:center;
+  text-align:center;
+  margin-bottom:16px;
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.12em;
+}
+.about-minimal-section{
+  padding:18px 0;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.about-minimal-label{
+  margin-bottom:12px;
+  font-size:11px;
+  line-height:1;
+  font-weight:750;
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.58);
+}
+.about-minimal-options{
+  display:grid;
+  gap:7px;
+}
+.about-minimal-options.four{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.about-minimal-options.three{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.about-minimal-options button{
+  min-width:0;
+  min-height:40px;
+  padding:0 7px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:11px;
+  background:rgba(255,255,255,.02);
+  color:rgba(255,255,255,.56);
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.about-minimal-options button.on{
+  border-color:rgba(239,189,134,.48);
+  background:rgba(239,189,134,.07);
+  color:#f1c18e;
+  box-shadow:0 0 14px rgba(239,189,134,.07);
+}
+.about-minimal-symbols{
+  position:static!important;
+  margin-top:6px!important;
+  padding:14px 0 0!important;
+}

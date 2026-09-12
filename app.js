@@ -247,9 +247,6 @@ async function renderAboutHim(){
   p.about ||= {};
   const a=p.about;
 
-  const age=(a.ageExact??'');
-  const height=(a.heightExact??'');
-  const weight=(a.weightExact??'');
   const ageBand=a.ageBand||'';
   const heightBand=a.heightBand||'';
   const build=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
@@ -260,64 +257,45 @@ async function renderAboutHim(){
   const builds=[['slim','Slim'],['average','Average'],['athletic','Athletic'],['big','Big']];
   const types=[['twink','Twink'],['bear','Bear'],['daddy','Daddy'],['otter','Otter']];
 
-  app.innerHTML=`<main class="about-one">
-    <div class="about-one-top"><button class="about-back" id="back">‹</button><div>ABOUT HIM</div><span></span></div>
+  app.innerHTML=`<main class="about-minimal">
+    <div class="about-minimal-top">
+      <button class="about-back" id="back">‹</button>
+      <div>ABOUT HIM</div>
+      <span></span>
+    </div>
 
-    <section class="about-one-section">
-      <div class="about-one-heading input-heading">
-        <span>AGE</span>
-        <input id="ageInput" class="about-number-input" type="number" min="18" max="99" inputmode="numeric" value="${age}" placeholder="—">
-      </div>
-      <div class="about-one-options four">
+    <section class="about-minimal-section">
+      <div class="about-minimal-label">AGE</div>
+      <div class="about-minimal-options four">
         ${ageBands.map(([k,l])=>`<button data-age-band="${k}" class="${ageBand===k?'on':''}">${l}</button>`).join('')}
       </div>
     </section>
 
-    <section class="about-one-section">
-      <div class="about-one-title">BODY</div>
-
-      <div class="about-one-metric">
-        <div class="about-one-heading input-heading">
-          <span>HEIGHT</span>
-          <label class="about-number-wrap">
-            <input id="heightInput" class="about-number-input" type="number" min="120" max="230" inputmode="numeric" value="${height}" placeholder="—">
-            <em>cm</em>
-          </label>
-        </div>
-        <div class="about-one-options three">
-          ${heightBands.map(([k,l])=>`<button data-height-band="${k}" class="${heightBand===k?'on':''}">${l}</button>`).join('')}
-        </div>
-      </div>
-
-      <div class="about-one-metric">
-        <div class="about-one-heading input-heading">
-          <span>WEIGHT</span>
-          <label class="about-number-wrap">
-            <input id="weightInput" class="about-number-input" type="number" min="35" max="250" inputmode="numeric" value="${weight}" placeholder="—">
-            <em>kg</em>
-          </label>
-        </div>
-      </div>
-
-      <div class="about-one-metric">
-        <div class="about-one-subtitle">BUILD</div>
-        <div class="about-one-options four">
-          ${builds.map(([k,l])=>`<button data-build="${k}" class="${build===k?'on':''}">${l}</button>`).join('')}
-        </div>
+    <section class="about-minimal-section">
+      <div class="about-minimal-label">HEIGHT</div>
+      <div class="about-minimal-options three">
+        ${heightBands.map(([k,l])=>`<button data-height-band="${k}" class="${heightBand===k?'on':''}">${l}</button>`).join('')}
       </div>
     </section>
 
-    <section class="about-one-section">
-      <div class="about-one-title">TYPE</div>
-      <div class="about-one-options four type-options">
+    <section class="about-minimal-section">
+      <div class="about-minimal-label">BUILD</div>
+      <div class="about-minimal-options four">
+        ${builds.map(([k,l])=>`<button data-build="${k}" class="${build===k?'on':''}">${l}</button>`).join('')}
+      </div>
+    </section>
+
+    <section class="about-minimal-section">
+      <div class="about-minimal-label">TYPE</div>
+      <div class="about-minimal-options four">
         ${types.map(([k,l])=>`<button data-type="${k}" class="${type===k?'on':''}">${l}</button>`).join('')}
       </div>
     </section>
 
-    <div class="about-symbols persistent-symbols about-one-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=79" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=79" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=79" alt=""></button>
+    <div class="about-symbols persistent-symbols about-minimal-symbols">
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=80" alt=""></button>
     </div>
   </main>`;
 
@@ -326,21 +304,6 @@ async function renderAboutHim(){
     current.about={...(current.about||{}),...(p.about||{})};
     await put('people',current);
   };
-
-  const bindNumber=(id,key)=>{
-    const input=document.getElementById(id);
-    const saveValue=async()=>{
-      const raw=input.value.trim();
-      if(raw==='') delete p.about[key];
-      else p.about[key]=Number(raw);
-      await persist();
-    };
-    input.addEventListener('change',saveValue);
-    input.addEventListener('blur',saveValue);
-  };
-  bindNumber('ageInput','ageExact');
-  bindNumber('heightInput','heightExact');
-  bindNumber('weightInput','weightExact');
 
   const bindChoice=(selector,apply)=>{
     document.querySelectorAll(selector).forEach(b=>b.onclick=async()=>{
@@ -351,11 +314,14 @@ async function renderAboutHim(){
       await persist();
     });
   };
+
   bindChoice('[data-age-band]',b=>{
-    if(b)p.about.ageBand=b.dataset.ageBand; else delete p.about.ageBand;
+    if(b)p.about.ageBand=b.dataset.ageBand;
+    else delete p.about.ageBand;
   });
   bindChoice('[data-height-band]',b=>{
-    if(b)p.about.heightBand=b.dataset.heightBand; else delete p.about.heightBand;
+    if(b)p.about.heightBand=b.dataset.heightBand;
+    else delete p.about.heightBand;
   });
   bindChoice('[data-build]',b=>{
     if(b){p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build}
@@ -366,11 +332,20 @@ async function renderAboutHim(){
     else{delete p.about.types;delete p.about.type}
   });
 
-  document.getElementById('back').onclick=async()=>{await persist();state.screen='postadd';render()};
+  document.getElementById('back').onclick=async()=>{
+    await persist();
+    state.screen='postadd';
+    render();
+  };
+
   document.querySelector('.persistent-symbols').onclick=e=>{
-    const b=e.target.closest('[data-subopen]'); if(!b)return;
+    const b=e.target.closest('[data-subopen]');
+    if(!b)return;
     const target={egg:'penis',peach:'peach',drop:'drops'}[b.dataset.subopen];
-    if(target){state.screen=target;render()}
+    if(target){
+      state.screen=target;
+      render();
+    }
   };
 }
 async function renderPenis(){
@@ -392,9 +367,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=79" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=79" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=79" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=80" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -477,9 +452,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=79" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=79" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=79" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=80" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -522,9 +497,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=79" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=79" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=79" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=80" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=80" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=80" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -945,7 +920,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=7.9');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=8.0');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

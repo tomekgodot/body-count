@@ -3145,3 +3145,22 @@ body.modal-open{
   opacity:.38!important;
   box-shadow:none!important;
 }
+
+/* v7.8 — About Him on one fast screen */
+.about-one{min-height:100dvh;padding:calc(16px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom));background:#050505;color:#fff}
+.about-one-top{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;text-align:center;margin-bottom:10px;font-size:12px;font-weight:750;letter-spacing:.12em}
+.about-one-section{padding:18px 0 20px;border-top:1px solid rgba(255,255,255,.075)}
+.about-one-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.about-one-heading span,.about-one-title{font-size:12px;font-weight:750;letter-spacing:.13em;color:rgba(255,255,255,.78)}
+.about-one-heading.sub span,.about-one-subtitle{font-size:10px;font-weight:700;letter-spacing:.11em;color:rgba(255,255,255,.43)}
+.about-one-heading strong{font-size:20px;font-weight:520;letter-spacing:-.025em;color:#f1c18e}
+.about-one-metric{margin-top:20px}
+.about-one-subtitle{margin-bottom:10px}
+.about-one-range{width:100%;height:28px;margin:0 0 10px;accent-color:#efbd86}
+.about-one-range::-webkit-slider-runnable-track{height:3px;border-radius:99px;background:rgba(255,255,255,.16)}
+.about-one-range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-9.5px;border-radius:50%;border:1px solid rgba(239,189,134,.55);background:#090909;box-shadow:0 0 14px rgba(239,189,134,.18)}
+.about-one-options{display:grid;gap:7px}.about-one-options.four{grid-template-columns:repeat(4,minmax(0,1fr))}.about-one-options.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.about-one-options button{min-width:0;min-height:38px;padding:0 6px;border:1px solid rgba(255,255,255,.105);border-radius:11px;background:rgba(255,255,255,.025);color:rgba(255,255,255,.58);font-size:11px;font-weight:600;white-space:nowrap}
+.about-one-options button.on{border-color:rgba(239,189,134,.48);background:rgba(239,189,134,.07);color:#f1c18e;box-shadow:0 0 14px rgba(239,189,134,.07)}
+.type-options{margin-top:14px}
+.about-one-symbols{position:static!important;margin-top:3px!important;padding:12px 0 0!important}

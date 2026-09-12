@@ -243,203 +243,106 @@ async function renderPostAdd(){
 
 async function renderAboutHim(){
   const p=await get('people',state.selectedPersonId);
+  if(!p){state.screen='home';return render()}
   p.about ||= {};
   const a=p.about;
-  state.aboutPage ||= 'age';
 
-  const ageBandFor=n=> n<30?'young':n<40?'30s':n<50?'middle':'older';
-  const ageBandLabel=x=>({young:'Young','30s':'30s',middle:'Middle age',older:'Older'})[x]||'';
   const age=Number(a.ageExact||32);
-  const ageBand=a.ageExact?ageBandFor(age):(a.ageBand||'30s');
-
   const height=Number(a.heightExact||180);
-  const heightBandFor=n=>n<174?'short':n<187?'medium':'tall';
-  const heightBandLabel=x=>({short:'Short',medium:'Medium',tall:'Tall'})[x]||'';
-  const heightBand=a.heightExact?heightBandFor(height):(a.heightBand||'medium');
-
   const weight=Number(a.weightExact||80);
-  const builds=['slim','average','athletic','big'];
+  const ageBand=a.ageBand||'30s';
+  const heightBand=a.heightBand||'medium';
   const build=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'average';
+  const type=(Array.isArray(a.types)&&a.types[0])||a.type||'';
 
-  const typeAnchors=[
-    {key:'twink',label:'TWINK',angle:-90},
-    {key:'bear',label:'BEAR',angle:0},
-    {key:'daddy',label:'DADDY',angle:90},
-    {key:'otter',label:'OTTER',angle:180}
-  ];
-  const normAngle=x=>((x%360)+360)%360;
-  const typeFromAngle=deg=>{
-    const a=normAngle(deg);
-    // Quadrants blend between the four anchor archetypes.
-    if(a>=337.5 || a<22.5) return {key:'bear',label:'BEAR'};
-    if(a<67.5) return {key:'daddy-bear',label:'DADDY BEAR'};
-    if(a<112.5) return {key:'daddy',label:'DADDY'};
-    if(a<157.5) return {key:'otter-daddy',label:'OTTER DADDY'};
-    if(a<202.5) return {key:'otter',label:'OTTER'};
-    if(a<247.5) return {key:'twonk',label:'TWONK'};
-    if(a<292.5) return {key:'twink',label:'TWINK'};
-    return {key:'young-bear',label:'YOUNG BEAR'};
-  };
-  let typeAngle=Number.isFinite(Number(a.typeAngle))?Number(a.typeAngle):270;
-  let typeNow=typeFromAngle(typeAngle);
+  const ageBands=[['young','Young'],['30s','30s'],['middle','Middle age'],['older','Older']];
+  const heightBands=[['short','Short'],['medium','Medium'],['tall','Tall']];
+  const builds=[['slim','Slim'],['average','Average'],['athletic','Athletic'],['big','Big']];
+  const types=[['twink','Twink'],['bear','Bear'],['daddy','Daddy'],['otter','Otter']];
 
-  const figure=(extra='')=>`<div class="guy-stage ${extra}">
-    <div class="guy-head"></div><div class="guy-neck"></div><div class="guy-body"></div>
-    <div class="guy-leg guy-leg-l"></div><div class="guy-leg guy-leg-r"></div>
-  </div>`;
+  app.innerHTML=`<main class="about-one">
+    <div class="about-one-top"><button class="about-back" id="back">‹</button><div>ABOUT HIM</div><span></span></div>
 
-  let panel='';
-  if(state.aboutPage==='age'){
-    const exact=!!a.ageExact;
-    panel=`<section class="visual-panel age-panel">
-      <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=77" alt=""></div>
-      <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
-      <div class="quick-categories age-cats">
-        ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
+    <section class="about-one-section">
+      <div class="about-one-heading"><span>AGE</span><strong id="ageValue">${age}</strong></div>
+      <input id="ageSlider" class="about-one-range" type="range" min="18" max="80" value="${age}">
+      <div class="about-one-options four">
+        ${ageBands.map(([k,l])=>`<button data-age-band="${k}" class="${ageBand===k?'on':''}">${l}</button>`).join('')}
       </div>
-    </section>`;
-  }else if(state.aboutPage==='body'){
-    const exactH=!!a.heightExact, exactW=!!a.weightExact;
-    panel=`<section class="visual-panel body-panel-v3">
-      <div class="body-visual-grid">
-        <div class="height-control">
-          <div class="height-label-rail">
-            <button class="axis-label tall">Tall</button>
-            <button class="axis-label medium">Medium</button>
-            <button class="axis-label short">Short</button>
-          </div>
-          <div class="height-slider-rail">
-            <input id="heightSlider" class="vertical-range" type="range" min="150" max="210" value="${height}" orient="vertical" aria-label="Exact height">
-          </div>
-        </div>
-        <div class="body-center">
-          <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=77" alt=""></div>
+    </section>
+
+    <section class="about-one-section">
+      <div class="about-one-title">BODY</div>
+      <div class="about-one-metric">
+        <div class="about-one-heading sub"><span>HEIGHT</span><strong id="heightValue">${height} cm</strong></div>
+        <input id="heightSlider" class="about-one-range" type="range" min="150" max="210" value="${height}">
+        <div class="about-one-options three">
+          ${heightBands.map(([k,l])=>`<button data-height-band="${k}" class="${heightBand===k?'on':''}">${l}</button>`).join('')}
         </div>
       </div>
-      <div class="weight-block">
-        <div class="mode-value weight-value"><strong id="weightValue">${exactW?weight+' kg':'Weight'}</strong></div>
-        <input id="weightSlider" class="range weight-range" type="range" min="50" max="110" value="${Math.max(50,Math.min(110,weight))}" aria-label="Exact weight">
+      <div class="about-one-metric">
+        <div class="about-one-heading sub"><span>WEIGHT</span><strong id="weightValue">${weight} kg</strong></div>
+        <input id="weightSlider" class="about-one-range" type="range" min="50" max="110" value="${weight}">
       </div>
-      <div class="build-label">BUILD</div>
-      <div class="quick-categories build-cats">
-        ${builds.map(x=>`<button data-build="${x}" class="${!exactW&&build===x?'on':''}">${x[0].toUpperCase()+x.slice(1)}</button>`).join('')}
+      <div class="about-one-metric">
+        <div class="about-one-subtitle">BUILD</div>
+        <div class="about-one-options four">
+          ${builds.map(([k,l])=>`<button data-build="${k}" class="${build===k?'on':''}">${l}</button>`).join('')}
+        </div>
       </div>
-    </section>`;
-  }else{
-    panel=`<section class="visual-panel type-panel-v3">
-      <div class="type-value" id="typeValue">${typeNow.label}</div>
-      <div class="type-wheel" id="typeWheel">
-        <span class="wheel-label wl-twink">TWINK</span>
-        <span class="wheel-label wl-bear">BEAR</span>
-        <span class="wheel-label wl-daddy">DADDY</span>
-        <span class="wheel-label wl-otter">OTTER</span>
-        <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=77" alt=""></div>
-        <div class="wheel-knob" id="wheelKnob"></div>
-      </div>
-      <div class="type-help">Drag around the circle</div>
-    </section>`;
-  }
+    </section>
 
-  app.innerHTML=`<main class="about-visual">
-    <div class="about-top"><button class="about-back" id="back">‹</button><div>WHO</div><span></span></div>
-    <nav class="about-tabs">
-      <button data-page="age" class="${state.aboutPage==='age'?'on':''}">AGE</button>
-      <button data-page="body" class="${state.aboutPage==='body'?'on':''}">BODY</button>
-      <button data-page="type" class="${state.aboutPage==='type'?'on':''}">TYPE</button>
-    </nav>
-    <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
-    <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=77" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=77" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=77" alt=""></button>
+    <section class="about-one-section">
+      <div class="about-one-title">TYPE</div>
+      <div class="about-one-options four type-options">
+        ${types.map(([k,l])=>`<button data-type="${k}" class="${type===k?'on':''}">${l}</button>`).join('')}
+      </div>
+    </section>
+
+    <div class="about-symbols persistent-symbols about-one-symbols">
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=78" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=78" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=78" alt=""></button>
     </div>
   </main>`;
 
-  document.getElementById('back').onclick=async()=>{await persist();state.screen='postadd';render()};
-  document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.aboutPage=b.dataset.page;render()});
-  const privateSymbolBar=document.querySelector('.persistent-symbols');
-  if(privateSymbolBar) privateSymbolBar.onclick=e=>{
-    const b=e.target.closest('[data-subopen]');
-    if(!b) return;
-    e.preventDefault();
-    const target={egg:'penis',peach:'peach',drop:'drops'}[b.dataset.subopen];
-    if(target){state.screen=target;render();}
+  const persist=async()=>{
+    const current=await get('people',state.selectedPersonId);
+    current.about={...(current.about||{}),...(p.about||{})};
+    await put('people',current);
   };
 
-  const persist=async()=>{const current=await get('people',state.selectedPersonId);current.about={...(current.about||{}),...(p.about||{})};await put('people',current)};
+  const ageSlider=document.getElementById('ageSlider');
+  ageSlider.oninput=()=>{p.about.ageExact=ageSlider.value;document.getElementById('ageValue').textContent=ageSlider.value};
+  ageSlider.onchange=persist;
 
-  if(state.aboutPage==='age'){
-    const s=document.getElementById('ageSlider'),v=document.getElementById('ageValue'),u=document.getElementById('ageUnit');
-    const paintAge=()=>{
-      const n=Number(s.value),band=ageBandFor(n);
-      v.textContent=n;u.textContent='years';p.about.ageExact=String(n);p.about.ageBand=band;
-      document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
-      document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
-      const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=77`;fig.style.filter='';fig.style.transform='scale(1)'}
-    };
-    s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
-    document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=77`;
-      document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
+  const heightSlider=document.getElementById('heightSlider');
+  heightSlider.oninput=()=>{p.about.heightExact=heightSlider.value;document.getElementById('heightValue').textContent=heightSlider.value+' cm'};
+  heightSlider.onchange=persist;
+
+  const weightSlider=document.getElementById('weightSlider');
+  weightSlider.oninput=()=>{p.about.weightExact=weightSlider.value;document.getElementById('weightValue').textContent=weightSlider.value+' kg'};
+  weightSlider.onchange=persist;
+
+  const bindChoice=(selector,apply)=>{
+    document.querySelectorAll(selector).forEach(b=>b.onclick=async()=>{
+      apply(b);
+      document.querySelectorAll(selector).forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
-    if(a.ageExact) paintAge();
-  }
+  };
+  bindChoice('[data-age-band]',b=>{p.about.ageBand=b.dataset.ageBand});
+  bindChoice('[data-height-band]',b=>{p.about.heightBand=b.dataset.heightBand});
+  bindChoice('[data-build]',b=>{p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build});
+  bindChoice('[data-type]',b=>{p.about.types=[b.dataset.type];p.about.type=b.dataset.type});
 
-  if(state.aboutPage==='body'){
-    const hs=document.getElementById('heightSlider'),hv=document.getElementById('heightValue');
-    const ws=document.getElementById('weightSlider'),wv=document.getElementById('weightValue');
-    const fig=document.getElementById('bodyPortrait');
-    const paintHeight=()=>{
-      const n=Number(hs.value),band=heightBandFor(n);p.about.heightExact=String(n);p.about.heightBand=band;hv.textContent=n+' cm';
-      if(fig){fig.style.transform=`scaleY(${.90+(n-150)/60*.20})`}
-      document.querySelectorAll('.axis-label').forEach(x=>x.classList.toggle('soft-on',x.classList.contains(band)));
-    };
-    const paintWeight=()=>{
-      const n=Number(ws.value);p.about.weightExact=String(n);wv.textContent=n+' kg';
-      
-    };
-    hs.oninput=paintHeight; ws.oninput=paintWeight; hs.onchange=async()=>{paintHeight();await persist()}; ws.onchange=async()=>{paintWeight();await persist()};
-    document.querySelectorAll('.axis-label').forEach(lbl=>lbl.onclick=async()=>{
-      const band=lbl.classList.contains('tall')?'tall':lbl.classList.contains('short')?'short':'medium';
-      p.about.heightExact='';p.about.heightBand=band;hv.textContent=heightBandLabel(band);
-      document.querySelectorAll('.axis-label').forEach(x=>x.classList.toggle('on',x===lbl));
-      await persist();
-    });
-    document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=77`;
-      document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
-      await persist();
-    });
-  }
-
-  if(state.aboutPage==='type'){
-    const wheel=document.getElementById('typeWheel'),knob=document.getElementById('wheelKnob'),value=document.getElementById('typeValue'),face=document.getElementById('wheelFace');
-    const paint=deg=>{
-      typeAngle=normAngle(deg);typeNow=typeFromAngle(typeAngle);p.about.typeAngle=String(typeAngle);p.about.types=[typeNow.key];
-      const r=116,rad=typeAngle*Math.PI/180,cx=140,cy=140;
-      knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
-      value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
-      const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=77`;}
-    };
-    const point=e=>{
-      const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
-      const x=t.clientX-(rect.left+rect.width/2),y=t.clientY-(rect.top+rect.height/2);
-      paint(Math.atan2(y,x)*180/Math.PI);
-    };
-    wheel.onpointerdown=e=>{wheel.setPointerCapture(e.pointerId);point(e)}; wheel.onpointerup=async e=>{point(e);await persist()};
-    wheel.onpointermove=e=>{if(e.buttons)point(e)};
-    wheel.ontouchmove=e=>{point(e);e.preventDefault()}; wheel.ontouchend=async()=>{await persist()};
-    paint(typeAngle);
-  }
+  document.getElementById('back').onclick=async()=>{await persist();state.screen='postadd';render()};
+  document.querySelector('.persistent-symbols').onclick=e=>{
+    const b=e.target.closest('[data-subopen]'); if(!b)return;
+    const target={egg:'penis',peach:'peach',drop:'drops'}[b.dataset.subopen];
+    if(target){state.screen=target;render()}
+  };
 }
-
-
 async function renderPenis(){
   const p=await get('people',state.selectedPersonId);
   p.about ||= {};
@@ -459,9 +362,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=77" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=77" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=77" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=78" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=78" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=78" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -544,9 +447,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=77" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=77" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=77" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=78" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=78" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=78" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -589,9 +492,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=77" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=77" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=77" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=78" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=78" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=78" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -1012,7 +915,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=7.7');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=7.8');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

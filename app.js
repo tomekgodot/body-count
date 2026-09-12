@@ -238,7 +238,7 @@ async function renderPostAdd(){
   requestAnimationFrame(()=>{const x=document.getElementById('postaddAdded');setTimeout(()=>x?.classList.add('show'),30);setTimeout(()=>x?.classList.add('hide'),1800)});
   aboutChoice.onclick=()=>{state.screen='about';render()};
   encounterChoice.onclick=()=>{state.detailsReturn='postadd';state.screen='encounterEdit';render()};
-  done.onclick=()=>{state.screen='person';render()};
+  done.onclick=()=>{state.collectionHighlight=state.selectedPersonId;state.screen='collection';render()};
 }
 
 async function renderAboutHim(){
@@ -295,9 +295,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=81" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=82" alt=""></button>
       </div>
     </section>
   </main>`;
@@ -372,9 +372,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=81" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=82" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -456,9 +456,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=81" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=82" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -501,9 +501,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=81" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=81" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=81" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=82" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -907,16 +907,66 @@ async function renderEncounter(){
  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{state.detailsReturn='person';state.screen='encounterEdit';render()});
 }
 
-async function renderCollection(){
- const people=await all('people');const encounters=await all('encounters');
- const rows=people.map(p=>{const es=encounters.filter(e=>e.personId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date));return {p,es,last:es[0]}}).sort((a,b)=>new Date(b.last?.date||b.p.createdAt||0)-new Date(a.last?.date||a.p.createdAt||0));
- app.innerHTML=`<div class="topbar"><div><h1 class="screen-title" style="margin:0">The Collection</h1><p class="sub" style="margin:5px 0 0">${people.length} ${people.length===1?'guy':'guys'}</p></div><div class="privacy-pill">🔒 Local</div></div>
- <div class="search-wrap"><input class="input" id="search" placeholder="Find by name or mental note…"></div><div id="collectionList">
- ${collectionMarkup(rows)}</div>${nav('collection')}`;
- const search=document.getElementById('search'); search.oninput=()=>{const q=search.value.trim().toLowerCase();const filtered=!q?rows:rows.filter(({p})=>`${p.name||''} ${p.lastMemory||''}`.toLowerCase().includes(q));document.getElementById('collectionList').innerHTML=collectionMarkup(filtered);attachCollectionRows()};
- attachCollectionRows();attachNav();
+function collectionDescription(p){
+  const a=p.about||{};
+  const age={young:'young','30s':'in his 30s',middle:'middle-aged',older:'older'}[a.ageBand];
+  const height={short:'short',medium:'medium-height',tall:'tall'}[a.heightBand];
+  const br=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
+  const build={slim:'slim',average:'average-build',athletic:'athletic',big:'big'}[String(br).toLowerCase()];
+  const tr=(Array.isArray(a.types)&&a.types[0])||a.type||'';
+  const type={twink:'twink',bear:'bear',daddy:'daddy',otter:'otter'}[String(tr).toLowerCase()];
+  const traits=[height,build,type].filter(Boolean);
+  if(!traits.length&&!age)return '';
+  let lead=traits.join(' ');
+  if(lead)lead=lead[0].toUpperCase()+lead.slice(1);
+  if(age){
+    if(!lead)return age[0].toUpperCase()+age.slice(1)+'.';
+    if(age==='in his 30s')return `${lead} in his 30s.`;
+    return `${lead}, ${age}.`;
+  }
+  return `${lead}.`;
 }
-function collectionMarkup(rows){return rows.length?rows.map(({p,es,last})=>`<button class="card person-card" style="width:100%;text-align:left" data-person="${p.id}"><div class="avatar">${esc(initials(p.name))}</div><div class="person-main"><h3>${esc(displayName(p))}</h3><p>${esc(p.lastMemory||last?.memory||`#${String(p.id).padStart(3,'0')}`)}</p></div><div class="person-meta"><b>${es.length}×</b><span>${avgRating(es)==='—'?'':`★ ${avgRating(es)}`}</span></div></button>`).join(''):`<div class="card empty">Nobody matching that.</div>`}
+async function renderCollection(){
+  const people=await all('people'), encounters=await all('encounters');
+  const rows=people.map(p=>{
+    const es=encounters.filter(e=>e.personId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    return {p,es,last:es[0],description:collectionDescription(p)};
+  }).sort((a,b)=>new Date(b.last?.date||b.p.createdAt||0)-new Date(a.last?.date||a.p.createdAt||0));
+
+  app.innerHTML=`<main class="people-collection">
+    <header class="people-head"><div><div class="people-eyebrow">PEOPLE</div><h1>Collection</h1></div>
+    <button class="people-add" id="peopleAdd" type="button" aria-label="Add a new guy">+</button></header>
+    <div class="people-search"><input id="search" type="search" placeholder="Find someone…" autocomplete="off"></div>
+    <div id="collectionList" class="collection-list">${collectionMarkup(rows,state.collectionHighlight)}</div>
+    ${nav('collection')}</main>`;
+
+  search.oninput=()=>{
+    const q=search.value.trim().toLowerCase();
+    const filtered=!q?rows:rows.filter(({p,description})=>`${p.name||''} ${p.lastMemory||''} ${description}`.toLowerCase().includes(q));
+    collectionList.innerHTML=collectionMarkup(filtered,null); attachCollectionRows();
+  };
+  peopleAdd.onclick=()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()};
+  attachCollectionRows();attachNav();
+
+  if(state.collectionHighlight){
+    const id=state.collectionHighlight; state.collectionHighlight=null;
+    requestAnimationFrame(()=>{
+      const card=document.querySelector(`[data-person="${id}"]`);
+      if(card){card.scrollIntoView({block:'center',behavior:'smooth'});card.classList.add('just-added');setTimeout(()=>card.classList.remove('just-added'),1800)}
+    });
+  }
+}
+function collectionMarkup(rows,highlightId=null){
+  if(!rows.length)return `<div class="collection-empty">Nobody here yet.</div>`;
+  return rows.map(({p,es,description})=>{
+    const avg=avgRating(es), note=(p.lastMemory||'').trim();
+    return `<button class="collection-person ${Number(highlightId)===Number(p.id)?'pending-highlight':''}" data-person="${p.id}" type="button">
+      <div class="collection-card-top"><h2>${esc(displayName(p))}</h2>${avg==='—'?'':`<div class="collection-rating"><span>★</span>${avg}</div>`}</div>
+      ${note?`<div class="collection-memory">${esc(note)}</div>`:''}
+      ${description?`<div class="collection-description">${esc(description)}</div>`:''}
+    </button>`;
+  }).join('');
+}
 function attachCollectionRows(){document.querySelectorAll('[data-person]').forEach(x=>x.onclick=()=>{state.selectedPersonId=Number(x.dataset.person);state.screen='person';render()})}
 
 (async()=>{
@@ -924,7 +974,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=8.1');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=8.2');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

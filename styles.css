@@ -2392,3 +2392,52 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   line-height:1;
 }
 body.modal-open{overflow:hidden}
+
+/* v6.1 — taller/slimmer hero number + clearer privacy line */
+.count-brand-wrap{
+  top:calc(18px + env(safe-area-inset-top))!important;
+  gap:6px!important;
+}
+.count-brand{
+  font-size:18px!important;
+  font-weight:650!important;
+  letter-spacing:.13em!important;
+  color:rgba(255,255,255,.92)!important;
+}
+.home-privacy{
+  display:block!important;
+  position:relative!important;
+  z-index:5!important;
+  font-size:10.5px!important;
+  line-height:1.2!important;
+  color:rgba(255,255,255,.52)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+.count-center{
+  inset:0 0 calc(76px + env(safe-area-inset-bottom)) 0!important;
+}
+.count-lockup{
+  width:min(86vw,390px)!important;
+  height:min(64vh,500px)!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+.count-number{
+  font-family:"Avenir Next Condensed","Helvetica Neue","SF Pro Display",-apple-system,BlinkMacSystemFont,Arial,sans-serif!important;
+  font-size:clamp(290px,90vw,470px)!important;
+  font-weight:300!important;
+  line-height:.72!important;
+  letter-spacing:-.06em!important;
+  transform:scaleX(.58) scaleY(1.16)!important;
+  transform-origin:center center!important;
+  white-space:nowrap!important;
+}
+.count-add{
+  right:8%!important;
+  bottom:17%!important;
+  width:62px!important;
+  height:62px!important;
+  z-index:6!important;
+}

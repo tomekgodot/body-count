@@ -2961,3 +2961,75 @@ body.modal-open{overflow:hidden}
 body.modal-open{
   overflow:auto!important;
 }
+
+/* v7.1 — keep Home fully visible behind the privacy popup */
+.privacy-modal{
+  background:transparent!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.privacy-backdrop{
+  background:transparent!important;
+  opacity:0!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.count-home{
+  background:transparent!important;
+}
+
+/* v7.2 — Modern hero numerals; everything else stays unchanged */
+.count-number{
+  font-family:"Helvetica Neue","Avenir Next","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important;
+  font-style:normal!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+  -webkit-font-smoothing:antialiased!important;
+  text-rendering:geometricPrecision!important;
+}
+
+/* Modern: clean, tall, confident, with more open proportions than the previous lock-screen cut. */
+.count-digits-1 .count-number{
+  font-size:clamp(350px,104vw,540px)!important;
+  font-weight:430!important;
+  line-height:.78!important;
+  letter-spacing:-.045em!important;
+  transform:scaleX(.78)!important;
+}
+.count-digits-2 .count-number{
+  font-size:clamp(270px,78vw,410px)!important;
+  font-weight:430!important;
+  line-height:.78!important;
+  letter-spacing:.025em!important;
+  transform:translateX(-6%) scaleX(.76)!important;
+}
+.count-digits-3 .count-number{
+  font-size:clamp(215px,59vw,325px)!important;
+  font-weight:420!important;
+  line-height:.78!important;
+  letter-spacing:.02em!important;
+  transform:translateX(-7%) scaleX(.68)!important;
+}
+
+/* Keep the + overlapping the lower-right of the numeral field, but fully legible. */
+.count-digits-1 .count-add{right:9%!important;bottom:16%!important;}
+.count-digits-2 .count-add{right:4%!important;bottom:16%!important;}
+.count-digits-3 .count-add{right:2%!important;bottom:16%!important;}
+
+/* Separate, slower heartbeat after the count-up settles.
+   It changes opacity/glow only, so it does not fight the digit-specific transforms above. */
+.count-number.count-settled{
+  animation:count-number-breathe 2.65s ease-in-out infinite!important;
+}
+@keyframes count-number-breathe{
+  0%,100%{
+    opacity:1;
+    filter:drop-shadow(0 0 0 rgba(255,255,255,0));
+  }
+  50%{
+    opacity:.86;
+    filter:drop-shadow(0 0 8px rgba(255,255,255,.10));
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .count-number.count-settled{animation:none!important;}
+}

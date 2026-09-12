@@ -1658,3 +1658,159 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
   opacity:0;
   transform:translate(-50%,-58%) scale(.985);
 }
+
+/* v5.3 — fixed penis navigation + calmer post-add reveal */
+
+.detail-pills.five{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px;
+}
+.detail-pills.five button{
+  min-width:0;
+  padding-left:5px;
+  padding-right:5px;
+}
+
+/* Post-add: no heading/prompt; actions are the screen */
+.postadd-next{
+  min-height:100dvh;
+  box-sizing:border-box;
+  padding:28px 18px 34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.postadd-next-inner{
+  width:min(100%,430px);
+  min-height:58dvh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:18px;
+}
+.postadd-actions{
+  display:grid;
+  gap:16px;
+}
+.postadd-action-card{
+  width:100%;
+  min-height:108px;
+  display:grid;
+  grid-template-columns:1fr 54px;
+  align-items:center;
+  gap:18px;
+  text-align:left;
+  padding:22px 20px 22px 22px;
+  border-radius:26px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,rgba(255,255,255,.060),rgba(255,255,255,.028));
+  color:#f5f1ed;
+  box-shadow:0 14px 36px rgba(0,0,0,.20);
+}
+.postadd-action-card:active{
+  transform:scale(.985);
+  background:rgba(255,255,255,.075);
+}
+.postadd-action-copy{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.postadd-action-copy strong{
+  font-size:15px;
+  line-height:1.25;
+  font-weight:850;
+  letter-spacing:.05em;
+}
+.postadd-action-copy small{
+  font-size:11px;
+  font-weight:500;
+  color:rgba(255,255,255,.40);
+  letter-spacing:.055em;
+}
+.postadd-plus-right{
+  justify-self:end;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:29px;
+  font-weight:300;
+  line-height:1;
+  color:#efbd86;
+  border:1px solid rgba(239,189,134,.50);
+  background:rgba(239,189,134,.08);
+  box-shadow:0 0 0 0 rgba(239,189,134,.22);
+  animation:postAddPulseRight 2.25s ease-out infinite;
+}
+.postadd-action-card:nth-child(2) .postadd-plus-right{animation-delay:.35s}
+@keyframes postAddPulseRight{
+  0%,58%,100%{box-shadow:0 0 0 0 rgba(239,189,134,.22)}
+  76%{box-shadow:0 0 0 9px rgba(239,189,134,0)}
+}
+.postadd-thatsit{
+  align-self:center;
+  margin-top:18px;
+  border:0;
+  background:transparent;
+  color:rgba(255,255,255,.62);
+  padding:14px 24px;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.13em;
+}
+.postadd-thatsit:active{color:#fff}
+
+/* Large acknowledgement bubble that briefly floats over the new screen */
+.postadd-toast-large{
+  position:fixed;
+  z-index:120;
+  left:50%;
+  top:38%;
+  transform:translate(-50%,-50%) scale(.88);
+  width:min(82vw,360px);
+  min-height:116px;
+  box-sizing:border-box;
+  padding:24px 26px;
+  border-radius:34px;
+  border:1px solid rgba(239,189,134,.30);
+  background:rgba(18,16,14,.94);
+  color:#f7f2ed;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  text-align:center;
+  font-size:21px;
+  font-weight:800;
+  line-height:1.15;
+  letter-spacing:-.01em;
+  opacity:0;
+  pointer-events:none;
+  box-shadow:0 28px 80px rgba(0,0,0,.58),0 0 44px rgba(239,189,134,.06);
+  backdrop-filter:blur(18px);
+  transition:opacity .30s ease,transform .34s cubic-bezier(.2,.9,.2,1);
+}
+.postadd-toast-large.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+.postadd-toast-large.hide{
+  opacity:0;
+  transform:translate(-50%,-58%) scale(.97);
+}
+.postadd-toast-check{
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:1px solid rgba(239,189,134,.46);
+  color:#efbd86;
+  font-size:18px;
+}

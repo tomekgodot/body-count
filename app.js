@@ -177,32 +177,31 @@ function detailTiles(){return [['position','↕','Position','Top, bottom, vers�
 async function renderPostAdd(){
   const p=await get('people',state.selectedPersonId);
   app.innerHTML=`<main class="postadd-next">
-    <div class="postadd-toast" id="postaddToast" role="status">Added to your count.</div>
+    <div class="postadd-toast-large" id="postaddToast" role="status">
+      <span class="postadd-toast-check">✓</span>
+      <span>Added to your count.</span>
+    </div>
 
     <div class="postadd-next-inner">
-      <div class="postadd-prompt">Want to add more?</div>
-
       <div class="postadd-actions">
         <button class="postadd-action-card" id="aboutChoice">
-          <span class="postadd-plus" aria-hidden="true">+</span>
           <span class="postadd-action-copy">
             <strong>MORE ABOUT HIM</strong>
             <small>Who</small>
           </span>
-          <span class="postadd-chevron" aria-hidden="true">›</span>
+          <span class="postadd-plus-right" aria-hidden="true">+</span>
         </button>
 
         <button class="postadd-action-card" id="encounterChoice">
-          <span class="postadd-plus" aria-hidden="true">+</span>
           <span class="postadd-action-copy">
             <strong>MORE ABOUT WHAT HAPPENED</strong>
             <small>What · When · How</small>
           </span>
-          <span class="postadd-chevron" aria-hidden="true">›</span>
+          <span class="postadd-plus-right" aria-hidden="true">+</span>
         </button>
       </div>
 
-      <button class="postadd-thatsit" id="done">THAT’S IT</button>
+      <button class="postadd-thatsit" id="done">I’M DONE ADDING</button>
     </div>
   </main>`;
 
@@ -210,7 +209,7 @@ async function renderPostAdd(){
     const toast=document.getElementById('postaddToast');
     if(toast){
       setTimeout(()=>toast.classList.add('show'),40);
-      setTimeout(()=>toast.classList.add('hide'),1650);
+      setTimeout(()=>toast.classList.add('hide'),1850);
     }
   });
 
@@ -218,8 +217,6 @@ async function renderPostAdd(){
   document.getElementById('encounterChoice').onclick=()=>{state.detailsReturn='postadd';state.screen='encounterEdit';render()};
   document.getElementById('done').onclick=()=>{state.screen='person';render()};
 }
-
-
 
 async function renderAboutHim(){
   const p=await get('people',state.selectedPersonId);
@@ -273,7 +270,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=52" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=53" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -295,7 +292,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=52" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=53" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -316,7 +313,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=52" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=53" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -332,9 +329,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=52" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=52" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=52" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=53" alt=""></button>
     </div>
   </main>`;
 
@@ -359,11 +356,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=52`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=53`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=52`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=53`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -391,7 +388,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=52`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=53`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -405,7 +402,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=52`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=53`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -426,60 +423,62 @@ async function renderPenis(){
   p.about.penis ||= {};
   const d=p.about.penis;
 
-  app.innerHTML=`<main class="about-screen detail-screen screen-enter">
-    ${privateTabs('penis')}
-    <section class="private-detail-content">
-      <div class="private-section">
-        <div class="private-label">SIZE</div>
-        <div class="private-choice-row private-choice-five">
-          ${['S','M','L','XL','XXL'].map(v=>`<button class="${d.size===v?'on':''}" data-penis-size="${v}">${v}</button>`).join('')}
-        </div>
-      </div>
+  const row=(label,key,items,extra='')=>`<section class="detail-block compact-choice-block">
+    <div class="detail-label">${label}</div>
+    <div class="detail-pills ${items.length===5?'five':items.length===4?'four':items.length===3?'three':'two'} ${extra}">
+      ${items.map(([v,t])=>`<button data-penis-key="${key}" data-penis-value="${v}" class="${d[key]===v?'on':''}">${t}</button>`).join('')}
+    </div>
+  </section>`;
 
-      <div class="private-section">
-        <div class="private-label">GIRTH</div>
-        <div class="private-choice-row">
-          ${['Slim','Average','Thick','Massive'].map(v=>`<button class="${d.girth===v?'on':''}" data-penis-girth="${v}">${v}</button>`).join('')}
-        </div>
-      </div>
+  app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
+    <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
+    <nav class="private-tabs">
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=53" alt=""></button>
+    </nav>
 
-      <div class="private-section">
-        <div class="private-label">FORESKIN</div>
-        <div class="private-choice-row">
-          ${['Cut','Uncut'].map(v=>`<button class="${d.foreskin===v?'on':''}" data-penis-foreskin="${v}">${v}</button>`).join('')}
-        </div>
-      </div>
+    ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
+    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Thick','Thick'],['Massive','Massive']])}
+    ${row('FORESKIN','foreskin',[['Cut','Cut'],['Uncut','Uncut']])}
+    ${row('VEINS','veins',[['Smooth','Smooth'],['Veiny','Veiny']])}
 
-      <div class="private-section">
-        <div class="private-label">VEINS</div>
-        <div class="private-choice-row">
-          ${['Smooth','Veiny'].map(v=>`<button class="${d.veins===v?'on':''}" data-penis-veins="${v}">${v}</button>`).join('')}
-        </div>
-      </div>
-
-      <div class="private-section">
-        <div class="private-label">CURVE</div>
-        <div class="private-choice-row curve-choice-row">
-          ${[['Up','⌒'],['Straight','—'],['Down','⌣']].map(([v,icon])=>`<button class="${d.curve===v?'on':''}" data-penis-curve="${v}"><span class="curve-mark">${icon}</span><span>${v}</span></button>`).join('')}
-        </div>
+    <section class="detail-block compact-choice-block">
+      <div class="detail-label">CURVE</div>
+      <div class="detail-pills three curve-choice-row">
+        <button data-penis-key="curve" data-penis-value="Up" class="${d.curve==='Up'?'on':''}"><span class="curve-mark">⌒</span><span>Up</span></button>
+        <button data-penis-key="curve" data-penis-value="Straight" class="${d.curve==='Straight'?'on':''}"><span class="curve-mark">—</span><span>Straight</span></button>
+        <button data-penis-key="curve" data-penis-value="Down" class="${d.curve==='Down'?'on':''}"><span class="curve-mark">⌣</span><span>Down</span></button>
       </div>
     </section>
   </main>`;
 
-  const bind=(selector,key)=>{
-    document.querySelectorAll(selector).forEach(b=>b.onclick=async()=>{
-      const value=b.dataset[Object.keys(b.dataset).find(k=>k.startsWith('penis'))];
-      d[key]=d[key]===value?'':value;
-      await put('people',p);
-      renderPenis();
-    });
+  const save=async()=>{
+    const c=await get('people',state.selectedPersonId);
+    c.about ||= {};
+    c.about.penis={...d};
+    await put('people',c);
   };
-  bind('[data-penis-size]','size');
-  bind('[data-penis-girth]','girth');
-  bind('[data-penis-foreskin]','foreskin');
-  bind('[data-penis-veins]','veins');
-  bind('[data-penis-curve]','curve');
-  bindPrivateTabs();
+
+  document.querySelectorAll('[data-go-private]').forEach(b=>b.onclick=async()=>{
+    await save();
+    state.screen=b.dataset.goPrivate;
+    render();
+  });
+
+  document.getElementById('backPenis').onclick=async()=>{
+    await save();
+    state.screen='about';
+    render();
+  };
+
+  document.querySelectorAll('[data-penis-key]').forEach(b=>b.onclick=async()=>{
+    const key=b.dataset.penisKey;
+    const val=b.dataset.penisValue;
+    d[key]=d[key]===val?'':val;
+    document.querySelectorAll(`[data-penis-key="${key}"]`).forEach(x=>x.classList.toggle('on',x===b && d[key]===val));
+    await save();
+  });
 }
 
 async function renderPeach(){
@@ -496,9 +495,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=52" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=52" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=52" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=53" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -538,9 +537,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=52" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=52" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=52" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=53" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -740,7 +739,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=5.2');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=5.3');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

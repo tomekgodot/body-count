@@ -1468,3 +1468,37 @@ body:has(.private-detail-screen)::-webkit-scrollbar{display:none}
 .enc-rating button{appearance:none;border:0;background:none;padding:0 3px;color:rgba(255,255,255,.16);font-size:42px;line-height:1}
 .enc-rating button.on{color:#e9b77c;text-shadow:0 0 18px rgba(233,183,124,.16)}
 .enc-autosave{text-align:center;color:rgba(255,255,255,.28);font-size:11px;margin:22px 0 0}
+
+/* v5.1 — clearer progressive disclosure */
+.quick-cue-hint{
+  margin:-3px 4px 15px;
+  color:rgba(255,255,255,.30);
+  font-size:11px;
+  letter-spacing:.01em;
+}
+.postadd-copy{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+}
+.postadd-copy strong{
+  font:inherit;
+  font-weight:850;
+}
+.postadd-copy small{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.04em;
+  color:rgba(255,255,255,.38);
+}
+.private-choice-five{
+  display:grid!important;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px!important;
+}
+.private-choice-five button{
+  min-width:0!important;
+  padding-left:6px!important;
+  padding-right:6px!important;
+}

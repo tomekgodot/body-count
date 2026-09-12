@@ -121,7 +121,7 @@ async function renderAdd(){
     `}
 
     <div class="quick-field mental-note-field">
-      <textarea id="memory" maxlength="60" placeholder="What you’ll remember him by…">${esc(state.quick.memory||'')}</textarea>
+      <textarea id="memory" maxlength="60" placeholder="One thing you’ll remember him by…">${esc(state.quick.memory||'')}</textarea>
     </div>
 
     <button class="primary quick-save" id="save" ${mode==='existing'&&!selected?'disabled':''}>ADD</button>
@@ -179,12 +179,12 @@ async function renderPostAdd(){
   app.innerHTML=`<main class="postadd-clean">
     <div class="postadd-confirm">
       <div class="eyebrow">ADDED</div>
-      <h1>${esc(displayName(p))}</h1>
+      <h1>Added to your count.</h1>
       ${p.lastMemory?`<p>${esc(p.lastMemory)}</p>`:''}
     </div>
     <div class="postadd-two">
-      <button class="postadd-choice" id="aboutChoice"><span>WHO</span><b>›</b></button>
-      <button class="postadd-choice" id="encounterChoice"><span>WHAT · WHEN · HOW</span><b>›</b></button>
+      <button class="postadd-choice" id="aboutChoice"><span class="postadd-copy"><strong>MORE ABOUT HIM</strong><small>Who</small></span><b>›</b></button>
+      <button class="postadd-choice" id="encounterChoice"><span class="postadd-copy"><strong>MORE ABOUT WHAT HAPPENED</strong><small>What · When · How</small></span><b>›</b></button>
     </div>
     <button class="postadd-done" id="done">DONE</button>
   </main>`;
@@ -248,7 +248,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=50" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=51" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -270,7 +270,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=50" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=51" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -291,7 +291,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=50" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=51" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -307,9 +307,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=50" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=51" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=51" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=51" alt=""></button>
     </div>
   </main>`;
 
@@ -331,11 +331,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=50`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=51`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=50`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=51`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -363,7 +363,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=50`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=51`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -377,7 +377,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=50`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=51`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -398,116 +398,61 @@ async function renderPenis(){
   p.about.penis ||= {};
   const d=p.about.penis;
 
-  const lengthClass=n=>n<=12?'S':n<=15?'M':n<=17?'L':n<=19?'XL':'XXL';
-  const lengthDefault={S:12,M:14,L:16,XL:18,XXL:21};
-  const girthClass=n=>n<=9?'Slim':n<=11?'Average':n<=13?'Thick':'Massive';
-  const girthDefault={'Slim':9,'Average':11,'Thick':13,'Massive':15};
-
-  const lenExact=d.lengthExact!==''&&d.lengthExact!=null;
-  const girExact=d.girthExact!==''&&d.girthExact!=null;
-  const lenVal=Number(d.lengthExact||lengthDefault[d.length]||16);
-  const girVal=Number(d.girthExact||girthDefault[d.girth]||11);
-
-  app.innerHTML=`<main class="private-detail-screen">
-    <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=50" alt=""></button>
-    </nav>
-<section class="detail-block slider-detail">
-      <div class="detail-title-row"><span>LENGTH</span></div>
-      <div class="live-measure">
-        <strong id="lengthNumber">${lenExact?lenVal:(d.length||'')}</strong><span id="lengthUnit">${lenExact?'cm':''}</span>
+  app.innerHTML=`<main class="about-screen detail-screen screen-enter">
+    ${privateTabs('penis')}
+    <section class="private-detail-content">
+      <div class="private-section">
+        <div class="private-label">SIZE</div>
+        <div class="private-choice-row private-choice-five">
+          ${['S','M','L','XL','XXL'].map(v=>`<button class="${d.size===v?'on':''}" data-penis-size="${v}">${v}</button>`).join('')}
+        </div>
       </div>
-      <input id="lengthSlider" class="measure-slider" type="range" min="10" max="25" step="1" value="${lenVal}">
-      <div class="size-pills five">
-        ${['S','M','L','XL','XXL'].map(x=>`<button data-length="${x}" class="${!lenExact&&d.length===x?'on':''}">${x}</button>`).join('')}
-      </div>
-    </section>
 
-    <section class="detail-block slider-detail">
-      <div class="detail-title-row"><span>GIRTH</span></div>
-      <div class="live-measure">
-        <strong id="girthNumber">${girExact?girVal:(d.girth||'')}</strong><span id="girthUnit">${girExact?'cm':''}</span>
+      <div class="private-section">
+        <div class="private-label">GIRTH</div>
+        <div class="private-choice-row">
+          ${['Slim','Average','Thick','Massive'].map(v=>`<button class="${d.girth===v?'on':''}" data-penis-girth="${v}">${v}</button>`).join('')}
+        </div>
       </div>
-      <input id="girthSlider" class="measure-slider" type="range" min="7" max="18" step="1" value="${girVal}">
-      <div class="size-pills four">
-        ${['Slim','Average','Thick','Massive'].map(x=>`<button data-girth="${x}" class="${!girExact&&d.girth===x?'on':''}">${x}</button>`).join('')}
+
+      <div class="private-section">
+        <div class="private-label">FORESKIN</div>
+        <div class="private-choice-row">
+          ${['Cut','Uncut'].map(v=>`<button class="${d.foreskin===v?'on':''}" data-penis-foreskin="${v}">${v}</button>`).join('')}
+        </div>
       </div>
-      <div class="measure-note">circumference</div>
-    </section>
 
-    <section class="detail-block split-block">
-      <div><div class="detail-label">FORESKIN</div><div class="detail-pills two">
-        <button data-cut="cut" class="${d.cut==='cut'?'on':''}">Cut</button>
-        <button data-cut="uncut" class="${d.cut==='uncut'?'on':''}">Uncut</button>
-      </div></div>
-      <div><div class="detail-label">VEINS</div><div class="detail-pills two">
-        <button data-veins="smooth" class="${d.veins==='smooth'?'on':''}">Smooth</button>
-        <button data-veins="veiny" class="${d.veins==='veiny'?'on':''}">Veiny</button>
-      </div></div>
-    </section>
+      <div class="private-section">
+        <div class="private-label">VEINS</div>
+        <div class="private-choice-row">
+          ${['Smooth','Veiny'].map(v=>`<button class="${d.veins===v?'on':''}" data-penis-veins="${v}">${v}</button>`).join('')}
+        </div>
+      </div>
 
-    <section class="detail-block">
-      <div class="detail-label">CURVE</div>
-      <div class="curve-grid three">
-        <button data-curve="up" class="${d.curve==='up'?'on':''}">
-          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 30 C24 30 35 28 45 22 C54 17 59 12 64 7"/></svg><small>Up</small>
-        </button>
-        <button data-curve="straight" class="${d.curve==='straight'?'on':''}">
-          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 19 C28 19 44 19 64 19"/></svg><small>Straight</small>
-        </button>
-        <button data-curve="down" class="${d.curve==='down'?'on':''}">
-          <svg viewBox="0 0 72 38" aria-hidden="true"><path d="M8 8 C24 8 35 10 45 16 C54 21 59 26 64 31"/></svg><small>Down</small>
-        </button>
+      <div class="private-section">
+        <div class="private-label">CURVE</div>
+        <div class="private-choice-row curve-choice-row">
+          ${[['Up','⌒'],['Straight','—'],['Down','⌣']].map(([v,icon])=>`<button class="${d.curve===v?'on':''}" data-penis-curve="${v}"><span class="curve-mark">${icon}</span><span>${v}</span></button>`).join('')}
+        </div>
       </div>
     </section>
   </main>`;
 
-  const save=async()=>{
-    const current=await get('people',state.selectedPersonId);
-    current.about ||= {}; current.about.penis={...d}; await put('people',current);
+  const bind=(selector,key)=>{
+    document.querySelectorAll(selector).forEach(b=>b.onclick=async()=>{
+      const value=b.dataset[Object.keys(b.dataset).find(k=>k.startsWith('penis'))];
+      d[key]=d[key]===value?'':value;
+      await put('people',p);
+      renderPenis();
+    });
   };
-    document.querySelectorAll('[data-go-private]').forEach(b=>b.onclick=async()=>{await save();state.screen=b.dataset.goPrivate;render();});
-document.getElementById('backPenis').onclick=async()=>{await save();state.screen='about';render()};
-
-  const ls=document.getElementById('lengthSlider');
-  const paintLength=()=>{
-    const n=Number(ls.value),cl=lengthClass(n);
-    d.lengthExact=String(n); d.length=cl;
-    document.getElementById('lengthNumber').textContent=n;
-    document.getElementById('lengthUnit').textContent='cm';
-        document.querySelectorAll('[data-length]').forEach(x=>x.classList.toggle('soft-on',x.dataset.length===cl));
-  };
-  ls.oninput=paintLength; ls.onchange=async()=>{paintLength();await save()};
-  document.querySelectorAll('[data-length]').forEach(b=>b.onclick=async()=>{
-    d.length=b.dataset.length; d.lengthExact='';
-    document.getElementById('lengthNumber').textContent=b.dataset.length;document.getElementById('lengthUnit').textContent='';
-    document.querySelectorAll('[data-length]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
-    ls.value=lengthDefault[b.dataset.length]; await save();
-  });
-
-  const gs=document.getElementById('girthSlider');
-  const paintGirth=()=>{
-    const n=Number(gs.value),cl=girthClass(n);
-    d.girthExact=String(n); d.girth=cl;
-    document.getElementById('girthNumber').textContent=n;
-    document.getElementById('girthUnit').textContent='cm';
-        document.querySelectorAll('[data-girth]').forEach(x=>x.classList.toggle('soft-on',x.dataset.girth===cl));
-  };
-  gs.oninput=paintGirth; gs.onchange=async()=>{paintGirth();await save()};
-  document.querySelectorAll('[data-girth]').forEach(b=>b.onclick=async()=>{
-    d.girth=b.dataset.girth; d.girthExact='';
-    document.getElementById('girthNumber').textContent=b.dataset.girth;document.getElementById('girthUnit').textContent='';
-    document.querySelectorAll('[data-girth]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
-    gs.value=girthDefault[b.dataset.girth]; await save();
-  });
-
-  document.querySelectorAll('[data-cut]').forEach(b=>b.onclick=async()=>{d.cut=b.dataset.cut;document.querySelectorAll('[data-cut]').forEach(x=>x.classList.toggle('on',x===b));await save()});
-  document.querySelectorAll('[data-veins]').forEach(b=>b.onclick=async()=>{d.veins=b.dataset.veins;document.querySelectorAll('[data-veins]').forEach(x=>x.classList.toggle('on',x===b));await save()});
-  document.querySelectorAll('[data-curve]').forEach(b=>b.onclick=async()=>{d.curve=b.dataset.curve;document.querySelectorAll('[data-curve]').forEach(x=>x.classList.toggle('on',x===b));await save()});
+  bind('[data-penis-size]','size');
+  bind('[data-penis-girth]','girth');
+  bind('[data-penis-foreskin]','foreskin');
+  bind('[data-penis-veins]','veins');
+  bind('[data-penis-curve]','curve');
+  bindPrivateTabs();
 }
-
 
 async function renderPeach(){
   const p=await get('people',state.selectedPersonId);
@@ -523,9 +468,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=50" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=51" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=51" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=51" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -565,9 +510,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=50" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=50" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=50" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=51" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=51" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=51" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -767,7 +712,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=5.0');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=5.1');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

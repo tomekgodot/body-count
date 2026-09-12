@@ -230,8 +230,8 @@ async function renderPostAdd(){
   app.innerHTML=`<main class="postadd-next"><div class="postadd-next-inner">
     <div class="postadd-added" id="postaddAdded">Added to your count</div>
     <div class="postadd-actions">
-      <button class="postadd-action-card" id="aboutChoice"><span class="postadd-action-copy"><strong>MORE ABOUT HIM</strong><small>Who</small></span><span class="postadd-plus-right">+</span></button>
-      <button class="postadd-action-card" id="encounterChoice"><span class="postadd-action-copy"><strong>MORE ABOUT WHAT HAPPENED</strong><small>What · When · How</small></span><span class="postadd-plus-right">+</span></button>
+      <button class="postadd-action-card" id="aboutChoice"><span class="postadd-action-copy"><strong>MORE ABOUT HIM</strong></span><span class="postadd-plus-right">+</span></button>
+      <button class="postadd-action-card" id="encounterChoice"><span class="postadd-action-copy"><strong>MORE ABOUT WHAT HAPPENED</strong></span><span class="postadd-plus-right">+</span></button>
     </div>
     <button class="postadd-thatsit" id="done">I’M DONE ADDING</button>
   </div></main>`;
@@ -293,7 +293,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=73" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=74" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -315,7 +315,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=73" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=74" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -336,7 +336,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=73" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=74" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -352,9 +352,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=73" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=73" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=73" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=74" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=74" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=74" alt=""></button>
     </div>
   </main>`;
 
@@ -379,11 +379,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=73`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=74`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=73`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=74`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -411,7 +411,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=73`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=74`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -425,7 +425,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=73`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=74`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -459,9 +459,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=73" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=73" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=73" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=74" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=74" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=74" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -538,9 +538,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=73" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=73" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=73" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=74" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=74" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=74" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -581,9 +581,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=73" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=73" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=73" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=74" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=74" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=74" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -649,12 +649,14 @@ async function renderEncounterEdit(){
   const base=new Date((e.when.date||e.date||now.toISOString().slice(0,10))+'T12:00:00');
   const curYear=Number(e.when.year)||base.getFullYear();
   const curMonth=Number(e.when.month)||base.getMonth()+1;
-  const curDay=Number(e.when.day)||base.getDate();
+  const calendarDaysInMonth=(year,month)=>new Date(Number(year),Number(month),0).getDate();
+  const maxDay=calendarDaysInMonth(curYear,curMonth);
+  const curDay=Math.min(Number(e.when.day)||base.getDate(),maxDay);
   const precision=e.when.precision||'exact';
   const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const seasons=['SPRING','SUMMER','AUTUMN','WINTER'];
   const years=Array.from({length:80},(_,i)=>now.getFullYear()-i);
-  const days=Array.from({length:31},(_,i)=>i+1);
+  const days=Array.from({length:maxDay},(_,i)=>i+1);
 
   const has=a=>e.happened.includes(a);
   const detailOptions={
@@ -702,11 +704,13 @@ async function renderEncounterEdit(){
     whenControl=`<div class="wheel-row wheel-one">${wheel('wYear',years,curYear)}</div>`;
   }else if(precision==='range'){
     const from=Number(e.when.from)||curYear;
-    const to=Number(e.when.to)||Math.min(now.getFullYear(),from+1);
+    const rawTo=Number(e.when.to)||Math.min(now.getFullYear(),from+1);
+    const to=Math.max(from,rawTo);
+    const toYears=years.filter(y=>y>=from);
     whenControl=`<div class="wheel-range">
       ${wheel('wFrom',years,from)}
       <span class="range-dash">—</span>
-      ${wheel('wTo',years,to)}
+      ${wheel('wTo',toYears,to)}
     </div>`;
   }
 
@@ -758,10 +762,16 @@ async function renderEncounterEdit(){
     if(e.when.precision==='exact'){
       const yy=Number(e.when.year)||curYear;
       const mm=Number(e.when.month)||curMonth;
-      const dd=Math.min(Number(e.when.day)||curDay,new Date(yy,mm,0).getDate());
+      const dd=Math.min(Number(e.when.day)||curDay,calendarDaysInMonth(yy,mm));
       e.when.day=dd;e.when.month=mm;e.when.year=yy;
       e.when.date=`${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
       e.date=e.when.date;
+    }
+    if(e.when.precision==='range'){
+      const from=Number(e.when.from)||curYear;
+      const to=Math.max(from,Number(e.when.to)||from);
+      e.when.from=from;
+      e.when.to=to;
     }
     await put('encounters',e);
   };
@@ -839,6 +849,12 @@ async function renderEncounterEdit(){
       e.when[key]=value;
       items.forEach((x,i)=>x.classList.toggle('selected',i===idx));
       await save();
+
+      const exactCalendarChanged=e.when.precision==='exact'&&(key==='month'||key==='year');
+      const rangeStartChanged=e.when.precision==='range'&&key==='from';
+      if(exactCalendarChanged||rangeStartChanged){
+        renderEncounterEdit();
+      }
     };
 
     list.addEventListener('scroll',()=>{
@@ -941,7 +957,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=7.3');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=7.4');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

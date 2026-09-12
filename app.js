@@ -1,3 +1,12 @@
+
+async function ensureFirstEncounter(personId){
+  const xs=await all('encounters');
+  const found=xs.find(e=>e.personId===personId);
+  if(found) return found;
+  const today=new Date().toISOString().slice(0,10);
+  const e={id:uid(),personId,date:today,when:{precision:'exact',date:today},happened:[],happenedDetails:{},rating:0,createdAt:Date.now()};
+  await put('encounters',e); return e;
+}
 const DB_NAME='bodycount-db';
 const DB_VERSION=1;
 const app=document.getElementById('app');
@@ -175,47 +184,20 @@ async function saveQuick(){
 
 function detailTiles(){return [['position','↕','Position','Top, bottom, vers…'],['happened','✦','What happened','Keep it brief or detailed'],['health','＋','Health','Protection & context'],['about','◌','About him','Age, height, notes'],['anatomy','◇','The details','Private extras']];}
 async function renderPostAdd(){
-  const p=await get('people',state.selectedPersonId);
-  app.innerHTML=`<main class="postadd-next">
-    <div class="postadd-toast-large" id="postaddToast" role="status">
-      <span class="postadd-toast-check">✓</span>
-      <span>Added to your count.</span>
+  const firstEncounter=await ensureFirstEncounter(state.selectedPersonId);
+  state.selectedEncounterId=firstEncounter.id;
+  app.innerHTML=`<main class="postadd-next"><div class="postadd-next-inner">
+    <div class="postadd-added" id="postaddAdded">Added to your count.</div>
+    <div class="postadd-actions">
+      <button class="postadd-action-card" id="aboutChoice"><span class="postadd-action-copy"><strong>MORE ABOUT HIM</strong><small>Who</small></span><span class="postadd-plus-right">+</span></button>
+      <button class="postadd-action-card" id="encounterChoice"><span class="postadd-action-copy"><strong>MORE ABOUT WHAT HAPPENED</strong><small>What · When · How</small></span><span class="postadd-plus-right">+</span></button>
     </div>
-
-    <div class="postadd-next-inner">
-      <div class="postadd-actions">
-        <button class="postadd-action-card" id="aboutChoice">
-          <span class="postadd-action-copy">
-            <strong>MORE ABOUT HIM</strong>
-            <small>Who</small>
-          </span>
-          <span class="postadd-plus-right" aria-hidden="true">+</span>
-        </button>
-
-        <button class="postadd-action-card" id="encounterChoice">
-          <span class="postadd-action-copy">
-            <strong>MORE ABOUT WHAT HAPPENED</strong>
-            <small>What · When · How</small>
-          </span>
-          <span class="postadd-plus-right" aria-hidden="true">+</span>
-        </button>
-      </div>
-
-      <button class="postadd-thatsit" id="done">I’M DONE ADDING</button>
-    </div>
-  </main>`;
-
-  requestAnimationFrame(()=>{
-    const toast=document.getElementById('postaddToast');
-    if(toast){
-      setTimeout(()=>toast.classList.add('show'),40);
-      setTimeout(()=>toast.classList.add('hide'),1850);
-    }
-  });
-
-  document.getElementById('aboutChoice').onclick=()=>{state.screen='about';render()};
-  document.getElementById('encounterChoice').onclick=()=>{state.detailsReturn='postadd';state.screen='encounterEdit';render()};
-  document.getElementById('done').onclick=()=>{state.screen='person';render()};
+    <button class="postadd-thatsit" id="done">I’M DONE ADDING</button>
+  </div></main>`;
+  requestAnimationFrame(()=>{const x=document.getElementById('postaddAdded');setTimeout(()=>x?.classList.add('show'),30);setTimeout(()=>x?.classList.add('hide'),1800)});
+  aboutChoice.onclick=()=>{state.screen='about';render()};
+  encounterChoice.onclick=()=>{state.detailsReturn='postadd';state.screen='encounterEdit';render()};
+  done.onclick=()=>{state.screen='person';render()};
 }
 
 async function renderAboutHim(){
@@ -270,7 +252,7 @@ async function renderAboutHim(){
     const exact=!!a.ageExact;
     panel=`<section class="visual-panel age-panel">
       <div class="visual-value mode-value"><strong id="ageValue">${exact?age:ageBandLabel(ageBand)}</strong><span id="ageUnit">${exact?'years':''}</span></div>
-      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=53" alt=""></div>
+      <div class="figure-wrap visual-photo-wrap age-photo-wrap"><img id="agePortrait" class="visual-photo age-photo" src="assets/age-${ageBand}.jpg?v=54" alt=""></div>
       <input id="ageSlider" class="range age-range" type="range" min="18" max="80" value="${age}" aria-label="Exact age">
       <div class="quick-categories age-cats">
         ${['young','30s','middle','older'].map(x=>`<button data-age-band="${x}" class="${!exact&&ageBand===x?'on':''}">${ageBandLabel(x)}</button>`).join('')}
@@ -292,7 +274,7 @@ async function renderAboutHim(){
         </div>
         <div class="body-center">
           <div class="body-summary"><strong id="heightValue">${exactH?height+' cm':heightBandLabel(heightBand)}</strong><span id="buildSummary">${build?build[0].toUpperCase()+build.slice(1):''}</span></div>
-          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=53" alt=""></div>
+          <div class="figure-wrap body-figure-wrap visual-photo-wrap"><img id="bodyPortrait" class="visual-photo body-photo" src="assets/body-${build}.jpg?v=54" alt=""></div>
         </div>
       </div>
       <div class="weight-block">
@@ -313,7 +295,7 @@ async function renderAboutHim(){
         <span class="wheel-label wl-daddy">DADDY</span>
         <span class="wheel-label wl-otter">OTTER</span>
         <div class="wheel-track"></div>
-        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=53" alt=""></div>
+        <div class="wheel-face ${typeNow.key}" id="wheelFace"><img id="typePortrait" class="type-photo" src="assets/type-${({twink:"twink",twonk:"twonk",otter:"otter","otter-daddy":"average",daddy:"daddy","daddy-bear":"bear",bear:"bear","young-bear":"bear"}[typeNow.key]||"average")}.jpg?v=54" alt=""></div>
         <div class="wheel-knob" id="wheelKnob"></div>
       </div>
       <div class="type-help">Drag around the circle</div>
@@ -329,9 +311,9 @@ async function renderAboutHim(){
     </nav>
     <div class="about-swipe-area" id="aboutSwipe">${panel}</div>
     <div class="about-symbols persistent-symbols">
-      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
-      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=53" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=54" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=54" alt=""></button>
+      <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=54" alt=""></button>
     </div>
   </main>`;
 
@@ -356,11 +338,11 @@ async function renderAboutHim(){
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.toggle('soft-on',x.dataset.ageBand===band));
       document.querySelectorAll('[data-age-band]').forEach(x=>x.classList.remove('on'));
       const fig=document.getElementById('agePortrait');
-      if(fig){fig.src=`assets/age-${band}.jpg?v=53`;fig.style.filter='';fig.style.transform='scale(1)'}
+      if(fig){fig.src=`assets/age-${band}.jpg?v=54`;fig.style.filter='';fig.style.transform='scale(1)'}
     };
     s.oninput=paintAge; s.onchange=async()=>{paintAge();await persist()};
     document.querySelectorAll('[data-age-band]').forEach(b=>b.onclick=async()=>{
-      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=53`;
+      p.about.ageExact='';p.about.ageBand=b.dataset.ageBand;v.textContent=ageBandLabel(b.dataset.ageBand);u.textContent='';document.getElementById('agePortrait').src=`assets/age-${b.dataset.ageBand}.jpg?v=54`;
       document.querySelectorAll('[data-age-band]').forEach(x=>{x.classList.toggle('on',x===b);x.classList.remove('soft-on')});
       await persist();
     });
@@ -388,7 +370,7 @@ async function renderAboutHim(){
       await persist();
     });
     document.querySelectorAll('[data-build]').forEach(b=>b.onclick=async()=>{
-      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=53`;
+      p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build;document.getElementById('buildSummary').textContent=b.textContent;document.getElementById('bodyPortrait').src=`assets/body-${b.dataset.build}.jpg?v=54`;
       document.querySelectorAll('[data-build]').forEach(x=>x.classList.toggle('on',x===b));
       await persist();
     });
@@ -402,7 +384,7 @@ async function renderAboutHim(){
       knob.style.left=(cx+Math.cos(rad)*r-9)+'px';knob.style.top=(cy+Math.sin(rad)*r-9)+'px';
       value.textContent=typeNow.label;face.className='wheel-face '+typeNow.key;face.dataset.type=typeNow.key;
       const im=document.getElementById('typePortrait');
-      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=53`;}
+      if(im){const map={twink:'twink',twonk:'twonk',otter:'otter','otter-daddy':'average',daddy:'daddy','daddy-bear':'bear',bear:'bear','young-bear':'bear'};im.src=`assets/type-${map[typeNow.key]||'average'}.jpg?v=54`;}
     };
     const point=e=>{
       const rect=wheel.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
@@ -433,9 +415,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=53" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=54" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=54" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=54" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -443,14 +425,7 @@ async function renderPenis(){
     ${row('FORESKIN','foreskin',[['Cut','Cut'],['Uncut','Uncut']])}
     ${row('VEINS','veins',[['Smooth','Smooth'],['Veiny','Veiny']])}
 
-    <section class="detail-block compact-choice-block">
-      <div class="detail-label">CURVE</div>
-      <div class="detail-pills three curve-choice-row">
-        <button data-penis-key="curve" data-penis-value="Up" class="${d.curve==='Up'?'on':''}"><span class="curve-mark">⌒</span><span>Up</span></button>
-        <button data-penis-key="curve" data-penis-value="Straight" class="${d.curve==='Straight'?'on':''}"><span class="curve-mark">—</span><span>Straight</span></button>
-        <button data-penis-key="curve" data-penis-value="Down" class="${d.curve==='Down'?'on':''}"><span class="curve-mark">⌣</span><span>Down</span></button>
-      </div>
-    </section>
+    <section class="detail-block compact-choice-block"><div class="detail-label">CURVE</div><div class="detail-pills four">${['Curved up','Straight','Curved down','Sideways'].map(v=>`<button data-penis-key="curve" data-penis-value="${v}" class="${d.curve===v?'on':''}">${v}</button>`).join('')}</div>${d.curve==='Sideways'?`<div class="detail-pills two subchoice-row">${['Left','Right'].map(v=>`<button data-penis-key="curveSide" data-penis-value="${v}" class="${d.curveSide===v?'on':''}">${v}</button>`).join('')}</div>`:''}</section><section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="penisNote" class="private-note" placeholder="Add a note…">${d.note||''}</textarea></section>
   </main>`;
 
   const save=async()=>{
@@ -479,6 +454,7 @@ async function renderPenis(){
     document.querySelectorAll(`[data-penis-key="${key}"]`).forEach(x=>x.classList.toggle('on',x===b && d[key]===val));
     await save();
   });
+  const pn=document.getElementById('penisNote');if(pn)pn.oninput=async()=>{d.note=pn.value;await save();};
 }
 
 async function renderPeach(){
@@ -495,15 +471,15 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=53" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=54" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=54" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=54" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
     ${row('FIRMNESS','firmness',[['soft','Soft'],['medium','Medium'],['firm','Firm']])}
     ${row('HAIR','hair',[['smooth','Smooth'],['trimmed','Trimmed'],['natural','Natural'],['hairy','Hairy']])}
-  </main>`;
+  <section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="peachNote" class="private-note" placeholder="Add a note…">${d.note||""}</textarea></section></main>`;
 
   const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.peach={...d};await put('people',c)};
     document.querySelectorAll('[data-go-private]').forEach(b=>b.onclick=async()=>{await save();state.screen=b.dataset.goPrivate;render();});
@@ -514,6 +490,7 @@ document.getElementById('backPeach').onclick=async()=>{await save();state.screen
     document.querySelectorAll(`[data-peach-key="${key}"]`).forEach(x=>x.classList.toggle('on',x===b));
     await save();
   });
+ const nn=document.getElementById('peachNote');if(nn)nn.oninput=async()=>{d.note=nn.value;const c=await get('people',state.selectedPersonId);c.about||={};c.about.peach={...d};await put('people',c);};
 }
 
 async function renderDrops(){
@@ -537,9 +514,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=53" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=53" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=53" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=54" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=54" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=54" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -558,7 +535,7 @@ async function renderDrops(){
         <button data-distance="long" class="${d.distance==='long'?'on':''}">Long shot</button>
       </div>
     </section>
-  </main>`;
+  <section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="dropsNote" class="private-note" placeholder="Add a note…">${d.note||""}</textarea></section></main>`;
 
   const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.drops={...d};await put('people',c)};
     document.querySelectorAll('[data-go-private]').forEach(b=>b.onclick=async()=>{await save();state.screen=b.dataset.goPrivate;render();});
@@ -573,81 +550,41 @@ document.getElementById('backDrops').onclick=async()=>{await save();state.screen
     document.querySelectorAll('[data-distance]').forEach(x=>x.classList.toggle('on',x===b));
     await save();
   });
+ const nn=document.getElementById('dropsNote');if(nn)nn.oninput=async()=>{d.note=nn.value;const c=await get('people',state.selectedPersonId);c.about||={};c.about.drops={...d};await put('people',c);};
 }
 
 
 async function renderEncounterEdit(){
-  const p=await get('people',state.selectedPersonId);
-  const e=state.selectedEncounterId?await get('encounters',state.selectedEncounterId):null;
-  if(!e) return;
-  e.happened ||= [];
-  e.activityDetails ||= {};
-  e.otherActivity ||= '';
-
-  const activities=[['Kiss','KISS'],['Oral','ORAL'],['Anal','ANAL'],['Rim','RIM'],['Other','OTHER']];
-  const detailOptions={
-    Oral:[['i-sucked','I sucked'],['he-sucked','He sucked'],['69','69']],
-    Anal:[['top','I topped'],['bottom','I bottomed'],['switch','We switched']],
-    Rim:[['i-rimmed','I rimmed'],['he-rimmed','He rimmed'],['both','Both']]
-  };
-  const detailHTML=key=>{
-    if(!e.happened.includes(key)||!detailOptions[key]) return '';
-    const cur=e.activityDetails[key]||'';
-    return `<div class="encounter-subchoices">${detailOptions[key].map(([v,l])=>`<button class="${cur===v?'on':''}" data-activity-detail="${key}" data-detail-value="${v}">${l}</button>`).join('')}</div>`;
-  };
-
-  app.innerHTML=`<main class="encounter-edit screen-enter">
-    <div class="about-top"><button class="about-back" id="backEncounterEdit">‹</button><div>ENCOUNTER</div><span></span></div>
-    <section class="enc-block">
-      <div class="enc-kicker">WHAT</div>
-      <div class="enc-activity-grid">${activities.map(([k,l])=>`<button class="enc-activity ${e.happened.includes(k)?'on':''}" data-activity="${k}">${l}</button>`).join('')}</div>
-      <div id="encDetails"></div>
-    </section>
-    <section class="enc-block">
-      <div class="enc-kicker">WHEN</div>
-      <input class="enc-date" id="encDate" type="date" value="${dateValue(e.date)}">
-    </section>
-    <section class="enc-block">
-      <div class="enc-kicker">HOW</div>
-      <div class="enc-rating">${[1,2,3,4,5].map(n=>`<button class="${n<=Number(e.rating||0)?'on':''}" data-enc-rating="${n}">★</button>`).join('')}</div>
-    </section>
-    <p class="enc-autosave">Everything saves as you go.</p>
-  </main>`;
-
-  const save=()=>put('encounters',e);
-  const redraw=()=>{
-    const h=document.getElementById('encDetails');
-    h.innerHTML=detailHTML('Oral')+detailHTML('Anal')+detailHTML('Rim')+
-      (e.happened.includes('Other')?`<input class="enc-other" id="otherActivity" maxlength="80" placeholder="What else?" value="${esc(e.otherActivity)}">`:'');
-    document.querySelectorAll('[data-activity-detail]').forEach(b=>b.onclick=async()=>{
-      const k=b.dataset.activityDetail,v=b.dataset.detailValue;
-      e.activityDetails[k]=e.activityDetails[k]===v?'':v;
-      await save(); redraw();
-    });
-    document.getElementById('otherActivity')?.addEventListener('input',ev=>{e.otherActivity=ev.target.value;save()});
-  };
-
-  document.getElementById('backEncounterEdit').onclick=async()=>{
-    const other=document.getElementById('otherActivity'); if(other)e.otherActivity=other.value.trim();
-    await save(); state.screen=state.detailsReturn==='person'?'person':'postadd'; render();
-  };
-  document.querySelectorAll('[data-activity]').forEach(b=>b.onclick=async()=>{
-    const k=b.dataset.activity;
-    const other=document.getElementById('otherActivity'); if(other)e.otherActivity=other.value;
-    if(e.happened.includes(k)){e.happened=e.happened.filter(x=>x!==k);delete e.activityDetails[k]}
-    else e.happened.push(k);
-    await save(); b.classList.toggle('on',e.happened.includes(k)); redraw();
-  });
-  document.getElementById('encDate').onchange=async ev=>{
-    const old=new Date(e.date||Date.now()), [y,m,d]=ev.target.value.split('-').map(Number);
-    old.setFullYear(y,m-1,d); e.date=old.toISOString(); await save();
-  };
-  document.querySelectorAll('[data-enc-rating]').forEach(b=>b.onclick=async()=>{
-    const n=Number(b.dataset.encRating); e.rating=e.rating===n?0:n;
-    document.querySelectorAll('[data-enc-rating]').forEach(x=>x.classList.toggle('on',Number(x.dataset.encRating)<=e.rating));
-    await save();
-  });
-  redraw();
+ let e=state.selectedEncounterId?await get('encounters',state.selectedEncounterId):await ensureFirstEncounter(state.selectedPersonId);
+ if(!e)e=await ensureFirstEncounter(state.selectedPersonId); state.selectedEncounterId=e.id;
+ e.happened||=[]; e.happenedDetails||={}; e.when||={precision:'exact',date:e.date||new Date().toISOString().slice(0,10)};
+ const now=new Date(), base=new Date((e.when.date||e.date||now.toISOString().slice(0,10))+'T12:00:00');
+ const y=Number(e.when.year)||base.getFullYear(),m=Number(e.when.month)||base.getMonth()+1,d=Number(e.when.day)||base.getDate(),prec=e.when.precision||'exact';
+ const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'], seasons=['SPRING','SUMMER','AUTUMN','WINTER'], years=Array.from({length:80},(_,i)=>now.getFullYear()-i);
+ const sel=(id,vals,cur,lab=v=>v)=>`<select id="${id}" class="bc-picker">${vals.map(v=>`<option value="${v}" ${String(v)===String(cur)?'selected':''}>${lab(v)}</option>`).join('')}</select>`;
+ let wc='';
+ if(prec==='exact')wc=`<div class="when-picker-row three-pickers">${sel('wDay',Array.from({length:31},(_,i)=>i+1),d)}${sel('wMonth',Array.from({length:12},(_,i)=>i+1),m,v=>months[v-1])}${sel('wYear',years,y)}</div>`;
+ if(prec==='month')wc=`<div class="when-picker-row two-pickers">${sel('wMonth',Array.from({length:12},(_,i)=>i+1),m,v=>months[v-1])}${sel('wYear',years,y)}</div>`;
+ if(prec==='season')wc=`<div class="when-picker-row two-pickers">${sel('wSeason',seasons,e.when.season||'SUMMER')}${sel('wYear',years,y)}</div>`;
+ if(prec==='year')wc=`<div class="when-picker-row one-picker">${sel('wYear',years,y)}</div>`;
+ if(prec==='range')wc=`<div class="when-range">${sel('wFrom',years,e.when.from||y)}<span>—</span>${sel('wTo',years,e.when.to||Math.min(now.getFullYear(),y+1))}</div>`;
+ const has=a=>e.happened.includes(a), detail=(a,vals)=>!has(a)?'':`<div class="activity-details">${vals.map(v=>`<button class="detail-chip ${(e.happenedDetails[a]||[]).includes(v)?'on':''}" data-da="${a}" data-dv="${v}">${v}</button>`).join('')}</div>`;
+ app.innerHTML=`<main class="encounter-editor screen-enter">
+ <div class="encounter-top"><button class="about-back" id="encBack">‹</button><div class="encounter-title">WHAT HAPPENED</div><span></span></div>
+ <section class="enc-section"><div class="activity-chips">${['Oral','Anal','Rim','Other'].map(v=>`<button class="activity-chip ${has(v)?'on':''}" data-act="${v}">${v.toUpperCase()}</button>`).join('')}</div>
+ ${detail('Oral',['I sucked','He sucked'])}${detail('Anal',['I topped','He topped'])}${detail('Rim',['I rimmed','He rimmed'])}
+ ${has('Other')?`<input class="enc-other" id="otherText" placeholder="What else?" value="${e.other||''}">`:''}</section>
+ <section class="enc-section"><div class="enc-section-title">WHEN</div><div class="precision-chips">${[['exact','Exact'],['month','Month'],['season','Season'],['year','Year'],['range','Range']].map(([v,t])=>`<button class="${prec===v?'on':''}" data-prec="${v}">${t}</button>`).join('')}</div>${wc}</section>
+ <section class="enc-section"><div class="enc-section-title">HOW WAS IT</div><div class="enc-stars">${[1,2,3,4,5].map(n=>`<button data-rate="${n}" class="${(e.rating||0)>=n?'on':''}">★</button>`).join('')}</div></section></main>`;
+ const save=async()=>{if(e.when.precision==='exact'){let yy=Number(e.when.year)||y,mm=Number(e.when.month)||m,dd=Math.min(Number(e.when.day)||d,new Date(yy,mm,0).getDate());e.when.date=`${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;e.date=e.when.date}await put('encounters',e)};
+ encBack.onclick=async()=>{await save();state.screen=state.detailsReturn||'person';render()};
+ document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{let v=b.dataset.act;e.happened=has(v)?e.happened.filter(x=>x!==v):[...e.happened,v];await save();renderEncounterEdit()});
+ document.querySelectorAll('[data-da]').forEach(b=>b.onclick=async()=>{let a=b.dataset.da,v=b.dataset.dv,x=e.happenedDetails[a]||[];e.happenedDetails[a]=x.includes(v)?x.filter(q=>q!==v):[...x,v];await save();renderEncounterEdit()});
+ document.querySelectorAll('[data-prec]').forEach(b=>b.onclick=async()=>{e.when.precision=b.dataset.prec;await save();renderEncounterEdit()});
+ const bind=(id,k)=>{let x=document.getElementById(id);if(x)x.onchange=async()=>{e.when[k]=x.value;await save();renderEncounterEdit()}};
+ [['wDay','day'],['wMonth','month'],['wYear','year'],['wSeason','season'],['wFrom','from'],['wTo','to']].forEach(x=>bind(...x));
+ document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=async()=>{let n=+b.dataset.rate;e.rating=e.rating===n?0:n;await save();renderEncounterEdit()});
+ let o=document.getElementById('otherText');if(o)o.oninput=async()=>{e.other=o.value;await save()};
 }
 
 async function renderDetails(){
@@ -739,7 +676,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=5.3');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=5.4');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

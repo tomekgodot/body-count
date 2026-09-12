@@ -3118,3 +3118,30 @@ body.modal-open{
 .encounter-flow-done{
   margin-top:26px!important;
 }
+
+/* v7.7 — quieter peach-outline actions, matching the Home + button */
+.flow-done,
+.quick-save{
+  background:rgba(5,5,5,.94)!important;
+  color:#f1c18e!important;
+  border:1px solid rgba(239,189,134,.38)!important;
+  box-shadow:
+    0 0 0 1px rgba(239,189,134,.035) inset,
+    0 0 18px rgba(239,189,134,.075)!important;
+}
+.flow-done{
+  font-weight:700!important;
+}
+.quick-save{
+  color:#f1c18e!important;
+}
+.flow-done:active,
+.quick-save:active{
+  background:rgba(239,189,134,.07)!important;
+  border-color:rgba(239,189,134,.56)!important;
+  box-shadow:0 0 22px rgba(239,189,134,.11)!important;
+}
+.quick-save:disabled{
+  opacity:.38!important;
+  box-shadow:none!important;
+}

@@ -2441,3 +2441,81 @@ body.modal-open{overflow:hidden}
   height:62px!important;
   z-index:6!important;
 }
+
+/* v6.2 — curved minimalist numeral + definitely visible privacy line */
+.count-brand-wrap{
+  position:absolute!important;
+  top:calc(20px + env(safe-area-inset-top))!important;
+  left:0!important;
+  right:0!important;
+  z-index:20!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  pointer-events:auto!important;
+}
+.count-brand{
+  position:static!important;
+  display:block!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important;
+  font-size:19px!important;
+  line-height:1!important;
+  font-weight:650!important;
+  letter-spacing:.13em!important;
+  color:rgba(255,255,255,.95)!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.home-privacy{
+  display:block!important;
+  position:static!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:2px 4px!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif!important;
+  font-size:11px!important;
+  line-height:1.25!important;
+  font-weight:500!important;
+  letter-spacing:.01em!important;
+  color:rgba(255,255,255,.60)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  overflow:visible!important;
+  pointer-events:auto!important;
+  z-index:21!important;
+}
+
+/* Back to the original curved feel, but thinner and much taller. */
+.count-lockup{
+  width:min(90vw,410px)!important;
+  height:min(66vh,520px)!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+.count-number{
+  font-family:"Avenir Next","SF Pro Display",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+  font-size:clamp(300px,92vw,490px)!important;
+  font-weight:300!important;
+  line-height:.74!important;
+  letter-spacing:-.065em!important;
+  font-stretch:normal!important;
+  transform:scaleX(.61) scaleY(1.18)!important;
+  transform-origin:center center!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+  -webkit-font-smoothing:antialiased!important;
+  text-rendering:optimizeLegibility!important;
+}
+
+/* + overlaps the lower-right edge of the numeral rather than floating below it. */
+.count-add{
+  right:11%!important;
+  bottom:19%!important;
+  z-index:8!important;
+}

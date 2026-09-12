@@ -2519,3 +2519,57 @@ body.modal-open{overflow:hidden}
   bottom:19%!important;
   z-index:8!important;
 }
+
+/* v6.3 — numeral direction based on supplied reference */
+.count-brand-wrap{
+  top:calc(19px + env(safe-area-inset-top))!important;
+  gap:7px!important;
+  text-align:center!important;
+}
+.count-brand{
+  font-size:21px!important;
+  line-height:1!important;
+  font-weight:650!important;
+  letter-spacing:.12em!important;
+  text-align:center!important;
+}
+.home-privacy{
+  width:100%!important;
+  box-sizing:border-box!important;
+  font-size:9.5px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:.005em!important;
+  text-align:center!important;
+  color:rgba(255,255,255,.52)!important;
+}
+
+/* Thin geometric humanist numerals: open, elegant curves, large poster scale. */
+.count-lockup{
+  width:min(94vw,440px)!important;
+  height:min(68vh,540px)!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+.count-number{
+  font-family:"Avenir Next","Helvetica Neue","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important;
+  font-size:clamp(330px,101vw,525px)!important;
+  font-weight:350!important;
+  line-height:.70!important;
+  letter-spacing:-.075em!important;
+  font-stretch:normal!important;
+  transform:scaleX(.69) scaleY(1.08)!important;
+  transform-origin:center center!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+  -webkit-font-smoothing:antialiased!important;
+  text-rendering:geometricPrecision!important;
+}
+
+/* Slight overlap into the numeral's lower-right field. */
+.count-add{
+  right:10%!important;
+  bottom:20%!important;
+  z-index:8!important;
+}

@@ -240,7 +240,7 @@ async function renderHome(){
   const count=people.length;
 
   app.innerHTML=`<main class="count-home">
-    <div class="count-brand"><span class="count-brand-body">BODY</span> <span class="count-brand-accent">COUNT</span></div>
+    <div class="count-brand">BODY COUNT</div>
     <button class="home-privacy-slogan" id="homePrivacy" type="button">Stored privately on this device</button>
 
     <div class="count-center">
@@ -264,26 +264,20 @@ async function renderHome(){
   </main>`;
 
   const number=document.getElementById('countNumber');
-  const paintCount=value=>{
-    const text=String(Math.max(0,Math.min(999,Number(value)||0))).padStart(3,'0');
-    number.innerHTML=text.split('').map(d=>`<span class="flip-digit"><span>${d}</span></span>`).join('');
-  };
   const startCountPulse=()=>number.classList.add('count-settled');
   if(count===0){
-    paintCount(0);
+    number.textContent='0';
     startCountPulse();
   }else{
     const duration=1100;
     const start=performance.now();
-    let lastValue=-1;
     const tick=now=>{
       const t=Math.min(1,(now-start)/duration);
       const eased=1-Math.pow(1-t,3);
-      const value=Math.min(count,Math.floor(eased*count));
-      if(value!==lastValue){paintCount(value);lastValue=value}
+      number.textContent=String(Math.min(count,Math.floor(eased*count)));
       if(t<1) requestAnimationFrame(tick);
       else{
-        paintCount(count);
+        number.textContent=String(count);
         startCountPulse();
       }
     };

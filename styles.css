@@ -4268,3 +4268,199 @@ body.modal-open{
 .count-home .encounter-count,
 .count-home .add-label,
 .count-home .home-tagline{display:none!important}
+
+
+/* v10.4 — rebuild Home geometry from scratch */
+.count-home{
+  position:relative!important;
+  min-height:100dvh!important;
+  overflow:hidden!important;
+  background:#050505!important;
+  color:#fff!important;
+}
+
+/* Header: BODY white, COUNT gradient, privacy directly below */
+.count-home .count-brand{
+  position:absolute!important;
+  top:calc(18px + env(safe-area-inset-top))!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:1px!important;
+  text-align:center!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important;
+  font-size:20px!important;
+  line-height:1.02!important;
+  font-weight:650!important;
+  letter-spacing:.18em!important;
+  z-index:20!important;
+}
+.count-brand-body,
+.count-brand-accent{
+  display:block!important;
+}
+.count-brand-body{
+  color:#f8f5f1!important;
+}
+.count-brand-accent{
+  background:var(--bc-gradient)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+}
+.count-home .home-privacy-slogan{
+  position:absolute!important;
+  top:calc(66px + env(safe-area-inset-top))!important;
+  left:0!important;
+  right:0!important;
+  width:max-content!important;
+  max-width:92vw!important;
+  margin:0 auto!important;
+  padding:2px 8px!important;
+  border:0!important;
+  background:transparent!important;
+  color:rgba(255,255,255,.50)!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif!important;
+  font-size:9.5px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:.01em!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  z-index:21!important;
+}
+
+/* No artwork behind the counter */
+.home-male-silhouette{
+  display:none!important;
+}
+
+/* Central counter area */
+.count-home .count-center{
+  position:absolute!important;
+  inset:0 0 calc(76px + env(safe-area-inset-bottom)) 0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+}
+.count-home .count-lockup{
+  position:relative!important;
+  width:min(84vw,430px)!important;
+  height:min(46dvh,390px)!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow:visible!important;
+  pointer-events:auto!important;
+  z-index:3!important;
+}
+
+/* Always exactly three narrow, tall flip cards */
+.count-home .count-number{
+  position:absolute!important;
+  left:50%!important;
+  top:48%!important;
+  transform:translate(-50%,-50%)!important;
+  width:100%!important;
+  max-width:none!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:6px!important;
+  font-family:"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed","Aptos Narrow","Helvetica Neue",Arial,sans-serif!important;
+  font-size:clamp(122px,33vw,166px)!important;
+  line-height:1!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+  color:#f7f2ec!important;
+  white-space:nowrap!important;
+}
+.flip-digit{
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  width:100%!important;
+  height:1.32em!important;
+  max-width:none!important;
+  overflow:hidden!important;
+  border:2px solid rgba(255,255,255,.17)!important;
+  border-radius:.105em!important;
+  background:linear-gradient(180deg,rgba(22,22,23,.98),rgba(7,7,8,.99))!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.44),inset 0 1px rgba(255,255,255,.035)!important;
+}
+.flip-digit>span{
+  position:relative!important;
+  z-index:1!important;
+  transform:scaleX(.64) scaleY(1.04)!important;
+  transform-origin:center!important;
+  font-variant-numeric:tabular-nums!important;
+}
+.flip-digit::before{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:50%!important;
+  height:2px!important;
+  transform:translateY(-1px)!important;
+  background:#020203!important;
+  box-shadow:0 -1px rgba(255,255,255,.045),0 1px rgba(0,0,0,.9)!important;
+  z-index:2!important;
+}
+.flip-digit::after{
+  content:""!important;
+  position:absolute!important;
+  left:5px!important;
+  right:5px!important;
+  top:50%!important;
+  height:8px!important;
+  transform:translateY(-50%)!important;
+  border-left:4px solid #050506!important;
+  border-right:4px solid #050506!important;
+  z-index:3!important;
+}
+
+/* Plus overlaps the lower-right corner of digit 3, but remains fully on-screen */
+.count-home .count-add{
+  position:absolute!important;
+  right:-10px!important;
+  bottom:17%!important;
+  width:60px!important;
+  height:60px!important;
+  border-radius:50%!important;
+  border:2px solid transparent!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+  color:transparent!important;
+  font-size:0!important;
+  box-shadow:0 0 18px rgba(172,61,213,.08),0 0 20px rgba(255,174,143,.05)!important;
+  z-index:10!important;
+  animation:count-add-bc-pulse 2.25s ease-in-out infinite!important;
+}
+.count-home .count-add::before{
+  content:"+"!important;
+  display:block!important;
+  font-size:35px!important;
+  line-height:50px!important;
+  font-weight:250!important;
+  background:var(--bc-gradient)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+}
+
+/* Home contains no supporting copy besides brand + privacy. */
+.count-home .count-subtitle,
+.count-home .encounter-count,
+.count-home .add-label,
+.count-home .home-tagline{
+  display:none!important;
+}

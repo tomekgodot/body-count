@@ -4185,3 +4185,86 @@ body.modal-open{
   font-size:39px!important;
   line-height:58px!important;
 }
+
+
+/* v10.3 — Home matched to approved mockup */
+.count-home .count-brand{
+  display:block!important;
+  position:absolute!important;
+  top:calc(18px + env(safe-area-inset-top))!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  text-align:center!important;
+  font-size:19px!important;
+  line-height:1!important;
+  font-weight:650!important;
+  letter-spacing:.19em!important;
+  color:#f8f4f0!important;
+}
+.count-brand-body,.count-brand-accent{display:inline!important}
+.count-home .home-privacy-slogan{
+  top:calc(49px + env(safe-area-inset-top))!important;
+}
+
+.home-male-silhouette{
+  position:absolute!important;
+  left:50%!important;
+  top:53%!important;
+  width:min(118vw,590px)!important;
+  height:min(86dvh,760px)!important;
+  transform:translate(-48%,-51%)!important;
+  opacity:.98!important;
+  z-index:0!important;
+}
+.home-male-silhouette svg{width:100%!important;height:100%!important;display:block!important}
+
+.count-home .count-lockup{
+  width:min(94vw,510px)!important;
+  height:min(58dvh,490px)!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow:visible!important;
+  z-index:3!important;
+}
+.count-home .count-number{
+  top:50%!important;
+  left:50%!important;
+  width:min(93vw,505px)!important;
+  max-width:none!important;
+  transform:translate(-50%,-50%)!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:5px!important;
+  font-size:clamp(126px,36.5vw,178px)!important;
+  line-height:1!important;
+}
+.flip-digit{
+  width:100%!important;
+  max-width:none!important;
+  height:1.20em!important;
+  border-radius:.105em!important;
+  border:2px solid rgba(255,255,255,.18)!important;
+  background:linear-gradient(180deg,rgba(22,22,23,.97),rgba(7,7,8,.985))!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.44),inset 0 1px rgba(255,255,255,.035)!important;
+}
+.flip-digit>span{
+  transform:scaleX(.75)!important;
+}
+.count-home .count-add{
+  right:-2.5%!important;
+  bottom:6.5%!important;
+  width:64px!important;
+  height:64px!important;
+  z-index:10!important;
+}
+.count-home .count-add::before{
+  font-size:37px!important;
+  line-height:54px!important;
+}
+
+/* No extra home labels beyond brand, privacy, count and plus. */
+.count-home .count-subtitle,
+.count-home .encounter-count,
+.count-home .add-label,
+.count-home .home-tagline{display:none!important}

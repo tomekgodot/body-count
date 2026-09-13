@@ -240,48 +240,112 @@ async function renderHome(){
   const count=people.length;
 
   app.innerHTML=`<main class="count-home">
-    <div class="count-brand"><span class="count-brand-body">BODY</span><span class="count-brand-accent">COUNT</span></div>
+    <div class="count-brand"><span class="count-brand-body">BODY</span> <span class="count-brand-accent">COUNT</span></div>
     <button class="home-privacy-slogan" id="homePrivacy" type="button">Stored privately on this device</button>
 
     <div class="count-center">
       <div class="home-male-silhouette" aria-hidden="true">
-        <svg viewBox="0 0 500 720" focusable="false">
+        <svg viewBox="0 0 540 820" focusable="false">
           <defs>
-            <linearGradient id="homeBodyStroke" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#7b31d8"/>
-              <stop offset=".50" stop-color="#be48d0"/>
-              <stop offset="1" stop-color="#ffad8e"/>
+            <linearGradient id="bodyEdge" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#6d2bd0"/>
+              <stop offset=".48" stop-color="#aa3fd0"/>
+              <stop offset="1" stop-color="#ffad8d"/>
             </linearGradient>
-            <linearGradient id="homeBodyFill" x1=".18" y1=".1" x2=".85" y2=".9">
-              <stop offset="0" stop-color="#171019"/>
-              <stop offset=".42" stop-color="#0b090c"/>
-              <stop offset="1" stop-color="#050506"/>
+            <linearGradient id="bodyFill" x1=".15" y1=".05" x2=".9" y2=".95">
+              <stop offset="0" stop-color="#130d16"/>
+              <stop offset=".35" stop-color="#0b090d"/>
+              <stop offset="1" stop-color="#040405"/>
             </linearGradient>
-            <radialGradient id="homeBodyGlow" cx=".68" cy=".45" r=".65">
-              <stop offset="0" stop-color="#ff9f85" stop-opacity=".15"/>
-              <stop offset=".43" stop-color="#a842d2" stop-opacity=".08"/>
+            <radialGradient id="bodyAura" cx=".72" cy=".35" r=".7">
+              <stop offset="0" stop-color="#ff9f87" stop-opacity=".17"/>
+              <stop offset=".42" stop-color="#a13fd3" stop-opacity=".12"/>
               <stop offset="1" stop-color="#000" stop-opacity="0"/>
             </radialGradient>
-            <filter id="homeSoftGlow" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="8"/>
+            <filter id="edgeGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="5"/>
             </filter>
           </defs>
-          <ellipse cx="290" cy="390" rx="190" ry="300" fill="url(#homeBodyGlow)" filter="url(#homeSoftGlow)"/>
-          <!-- head + neck, turned slightly away -->
-          <path d="M281 73c38 1 67 31 67 69 0 29-15 53-39 66-5 3-9 8-10 14l-6 37-78 4-8-38c-2-8-6-13-13-17-20-14-32-37-31-63 1-41 33-72 73-72z"
-                fill="url(#homeBodyFill)"/>
-          <!-- torso seen from the back with right shoulder/arm and lower body -->
-          <path d="M205 226c-38 13-81 32-104 73-20 36-22 78-12 119 11 47 36 82 50 124 12 35 16 77 18 117h228c-1-24 0-49 5-75 7-38 25-75 37-111 14-41 18-84 2-123-16-39-48-65-91-84-23-10-40-27-48-49-18 14-40 21-65 21-26 0-48-4-68-12z"
-                fill="url(#homeBodyFill)"/>
+
+          <ellipse cx="334" cy="404" rx="210" ry="330" fill="url(#bodyAura)"/>
+
+          <!-- back-view male figure, head turned to the right -->
+          <path d="M317 77
+                   c38 0 68 29 68 66
+                   c0 30-16 54-41 67
+                   c-12 6-17 16-19 31
+                   l-3 29
+                   c39 13 75 29 109 53
+                   c32 23 51 58 58 101
+                   c7 45-4 93-18 137
+                   c-12 39-21 76-24 111
+                   c-3 36-1 68 1 97
+                   H157
+                   c3-30 4-62 1-96
+                   c-3-39-13-78-26-116
+                   c-15-43-28-90-20-134
+                   c8-43 29-77 62-101
+                   c34-25 70-41 108-54
+                   l-4-29
+                   c-2-14-8-24-20-31
+                   c-21-14-34-37-34-64
+                   c0-39 31-68 70-68
+                   z"
+                fill="url(#bodyFill)"/>
+
           <!-- right arm -->
-          <path d="M334 265c45 19 79 47 91 91 13 48-2 99-17 146-11 35-15 72-18 112-1 18-10 30-23 34-14 4-25-5-24-24 2-42 7-82 17-120 11-44 17-86 2-118-10-22-26-37-50-49z"
-                fill="#080709"/>
-          <!-- contour/rim light -->
-          <path class="home-body-rim left" d="M207 225c-47 15-89 36-110 77-19 37-18 80-7 121 13 48 36 83 49 123 10 31 15 70 18 113"/>
-          <path class="home-body-rim right" d="M291 218c11 23 31 39 55 49 42 18 72 43 86 81 16 43 8 87-6 128-11 34-29 73-34 111-3 25-4 48-4 70"/>
-          <path class="home-body-rim shoulder" d="M132 284c53-4 91 8 128 42 28-28 56-42 93-48"/>
-          <path class="home-body-rim back" d="M260 326c-11 62-12 126 0 191"/>
-          <path class="home-body-rim hip" d="M165 555c33-18 68-21 97-4 29-17 64-15 101 4"/>
+          <path d="M409 309
+                   c43 20 72 49 82 91
+                   c11 47-1 92-16 137
+                   c-13 39-20 80-23 120
+                   c-2 27-11 47-28 50
+                   c-17 3-26-11-23-35
+                   c4-40 9-79 18-117
+                   c10-43 14-80 2-108
+                   c-10-24-29-42-55-56z"
+                fill="#070608"/>
+
+          <!-- brighter edge lights, like the mockup -->
+          <path d="M282 269
+                   c-43 13-83 31-115 55
+                   c-31 24-50 58-57 100
+                   c-7 45 7 93 21 135
+                   c13 40 23 79 26 116"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="8" stroke-linecap="round" opacity=".63"
+                filter="url(#edgeGlow)"/>
+          <path d="M324 266
+                   c10 21 28 37 54 48
+                   c50 21 88 48 104 88
+                   c18 46 8 94-7 139
+                   c-12 37-23 80-27 124"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="9" stroke-linecap="round" opacity=".92"
+                filter="url(#edgeGlow)"/>
+          <path d="M372 100
+                   c16 13 25 33 25 55
+                   c0 28-14 51-38 64"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="7" stroke-linecap="round" opacity=".85"
+                filter="url(#edgeGlow)"/>
+
+          <!-- shoulder blades/back structure -->
+          <path d="M164 335
+                   c47-3 88 9 139 48
+                   c32-31 67-45 105-48"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="4" stroke-linecap="round" opacity=".32"/>
+          <path d="M303 384
+                   c-9 58-8 118 2 180"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="2.4" stroke-linecap="round" opacity=".18"/>
+
+          <!-- lower-body contour, subtle/non-explicit -->
+          <path d="M189 622
+                   c29-19 67-25 112-8
+                   c39-17 76-12 111 7"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="4.2" stroke-linecap="round" opacity=".24"/>
+          <path d="M176 647
+                   c33-14 67-12 102 9"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="3.2" stroke-linecap="round" opacity=".16"/>
+          <path d="M329 654
+                   c27-17 57-20 88-9"
+                fill="none" stroke="url(#bodyEdge)" stroke-width="3.2" stroke-linecap="round" opacity=".16"/>
         </svg>
       </div>
       <div class="count-lockup count-digits-${Math.min(3,String(count).length)}">

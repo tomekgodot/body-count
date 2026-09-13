@@ -314,9 +314,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=89" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=90" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=90" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=90" alt=""></button>
       </div>
     </section>
   </main>`;
@@ -391,9 +391,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=89" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=90" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=90" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=90" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -475,9 +475,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=89" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=90" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=90" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=90" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -520,9 +520,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=89" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=90" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=90" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=90" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -972,13 +972,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=89',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=90',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=89',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=90',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -986,7 +986,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=89',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=90',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1041,7 +1041,6 @@ async function renderPerson(){
     <header class="person-profile-head">
       <button class="profile-back" id="profileBack" type="button" aria-label="Back">‹</button>
       <div class="profile-head-copy">
-        <div class="profile-kicker">PERSON</div>
         <div class="profile-name-row">
           <h1 id="profileNameText">${esc(displayName(p))}</h1>
           <button class="profile-name-edit" id="editName" type="button" aria-label="Edit name">✎</button>
@@ -1077,7 +1076,6 @@ async function renderPerson(){
     <section class="profile-section encounters-section">
       <div class="encounters-title-row">
         <div class="profile-section-title">ENCOUNTERS</div>
-        <button class="profile-add-encounter" id="addEncounter" type="button">+ ADD</button>
       </div>
       <div class="profile-encounters">
         ${encounters.length?encounters.map(e=>{
@@ -1094,6 +1092,7 @@ async function renderPerson(){
           </button>`;
         }).join(''):`<div class="profile-no-encounters">No encounters yet.</div>`}
       </div>
+      <button class="profile-add-encounter-wide" id="addEncounter" type="button">ADD ENCOUNTER</button>
     </section>
 
     <div class="profile-actions">
@@ -1271,18 +1270,24 @@ async function renderTimeline(){
   const items=encounters.map(e=>{
     const p=pm.get(e.personId); if(!p)return '';
     const g=timelineGroupLabel(e),gm=''; last=g;
-    const lines=encounterSummaryLines(e),memory=(p.lastMemory||'').trim();
+    const lines=encounterSummaryLines(e);
     return `${gm}<article class="timeline-item"><div class="timeline-rail"><div class="timeline-date">${esc(timelineShortDate(e))}</div><span class="timeline-dot"></span></div>
       <button class="timeline-card" data-timeline-encounter="${e.id}"><div class="timeline-card-top"><strong>${esc(displayName(p))}</strong><span class="timeline-meta">
       ${String(e.privateNote||'').trim()?`<span class="timeline-note">${noteIconMarkup()}</span>`:''}${e.rating?`<span class="timeline-rating">★ ${e.rating}</span>`:''}</span></div>
-      ${memory?`<div class="timeline-memory">${esc(memory)}</div>`:''}${lines.map(x=>`<div class="timeline-line">${esc(x)}</div>`).join('')}</button></article>`;
+      ${lines.map(x=>`<div class="timeline-line">${esc(x)}</div>`).join('')}</button></article>`;
   }).join('');
   app.innerHTML=`<main class="people-timeline"><header class="people-head"><div><h1>People</h1></div><button class="people-add" id="timelineAdd">+</button></header>
   <div class="people-view-switch"><button id="openCollection">COLLECTION</button><button class="active">TIMELINE</button></div>
   <div class="timeline-list">${items||`<div class="timeline-empty">Your encounters will appear here.</div>`}</div>${nav('collection')}</main>`;
   openCollection.onclick=()=>{state.screen='collection';render()};
   timelineAdd.onclick=()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()};
-  document.querySelectorAll('[data-timeline-encounter]').forEach(c=>c.onclick=()=>{state.selectedEncounterId=+c.dataset.timelineEncounter;const e=encounters.find(x=>x.id===state.selectedEncounterId);if(e)state.selectedPersonId=e.personId;state.detailsReturn='timeline';state.screen='encounterEdit';render()});
+  document.querySelectorAll('[data-timeline-encounter]').forEach(c=>c.onclick=()=>{
+    const e=encounters.find(x=>x.id===+c.dataset.timelineEncounter);
+    if(!e)return;
+    state.selectedPersonId=e.personId;
+    state.screen='person';
+    render();
+  });
   attachNav();
 }
 function collectionDescription(p){
@@ -1354,7 +1359,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=8.9');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=9.0');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

@@ -4464,3 +4464,26 @@ body.modal-open{
 .count-home .home-tagline{
   display:none!important;
 }
+
+
+/* v10.5 — final Home counter proportions */
+.count-home .count-lockup{
+  width:min(78vw,400px)!important;
+  height:min(50dvh,420px)!important;
+}
+.count-home .count-number{
+  width:100%!important;
+  top:48%!important;
+  gap:6px!important;
+  font-size:clamp(146px,39.6vw,199px)!important;
+}
+.flip-digit{
+  height:1.38em!important;
+}
+.flip-digit>span{
+  transform:scaleX(.64) scaleY(1.04)!important;
+}
+.count-home .count-add{
+  right:-10px!important;
+  bottom:17%!important;
+}

@@ -8,7 +8,7 @@ async function ensureFirstEncounter(personId){
   await put('encounters',e); return e;
 }
 const DB_NAME='bodycount-db-v2';
-const DB_VERSION=1;
+const DB_VERSION=2;
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -21,6 +21,7 @@ function openDB(){
       if(!d.objectStoreNames.contains('people')) d.createObjectStore('people',{keyPath:'id',autoIncrement:true});
       if(!d.objectStoreNames.contains('encounters')) d.createObjectStore('encounters',{keyPath:'id',autoIncrement:true});
       if(!d.objectStoreNames.contains('settings')) d.createObjectStore('settings',{keyPath:'key'});
+      if(!d.objectStoreNames.contains('photos')) d.createObjectStore('photos',{keyPath:'personId'});
     };
     req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error);
   });
@@ -36,10 +37,56 @@ const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
 const fmt=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(new Date(d));
 const dateValue=d=>{const x=new Date(d||Date.now()),off=x.getTimezoneOffset();return new Date(x.getTime()-off*60000).toISOString().slice(0,10)};
-const displayName=p=>p?.name?.trim()||`Mystery #${p?.id}`;
+const displayName=p=>p?.name?.trim()||`Guy #${p?.id}`;
 const avgRating=es=>{const r=es.filter(e=>e.rating>0);return r.length?(r.reduce((s,e)=>s+e.rating,0)/r.length).toFixed(1):'—'};
 
+let activePhotoUrls=[];
+function clearPhotoUrls(){
+  activePhotoUrls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});
+  activePhotoUrls=[];
+}
+async function personPhoto(personId){
+  try{return await get('photos',Number(personId))}catch(e){return null}
+}
+function photoObjectUrl(record){
+  if(!record?.blob)return '';
+  const u=URL.createObjectURL(record.blob);
+  activePhotoUrls.push(u);
+  return u;
+}
+async function optimizePhoto(file){
+  if(!file || !file.type?.startsWith('image/')) throw new Error('Not an image');
+  const src=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((resolve,reject)=>{
+      const i=new Image();
+      i.onload=()=>resolve(i);
+      i.onerror=()=>reject(new Error('Image could not be opened'));
+      i.src=src;
+    });
+    const maxSide=1800;
+    let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+    const scale=Math.min(1,maxSide/Math.max(w,h));
+    w=Math.max(1,Math.round(w*scale)); h=Math.max(1,Math.round(h*scale));
+    const canvas=document.createElement('canvas');
+    canvas.width=w; canvas.height=h;
+    const ctx=canvas.getContext('2d',{alpha:false});
+    ctx.fillStyle='#090909'; ctx.fillRect(0,0,w,h);
+    ctx.drawImage(img,0,0,w,h);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.86));
+    return blob||file;
+  }finally{
+    URL.revokeObjectURL(src);
+  }
+}
+async function savePersonPhoto(personId,file){
+  const blob=await optimizePhoto(file);
+  await put('photos',{personId:Number(personId),blob,updatedAt:Date.now()});
+}
+
+
 async function render(){
+  clearPhotoUrls();
   if(state.screen==='home') return renderHome();
   if(state.screen==='add') return renderAdd();
   if(state.screen==='postadd') return renderPostAdd();
@@ -337,6 +384,8 @@ async function renderPostAdd(){
 async function renderAboutHim(){
   const p=await get('people',state.selectedPersonId);
   if(!p){state.screen='home';return render()}
+  const photoRecord=await personPhoto(p.id);
+  const photoUrl=photoObjectUrl(photoRecord);
   p.about ||= {};
   const a=p.about;
 
@@ -356,6 +405,28 @@ async function renderAboutHim(){
       <div>ABOUT HIM</div>
       <span></span>
     </div>
+
+    <section class="about-minimal-section about-photo-section">
+      <div class="about-minimal-label">PHOTO</div>
+      ${photoUrl?`
+        <button class="about-photo-preview" id="aboutPhotoPreview" type="button" aria-label="View photo">
+          <img src="${photoUrl}" alt="">
+        </button>
+        <div class="about-photo-actions">
+          <button id="replacePhoto" type="button">REPLACE</button>
+          <button id="removePhoto" type="button">REMOVE</button>
+        </div>
+      `:`
+        <button class="about-photo-empty" id="addPhoto" type="button">
+          <span class="about-photo-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 6.5h3l1.3-2h7.4l1.3 2h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="3.7"/></svg>
+          </span>
+          <span>ADD PHOTO OR SCREENSHOT</span>
+        </button>
+      `}
+      <div class="about-photo-privacy">Stored only on this device.</div>
+      <input id="photoInput" class="photo-file-input" type="file" accept="image/*">
+    </section>
 
     <section class="about-minimal-section">
       <div class="about-minimal-label">AGE</div>
@@ -388,11 +459,21 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=91" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=91" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=91" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=95" alt=""></button>
       </div>
     </section>
+
+    <button class="about-done-wide" id="aboutDone" type="button">DONE</button>
+
+    ${photoUrl?`<div class="photo-viewer" id="photoViewer" hidden>
+      <button class="photo-viewer-backdrop" id="photoViewerBackdrop" type="button" aria-label="Close"></button>
+      <div class="photo-viewer-stage">
+        <img src="${photoUrl}" alt="">
+        <button class="photo-viewer-close" id="photoViewerClose" type="button" aria-label="Close">×</button>
+      </div>
+    </div>`:''}
   </main>`;
 
   const persist=async()=>{
@@ -428,7 +509,44 @@ async function renderAboutHim(){
     else{delete p.about.types;delete p.about.type}
   });
 
+
+  const photoInput=document.getElementById('photoInput');
+  const openPicker=()=>photoInput.click();
+  const addPhotoButton=document.getElementById('addPhoto');
+  const replacePhotoButton=document.getElementById('replacePhoto');
+  if(addPhotoButton)addPhotoButton.onclick=openPicker;
+  if(replacePhotoButton)replacePhotoButton.onclick=openPicker;
+  photoInput.onchange=async()=>{
+    const file=photoInput.files?.[0];
+    if(!file)return;
+    try{
+      await savePersonPhoto(p.id,file);
+      renderAboutHim();
+    }catch(e){
+      alert('That image could not be added.');
+    }
+  };
+  const removePhotoButton=document.getElementById('removePhoto');
+  if(removePhotoButton)removePhotoButton.onclick=async()=>{
+    await remove('photos',p.id);
+    renderAboutHim();
+  };
+  if(photoUrl){
+    const viewer=document.getElementById('photoViewer');
+    const openViewer=()=>{viewer.hidden=false;document.body.classList.add('modal-open')};
+    const closeViewer=()=>{viewer.hidden=true;document.body.classList.remove('modal-open')};
+    document.getElementById('aboutPhotoPreview').onclick=openViewer;
+    document.getElementById('photoViewerBackdrop').onclick=closeViewer;
+    document.getElementById('photoViewerClose').onclick=closeViewer;
+  }
+
   document.getElementById('back').onclick=async()=>{
+    await persist();
+    state.screen=state.detailsReturn==='person'?'person':'postadd';
+    render();
+  };
+
+  document.getElementById('aboutDone').onclick=async()=>{
     await persist();
     state.screen=state.detailsReturn==='person'?'person':'postadd';
     render();
@@ -465,9 +583,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=91" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=91" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=91" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=95" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -510,11 +628,7 @@ async function renderPenis(){
     state.screen='about';
     render();
   };
-  document.getElementById('donePenis').onclick=async()=>{
-    await save();
-    state.screen='peach';
-    render();
-  };
+  document.getElementById('donePenis').onclick=async()=>{await save();state.screen='about';render();};
 
   document.querySelectorAll('[data-penis-key]').forEach(b=>b.onclick=async()=>{
     const key=b.dataset.penisKey;
@@ -549,9 +663,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=91" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=91" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=91" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=95" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -563,7 +677,7 @@ ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
   const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.peach={...d};await put('people',c)};
     document.querySelectorAll('[data-go-private]').forEach(b=>b.onclick=async()=>{await save();state.screen=b.dataset.goPrivate;render();});
 document.getElementById('backPeach').onclick=async()=>{await save();state.screen='about';render()};
-document.getElementById('donePeach').onclick=async()=>{await save();state.screen='drops';render()};
+document.getElementById('donePeach').onclick=async()=>{await save();state.screen='about';render();};
   document.querySelectorAll('[data-peach-key]').forEach(b=>b.onclick=async()=>{
     const key=b.dataset.peachKey,val=b.dataset.peachValue;
     d[key]=val;
@@ -594,9 +708,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=91" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=91" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=91" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=95" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -621,7 +735,7 @@ async function renderDrops(){
   const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.drops={...d};await put('people',c)};
     document.querySelectorAll('[data-go-private]').forEach(b=>b.onclick=async()=>{await save();state.screen=b.dataset.goPrivate;render();});
 document.getElementById('backDrops').onclick=async()=>{await save();state.screen='about';render()};
-document.getElementById('doneDrops').onclick=async()=>{await save();state.screen='about';render()};
+document.getElementById('doneDrops').onclick=async()=>{await save();state.screen='about';render();};
   document.querySelectorAll('[data-amount]').forEach(b=>b.onclick=async()=>{
     d.amount=b.dataset.amount;
     document.querySelectorAll('[data-amount]').forEach(x=>x.classList.toggle('on',x===b));
@@ -1046,13 +1160,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=91',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=95',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=91',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=95',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -1060,7 +1174,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=91',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=95',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1102,6 +1216,8 @@ function encounterSummaryLines(e){
 async function renderPerson(){
   const p=await get('people',state.selectedPersonId);
   if(!p){state.screen='collection';return render()}
+  const photoRecord=await personPhoto(p.id);
+  const photoUrl=photoObjectUrl(photoRecord);
   const encounters=(await all('encounters'))
     .filter(e=>e.personId===p.id)
     .sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -1128,6 +1244,12 @@ async function renderPerson(){
         </button>
       </div>
     </header>
+
+    ${photoUrl?`<section class="profile-photo-section">
+      <button class="profile-photo" id="profilePhoto" type="button" aria-label="View photo">
+        <img src="${photoUrl}" alt="">
+      </button>
+    </section>`:''}
 
     ${about.length?`<section class="profile-section">
       <div class="profile-section-title">ABOUT HIM</div>
@@ -1182,7 +1304,7 @@ async function renderPerson(){
           <button class="note-close" id="nameEditClose" type="button" aria-label="Close">×</button>
         </div>
         <input class="name-edit-input" id="nameEditInput" value="${esc(p.name||'')}" placeholder="Name / Nick">
-        <div class="note-autosave">Saved automatically</div>
+        <button class="name-edit-done" id="nameEditDone" type="button">DONE</button>
       </section>
     </div>
 
@@ -1201,6 +1323,14 @@ async function renderPerson(){
       </section>
     </div>
 
+    ${photoUrl?`<div class="photo-viewer" id="profilePhotoViewer" hidden>
+      <button class="photo-viewer-backdrop" id="profilePhotoBackdrop" type="button" aria-label="Close"></button>
+      <div class="photo-viewer-stage">
+        <img src="${photoUrl}" alt="">
+        <button class="photo-viewer-close" id="profilePhotoClose" type="button" aria-label="Close">×</button>
+      </div>
+    </div>`:''}
+
     <div class="profile-delete-modal" id="deleteModal" hidden>
       <button class="profile-delete-backdrop" id="deleteBackdrop" aria-label="Cancel"></button>
       <section class="profile-delete-sheet" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
@@ -1218,6 +1348,14 @@ async function renderPerson(){
 
   document.getElementById('profileBack').onclick=()=>{state.screen='collection';render()};
   document.getElementById('editPerson').onclick=()=>{state.detailsReturn='person';state.screen='about';render()};
+  if(photoUrl){
+    const pv=document.getElementById('profilePhotoViewer');
+    const openPhoto=()=>{pv.hidden=false;document.body.classList.add('modal-open')};
+    const closePhoto=()=>{pv.hidden=true;document.body.classList.remove('modal-open')};
+    document.getElementById('profilePhoto').onclick=openPhoto;
+    document.getElementById('profilePhotoBackdrop').onclick=closePhoto;
+    document.getElementById('profilePhotoClose').onclick=closePhoto;
+  }
 
   document.getElementById('addEncounter').onclick=async()=>{
     const today=new Date().toISOString().slice(0,10);
@@ -1253,6 +1391,7 @@ async function renderPerson(){
   editNameButton.onclick=openNameEdit;
   document.getElementById('nameEditBackdrop').onclick=closeNameEdit;
   document.getElementById('nameEditClose').onclick=closeNameEdit;
+  document.getElementById('nameEditDone').onclick=closeNameEdit;
   nameEditInput.oninput=async()=>{p.name=nameEditInput.value.trim();await put('people',p);profileNameText.textContent=displayName(p)};
 
   const personNoteModal=document.getElementById('personNoteModal');
@@ -1284,6 +1423,7 @@ async function renderPerson(){
   document.getElementById('cancelDelete').onclick=closeDelete;
   document.getElementById('confirmDelete').onclick=async()=>{
     for(const e of encounters) await remove('encounters',e.id);
+    await remove('photos',p.id);
     await remove('people',p.id);
     document.body.classList.remove('modal-open');
     state.selectedPersonId=null;
@@ -1355,7 +1495,7 @@ async function renderTimeline(){
     return `${gm}<article class="timeline-item"><div class="timeline-rail"><div class="timeline-date">${esc(timelineShortDate(e))}</div><span class="timeline-dot"></span></div>
       <button class="timeline-card" data-timeline-encounter="${e.id}"><div class="timeline-card-top"><strong>${esc(displayName(p))}</strong><span class="timeline-meta">
       ${String(e.privateNote||'').trim()?`<span class="timeline-note">${noteIconMarkup()}</span>`:''}${e.rating?`<span class="timeline-rating">★ ${e.rating}</span>`:''}</span></div>
-      ${lines.map(x=>`<div class="timeline-line">${esc(x)}</div>`).join('')}</button></article>`;
+      ${lines.length?`<div class="timeline-line">${esc(lines.join(' · '))}</div>`:''}</button></article>`;
   }).join('');
   app.innerHTML=`<main class="people-timeline"><header class="people-head"><div><h1>People</h1></div><button class="people-add" id="timelineAdd">+</button></header>
   <div class="people-view-switch"><button id="openCollection">COLLECTION</button><button class="active">TIMELINE</button></div>
@@ -1440,7 +1580,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=9.1');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=9.5');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

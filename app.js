@@ -97,7 +97,7 @@ async function render(){
   if(state.screen==='person') return renderPerson();
   if(state.screen==='collection') return renderCollection();
   if(state.screen==='timeline') return renderTimeline();
-  if(state.screen==='insights') return renderPlaceholder('Insights','Your patterns will live here once there is enough data.','insights');
+  if(state.screen==='insights') return renderStats();
   if(state.screen==='you') return renderPlaceholder('You','Privacy, health, backup and settings will live here.','you');
   if(state.screen==='details') return renderDetails();
   if(state.screen==='encounter') return renderEncounter();
@@ -116,7 +116,7 @@ function nav(active='home'){
   return `<nav class="bottom-nav">
     <button class="navbtn ${active==='home'?'active':''}" data-nav="home"><span class="nav-ico">○</span><span>COUNT</span></button>
     <button class="navbtn ${active==='collection'?'active':''}" data-nav="collection"><span class="nav-ico">◫</span><span>PEOPLE</span></button>
-    <button class="navbtn ${active==='insights'?'active':''}" data-nav="insights"><span class="nav-ico">⌁</span><span>INSIGHTS</span></button>
+    <button class="navbtn ${active==='insights'?'active':''}" data-nav="insights"><span class="nav-ico">⌁</span><span>STATS</span></button>
     <button class="navbtn ${active==='you'?'active':''}" data-nav="you"><span class="nav-ico">◌</span><span>YOU</span></button>
   </nav>`;
 }
@@ -186,6 +186,103 @@ async function renderHome(){
   document.getElementById('privacyClose').onclick=closePrivacy;
   document.getElementById('privacyBackdrop').onclick=closePrivacy;
 
+  attachNav();
+}
+
+async function renderStats(){
+  const people=await all('people');
+  const encounters=await all('encounters');
+  const byPerson=new Map(people.map(p=>[p.id,[]]));
+  encounters.forEach(e=>{if(byPerson.has(e.personId))byPerson.get(e.personId).push(e)});
+
+  const uniquePeopleWith=predicate=>{
+    const ids=new Set();
+    encounters.forEach(e=>{if(predicate(e))ids.add(e.personId)});
+    return ids.size;
+  };
+  const hasDetail=(e,activity,value)=>{
+    if(!(e.happened||[]).includes(activity))return false;
+    const vals=e.happenedDetails?.[activity];
+    return Array.isArray(vals)?vals.includes(value):vals===value;
+  };
+  const sexStats=[
+    ['DICKS I SUCKED',uniquePeopleWith(e=>hasDetail(e,'Oral','I sucked'))],
+    ['GUYS WHO SUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Oral','He sucked'))],
+    ['ASSES I FUCKED',uniquePeopleWith(e=>hasDetail(e,'Anal','I topped'))],
+    ['GUYS WHO FUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Anal','He topped'))],
+    ['ASSES I RIMMED',uniquePeopleWith(e=>hasDetail(e,'Rim','I rimmed'))],
+    ['GUYS WHO RIMMED ME',uniquePeopleWith(e=>hasDetail(e,'Rim','He rimmed'))]
+  ];
+
+  const dist=(getter,order,labels)=>{
+    const counts=new Map(order.map(k=>[k,0])); let known=0;
+    people.forEach(p=>{const k=getter(p);if(counts.has(k)){counts.set(k,counts.get(k)+1);known++}});
+    return {known,rows:order.map(k=>({label:labels[k]||k,value:counts.get(k)}))};
+  };
+  const getOne=v=>Array.isArray(v)?v[0]:v;
+  const type=dist(p=>String(getOne(p.about?.types)||p.about?.type||'').toLowerCase(),['twink','bear','daddy','otter'],{twink:'Twink',bear:'Bear',daddy:'Daddy',otter:'Otter'});
+  const build=dist(p=>String(getOne(p.about?.build)||p.about?.buildVisual||'').toLowerCase(),['slim','average','athletic','big'],{slim:'Slim',average:'Average',athletic:'Athletic',big:'Big'});
+  const height=dist(p=>String(p.about?.heightBand||'').toLowerCase(),['short','medium','tall'],{short:'Short',medium:'Medium',tall:'Tall'});
+  const age=dist(p=>String(p.about?.ageBand||'').toLowerCase(),['young','30s','middle','older'],{young:'Young','30s':'30s',middle:'Middle age',older:'Older'});
+
+  const barBlock=(title,d)=>{
+    if(!d.known)return '';
+    const max=Math.max(1,...d.rows.map(r=>r.value));
+    return `<section class="stats-chart"><div class="stats-section-title">${title}</div><div class="stats-bars">${d.rows.map(r=>`<div class="stats-bar-row"><span>${r.label}</span><div class="stats-bar-track"><i style="width:${(r.value/max)*100}%"></i></div><strong>${r.value}</strong></div>`).join('')}</div><div class="stats-based">Based on ${d.known} ${d.known===1?'guy':'guys'}</div></section>`;
+  };
+
+  const repeaters=people.filter(p=>(byPerson.get(p.id)||[]).length>1);
+  const oneHits=people.filter(p=>(byPerson.get(p.id)||[]).length===1);
+  const mostSeen=[...people].sort((a,b)=>(byPerson.get(b.id)||[]).length-(byPerson.get(a.id)||[]).length)[0];
+  const mostSeenN=mostSeen?(byPerson.get(mostSeen.id)||[]).length:0;
+  const repeatRate=people.length?Math.round(repeaters.length/people.length*100):0;
+
+  const rated=encounters.filter(e=>Number(e.rating)>0);
+  const average=rated.length?(rated.reduce((n,e)=>n+Number(e.rating),0)/rated.length).toFixed(1):null;
+  const fiveEnc=rated.filter(e=>Number(e.rating)===5).length;
+  const fiveGuys=new Set(rated.filter(e=>Number(e.rating)===5).map(e=>e.personId)).size;
+
+  const now=new Date(),thisYear=now.getFullYear(),thisMonth=now.getMonth()+1;
+  const ym=e=>{
+    const w=e.when||{};
+    if((w.precision==='exact'||!w.precision)){
+      const raw=String(w.date||e.date||'').slice(0,10),m=raw.match(/^(\d{4})-(\d{2})/);return m?[+m[1],+m[2]]:null;
+    }
+    if(w.precision==='month'&&w.year&&w.month)return [+w.year,+w.month];
+    return null;
+  };
+  const exactMonths=encounters.map(e=>[e,ym(e)]).filter(x=>x[1]);
+  const thisMonthN=exactMonths.filter(([,x])=>x[0]===thisYear&&x[1]===thisMonth).length;
+  const inYear=e=>{const c=encounterChronology(e);return c.start<=Date.UTC(thisYear,11,31)&&c.end>=Date.UTC(thisYear,0,1)};
+  const thisYearN=encounters.filter(inYear).length;
+  const monthCounts=new Map();
+  exactMonths.forEach(([,x])=>{const k=`${x[0]}-${String(x[1]).padStart(2,'0')}`;monthCounts.set(k,(monthCounts.get(k)||0)+1)});
+  const busiest=[...monthCounts.entries()].sort((a,b)=>b[1]-a[1]||b[0].localeCompare(a[0]))[0];
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const busiestLabel=busiest?(()=>{const [y,m]=busiest[0].split('-').map(Number);return `${monthNames[m-1]} ${y}`})():null;
+
+  const typeWinner=type.known?[...type.rows].sort((a,b)=>b.value-a.value)[0]:null;
+  const buildWinner=build.known?[...build.rows].sort((a,b)=>b.value-a.value)[0]:null;
+  const ageWinner=age.known?[...age.rows].sort((a,b)=>b.value-a.value)[0]:null;
+  const yourType=[buildWinner?.value?buildWinner.label:null,ageWinner?.value?ageWinner.label:null,typeWinner?.value?typeWinner.label:null].filter(Boolean).join(' · ');
+
+  app.innerHTML=`<main class="stats-screen">
+    <header class="stats-head"><h1>Stats</h1></header>
+    <section class="stats-hero"><div class="stats-kicker">BODY COUNT</div><div class="stats-count">${people.length}</div><div class="stats-encounters">${encounters.length} ${encounters.length===1?'ENCOUNTER':'ENCOUNTERS'}</div></section>
+
+    <section class="stats-section"><div class="stats-section-title">THE NUMBERS</div><div class="stats-number-grid">${sexStats.map(([label,value])=>`<div class="stats-number-card"><strong>${value}</strong><span>${label}</span></div>`).join('')}</div><div class="stats-based">Unique guys · based on recorded encounter details</div></section>
+
+    <section class="stats-section"><div class="stats-section-title">ENCORES</div><div class="stats-mini-grid"><div><strong>${oneHits.length}</strong><span>ONE HIT WONDERS</span></div><div><strong>${repeaters.length}</strong><span>ENCORES</span></div><div><strong>${repeatRate}%</strong><span>ENCORE RATE</span></div><div><strong>${mostSeenN}</strong><span>MOST ENCOUNTERS</span></div></div>${mostSeenN>1?`<div class="stats-callout">${esc(displayName(mostSeen))}</div>`:''}</section>
+
+    ${barBlock('TYPE',type)}${barBlock('BUILD',build)}${barBlock('HEIGHT',height)}${barBlock('AGE',age)}
+
+    ${rated.length?`<section class="stats-section"><div class="stats-section-title">HOW WAS IT</div><div class="stats-mini-grid"><div><strong>★ ${average}</strong><span>AVERAGE RATING</span></div><div><strong>${fiveEnc}</strong><span>5 STAR ENCOUNTERS</span></div><div><strong>${fiveGuys}</strong><span>5 STAR GUYS</span></div><div><strong>${rated.length}</strong><span>RATED</span></div></div><div class="stats-based">Based on ${rated.length} rated ${rated.length===1?'encounter':'encounters'}</div></section>`:''}
+
+    <section class="stats-section"><div class="stats-section-title">TIME</div><div class="stats-mini-grid"><div><strong>${thisYearN}</strong><span>THIS YEAR</span></div><div><strong>${thisMonthN}</strong><span>THIS MONTH</span></div>${busiest?`<div class="stats-wide"><strong>${busiest[1]}</strong><span>MOST ACTIVE MONTH · ${busiestLabel.toUpperCase()}</span></div>`:''}</div>${exactMonths.length?`<div class="stats-based">Monthly stats use encounters with an exact date or month</div>`:''}</section>
+
+    ${(yourType||mostSeenN>1)?`<section class="stats-section stats-fun"><div class="stats-section-title">FUN STATS</div>${yourType?`<div class="stats-fun-row"><span>YOUR TYPE</span><strong>${esc(yourType)}</strong></div>`:''}${mostSeenN>1?`<div class="stats-fun-row"><span>COMEBACK KING</span><strong>${esc(displayName(mostSeen))} · ${mostSeenN} encounters</strong></div>`:''}${busiest?`<div class="stats-fun-row"><span>BUSIEST MONTH</span><strong>${busiestLabel}</strong></div>`:''}</section>`:''}
+    ${nav('insights')}
+  </main>`;
   attachNav();
 }
 
@@ -458,9 +555,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=97" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=98" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=98" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=98" alt=""></button>
       </div>
     </section>
 
@@ -582,9 +679,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=97" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=98" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=98" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=98" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -662,9 +759,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=97" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=98" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=98" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=98" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -707,9 +804,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=97" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=98" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=98" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=98" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -1160,13 +1257,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=97',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=98',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=97',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=98',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -1174,7 +1271,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=97',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=98',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1688,7 +1785,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=9.7');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=9.8');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

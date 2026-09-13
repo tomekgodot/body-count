@@ -3649,3 +3649,31 @@ body.modal-open{
 .profile-add-encounter-wide:active{
   background:rgba(239,189,134,.075);
 }
+
+/* v9.1 — search-first existing-person encounter flow */
+.quick-existing-search{margin-top:10px}
+.quick-existing-results{
+  margin-top:8px;
+  max-height:42dvh;
+  overflow:auto;
+}
+.quick-existing-results:empty{display:none}
+.quick-existing-results .pick-person{width:100%}
+.quick-selected-person{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin:12px 2px 2px;
+  color:rgba(255,255,255,.35);
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.quick-selected-person strong{
+  color:rgba(255,255,255,.78);
+  font-size:13px;
+  font-weight:650;
+  letter-spacing:0;
+  text-transform:none;
+}

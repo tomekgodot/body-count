@@ -30,6 +30,7 @@ function all(name){return new Promise((r,j)=>{const q=store(name).getAll();q.ons
 function get(name,id){return new Promise((r,j)=>{const q=store(name).get(id);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
 function put(name,value){return new Promise((r,j)=>{const q=store(name,'readwrite').put(value);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
 function add(name,value){return new Promise((r,j)=>{const q=store(name,'readwrite').add(value);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
+function remove(name,id){return new Promise((r,j)=>{const q=store(name,'readwrite').delete(id);q.onsuccess=()=>r();q.onerror=()=>j(q.error)})}
 
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
@@ -48,6 +49,7 @@ async function render(){
   if(state.screen==='drops') return renderDrops();
   if(state.screen==='person') return renderPerson();
   if(state.screen==='collection') return renderCollection();
+  if(state.screen==='timeline') return renderTimeline();
   if(state.screen==='insights') return renderPlaceholder('Insights','Your patterns will live here once there is enough data.','insights');
   if(state.screen==='you') return renderPlaceholder('You','Privacy, health, backup and settings will live here.','you');
   if(state.screen==='details') return renderDetails();
@@ -171,7 +173,11 @@ async function renderAdd(){
     `}
 
     <div class="quick-field mental-note-field">
-      <textarea id="memory" maxlength="60" placeholder="One thing you’ll remember him by…">${esc(state.quick.memory||'')}</textarea>
+      <div class="quick-memory-block">
+        <label class="quick-memory-label" for="lastMemory">MEMORY CUE</label>
+        <textarea id="memory" maxlength="60" placeholder="One thing you’ll remember him by…">
+        <div class="quick-memory-helper">You can add more details later.</div>
+      </div>${esc(state.quick.memory||'')}</textarea>
     </div>
 
     <button class="primary quick-save" id="save" ${mode==='existing'&&!selected?'disabled':''}>ADD</button>
@@ -295,9 +301,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=82" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=87" alt=""></button>
       </div>
     </section>
   </main>`;
@@ -337,7 +343,7 @@ async function renderAboutHim(){
 
   document.getElementById('back').onclick=async()=>{
     await persist();
-    state.screen='postadd';
+    state.screen=state.detailsReturn==='person'?'person':'postadd';
     render();
   };
 
@@ -372,9 +378,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=82" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=87" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -456,9 +462,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=82" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=87" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -501,9 +507,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=82" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=82" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=82" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=87" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -641,7 +647,9 @@ async function renderEncounterEdit(){
     <div class="encounter-top">
       <button class="about-back" id="encBack">‹</button>
       <div class="encounter-title">ENCOUNTER</div>
-      <span></span>
+      <button class="note-icon-button encounter-note-button ${String(e.privateNote||'').trim()?'has-note':''}" id="encNoteButton" type="button" aria-label="Private note">
+        ${noteIconMarkup()}<span class="note-dot"></span>
+      </button>
     </div>
 
     <section class="enc-section">
@@ -680,6 +688,21 @@ async function renderEncounterEdit(){
       </div>
     </section>
     <button class="flow-done encounter-flow-done" id="encDone">DONE</button>
+
+    <div class="note-modal" id="encNoteModal" hidden>
+      <button class="note-modal-backdrop" id="encNoteBackdrop" type="button" aria-label="Close note"></button>
+      <section class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="encNoteTitle">
+        <div class="note-sheet-head">
+          <div>
+            <div class="note-sheet-kicker">PRIVATE NOTE</div>
+            <h2 id="encNoteTitle">This encounter</h2>
+          </div>
+          <button class="note-close" id="encNoteClose" type="button" aria-label="Close">×</button>
+        </div>
+        <textarea class="note-textarea" id="encNoteText" placeholder="">${esc(e.privateNote||'')}</textarea>
+        <div class="note-autosave">Saved automatically</div>
+      </section>
+    </div>
   </main>`;
 
   const save=async()=>{
@@ -707,6 +730,27 @@ async function renderEncounterEdit(){
   };
   document.getElementById('encBack').onclick=leaveEncounterEditor;
   document.getElementById('encDone').onclick=leaveEncounterEditor;
+
+  const encNoteModal=document.getElementById('encNoteModal');
+  const encNoteButton=document.getElementById('encNoteButton');
+  const encNoteText=document.getElementById('encNoteText');
+  const openEncNote=()=>{
+    encNoteModal.hidden=false;
+    document.body.classList.add('modal-open');
+    setTimeout(()=>encNoteText.focus(),80);
+  };
+  const closeEncNote=()=>{
+    encNoteModal.hidden=true;
+    document.body.classList.remove('modal-open');
+  };
+  encNoteButton.onclick=openEncNote;
+  document.getElementById('encNoteBackdrop').onclick=closeEncNote;
+  document.getElementById('encNoteClose').onclick=closeEncNote;
+  encNoteText.oninput=async()=>{
+    e.privateNote=encNoteText.value;
+    await save();
+    encNoteButton.classList.toggle('has-note',!!encNoteText.value.trim());
+  };
 
   document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{
     const v=b.dataset.act;
@@ -880,22 +924,265 @@ const selected=k=>document.querySelector(`[data-single="${k}"].on`)?.dataset.val
 const rating=k=>Math.max(0,...[...document.querySelectorAll(`[data-ratekey="${k}"].on`)].map(x=>Number(x.dataset.rate)));
 
 function profileSummary(p){const bits=[];if(p.about?.ageExact)bits.push(`${esc(p.about.ageExact)} yrs`);else if(p.about?.ageBand)bits.push(esc(p.about.ageBand));if(p.about?.heightExact)bits.push(`${esc(p.about.heightExact)} cm`);else if(p.about?.heightBand)bits.push(esc(p.about.heightBand));return bits.join(' · ')}
-async function renderPerson(){
- const p=await get('people',state.selectedPersonId);
- const encounters=(await all('encounters')).filter(e=>e.personId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
- const avg=avgRating(encounters); const latest=encounters[0];
- app.innerHTML=`<button class="linkbtn" id="back">← Collection</button>
- <section class="profile-hero"><div class="profile-avatar">${esc(initials(p.name))}</div><div class="profile-copy"><div class="eyebrow">#${String(p.id).padStart(3,'0')}</div><h1>${esc(displayName(p))}</h1><p>${esc(p.lastMemory||latest?.memory||'No mental note yet')}</p><div class="profile-badges"><span>${encounters.length}× met</span><span>${avg==='—'?'Not rated':`★ ${avg}`}</span>${profileSummary(p)?`<span>${profileSummary(p)}</span>`:''}</div></div></section>
- <div class="section-title"><h2>Remember more</h2><span>optional</span></div><div class="option-grid compact">${detailTiles().map(x=>`<button class="option" data-profile-detail="${x[0]}"><div class="ico">${x[1]}</div><b>${x[2]}</b><span>${x[3]}</span></button>`).join('')}</div>
- <div class="section-title"><h2>History</h2><span>${encounters.length} ${encounters.length===1?'time':'times'}</span></div>
- ${encounters.length?encounters.map((e,i)=>`<button class="card encounter-card" data-encounter="${e.id}"><div><b>${i===0?'Latest · ':''}${fmt(e.date)}</b><p>${esc(e.memory||'No mental note')}</p></div><div class="encounter-rating">${e.rating?`★ ${e.rating}`:'—'}</div></button>`).join(''):`<div class="card empty">No history yet.</div>`}
- <div style="height:12px"></div><button class="primary" id="again">＋ ADD ANOTHER TIME</button>${nav('collection')}`;
- document.getElementById('back').onclick=()=>{state.screen='collection';render()};
- document.getElementById('again').onclick=()=>{state.quick={rating:0,mode:'existing',personId:p.id};state.screen='add';render()};
- document.querySelectorAll('[data-profile-detail]').forEach(b=>b.onclick=()=>{state.detailsTab=b.dataset.profileDetail;state.selectedEncounterId=latest?.id||null;state.detailsReturn='person';state.screen='details';render()});
- document.querySelectorAll('[data-encounter]').forEach(b=>b.onclick=()=>{state.selectedEncounterId=Number(b.dataset.encounter);state.screen='encounter';render()});attachNav();
+function noteIconMarkup(){
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6.75 3.75h7.9l2.6 2.6v13.9H6.75z"></path>
+    <path d="M14.5 3.9v2.8h2.8"></path>
+    <path d="M9.2 10h5.6M9.2 13h5.6M9.2 16h3.8"></path>
+  </svg>`;
 }
 
+function personAboutSummary(p){
+  const a=p.about||{};
+  const vals=[];
+  const age={young:'Young','30s':'30s',middle:'Middle age',older:'Older'}[a.ageBand];
+  const height={short:'Short',medium:'Medium height',tall:'Tall'}[a.heightBand];
+  const br=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
+  const build={slim:'Slim',average:'Average',athletic:'Athletic',big:'Big'}[String(br).toLowerCase()];
+  const tr=(Array.isArray(a.types)&&a.types[0])||a.type||'';
+  const type={twink:'Twink',bear:'Bear',daddy:'Daddy',otter:'Otter'}[String(tr).toLowerCase()];
+  [age,height,build,type].filter(Boolean).forEach(x=>vals.push(x));
+  return vals;
+}
+
+function privateSummary(p){
+  const a=p.about||{};
+  const out=[];
+  const titleCase=s=>s ? String(s).charAt(0).toUpperCase()+String(s).slice(1) : '';
+
+  const penis=a.penis||{};
+  const penisBits=[
+    penis.size,
+    penis.girth,
+    penis.foreskin,
+    penis.curveVertical,
+    penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
+  ].filter(Boolean);
+  if(penisBits.length || (penis.note||'').trim()){
+    out.push({icon:'assets/detail-eggplant.png?v=87',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+  }
+
+  const peach=a.peach||{};
+  const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
+  if(peachBits.length || (peach.note||'').trim()){
+    out.push({icon:'assets/detail-peach.png?v=87',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+  }
+
+  const drops=a.drops||{};
+  const amount={low:'Small',medium:'Medium',high:'Large'}[drops.amount];
+  const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
+  const dropBits=[amount,distance].filter(Boolean);
+  if(dropBits.length || (drops.note||'').trim()){
+    out.push({icon:'assets/detail-drops.png?v=87',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+  }
+  return out;
+}
+
+function encounterWhenLabel(e){
+  const w=e.when||{};
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if(w.precision==='month' && w.month && w.year) return `${months[Number(w.month)-1]} ${w.year}`;
+  if(w.precision==='season' && w.season && w.year) return `${String(w.season).charAt(0)+String(w.season).slice(1).toLowerCase()} ${w.year}`;
+  if(w.precision==='year' && w.year) return String(w.year);
+  if(w.precision==='range' && w.from) return `${w.from}${w.to?` — ${w.to}`:''}`;
+  const raw=String(w.date||e.date||'').slice(0,10);
+  if(raw){
+    const d=new Date(`${raw}T12:00:00`);
+    if(!Number.isNaN(d.getTime())) return new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(d);
+  }
+  return 'Unknown date';
+}
+
+function encounterSummaryLines(e){
+  const lines=[];
+  const happened=(e.happened||[]).filter(Boolean);
+  if(happened.length) lines.push(happened.join(' · '));
+
+  const details=[];
+  ['Oral','Anal','Rim'].forEach(k=>{
+    const vals=e.happenedDetails?.[k];
+    if(Array.isArray(vals)) details.push(...vals);
+    else if(vals) details.push(vals);
+  });
+  if((e.other||'').trim()) details.push(e.other.trim());
+  if(details.length) lines.push(details.join(' · '));
+
+  const protection=(e.protection||e.health||[]).filter(Boolean);
+  if(protection.length) lines.push(protection.join(' · '));
+  return lines;
+}
+
+async function renderPerson(){
+  const p=await get('people',state.selectedPersonId);
+  if(!p){state.screen='collection';return render()}
+  const encounters=(await all('encounters'))
+    .filter(e=>e.personId===p.id)
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const avg=avgRating(encounters);
+  const about=personAboutSummary(p);
+  const spicy=privateSummary(p);
+  const note=(p.lastMemory||'').trim();
+
+  app.innerHTML=`<main class="person-profile">
+    <header class="person-profile-head">
+      <button class="profile-back" id="profileBack" type="button" aria-label="Back">‹</button>
+      <div class="profile-head-copy">
+        <div class="profile-kicker">PERSON</div>
+        <h1>${esc(displayName(p))}</h1>
+        ${note?`<p>${esc(note)}</p>`:''}
+      </div>
+      <div class="profile-head-tools">
+        ${avg==='—'?'':`<div class="profile-average"><span>★</span>${avg}</div>`}
+        <button class="note-icon-button ${String(p.privateNote||'').trim()?'has-note':''}" id="personNoteButton" type="button" aria-label="Private note">
+          ${noteIconMarkup()}<span class="note-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    ${about.length?`<section class="profile-section">
+      <div class="profile-section-title">ABOUT HIM</div>
+      <div class="profile-facts">${about.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+    </section>`:''}
+
+    ${spicy.length?`<section class="profile-section">
+      <div class="profile-section-title">SPICY DETAILS</div>
+      <div class="spicy-summary-list">
+        ${spicy.map(x=>`<div class="spicy-summary-row">
+          <img src="${x.icon}" alt="">
+          <div>
+            <div class="spicy-summary-label">${x.label}</div>
+            ${x.bits.length?`<div class="spicy-summary-bits">${x.bits.map(esc).join(' · ')}</div>`:''}
+            ${x.note?`<div class="spicy-summary-note">${esc(x.note)}</div>`:''}
+          </div>
+        </div>`).join('')}
+      </div>
+    </section>`:''}
+
+    <section class="profile-section encounters-section">
+      <div class="encounters-title-row">
+        <div class="profile-section-title">ENCOUNTERS</div>
+        <button class="profile-add-encounter" id="addEncounter" type="button">+ ADD</button>
+      </div>
+      <div class="profile-encounters">
+        ${encounters.length?encounters.map(e=>{
+          const lines=encounterSummaryLines(e);
+          return `<button class="profile-encounter-card" data-encounter="${e.id}" type="button">
+            <div class="profile-encounter-top">
+              <strong>${esc(encounterWhenLabel(e))}</strong>
+              <span class="profile-encounter-meta">
+                ${String(e.privateNote||'').trim()?`<span class="profile-note-marker" aria-label="Has private note">${noteIconMarkup()}</span>`:''}
+                ${e.rating?`<span class="profile-encounter-rating">★ ${e.rating}</span>`:''}
+              </span>
+            </div>
+            ${lines.map(x=>`<div class="profile-encounter-line">${esc(x)}</div>`).join('')}
+          </button>`;
+        }).join(''):`<div class="profile-no-encounters">No encounters yet.</div>`}
+      </div>
+    </section>
+
+    <div class="profile-actions">
+      <button class="profile-edit" id="editPerson" type="button">Edit profile</button>
+      <button class="profile-delete" id="deletePerson" type="button">Delete person</button>
+    </div>
+
+    <div class="note-modal" id="personNoteModal" hidden>
+      <button class="note-modal-backdrop" id="personNoteBackdrop" type="button" aria-label="Close note"></button>
+      <section class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="personNoteTitle">
+        <div class="note-sheet-head">
+          <div>
+            <div class="note-sheet-kicker">PRIVATE NOTE</div>
+            <h2 id="personNoteTitle">${esc(displayName(p))}</h2>
+          </div>
+          <button class="note-close" id="personNoteClose" type="button" aria-label="Close">×</button>
+        </div>
+        <textarea class="note-textarea" id="personNoteText" placeholder="">${esc(p.privateNote||'')}</textarea>
+        <div class="note-autosave">Saved automatically</div>
+      </section>
+    </div>
+
+    <div class="profile-delete-modal" id="deleteModal" hidden>
+      <button class="profile-delete-backdrop" id="deleteBackdrop" aria-label="Cancel"></button>
+      <section class="profile-delete-sheet" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+        <h2 id="deleteTitle">Delete ${esc(displayName(p))}?</h2>
+        <p>This will also delete all encounters with him.</p>
+        <div class="profile-delete-buttons">
+          <button id="cancelDelete" type="button">Cancel</button>
+          <button id="confirmDelete" type="button">Delete</button>
+        </div>
+      </section>
+    </div>
+
+    ${nav('collection')}
+  </main>`;
+
+  document.getElementById('profileBack').onclick=()=>{state.screen='collection';render()};
+  document.getElementById('editPerson').onclick=()=>{state.detailsReturn='person';state.screen='about';render()};
+
+  document.getElementById('addEncounter').onclick=async()=>{
+    const today=new Date().toISOString().slice(0,10);
+    const id=await add('encounters',{
+      personId:p.id,
+      date:new Date().toISOString(),
+      when:{precision:'exact',date:today},
+      happened:[],
+      happenedDetails:{},
+      protection:[],
+      rating:0,
+      createdAt:Date.now()
+    });
+    state.selectedEncounterId=id;
+    state.detailsReturn='person';
+    state.screen='encounterEdit';
+    render();
+  };
+
+  document.querySelectorAll('[data-encounter]').forEach(b=>b.onclick=()=>{
+    state.selectedEncounterId=Number(b.dataset.encounter);
+    state.detailsReturn='person';
+    state.screen='encounterEdit';
+    render();
+  });
+
+  const personNoteModal=document.getElementById('personNoteModal');
+  const personNoteButton=document.getElementById('personNoteButton');
+  const personNoteText=document.getElementById('personNoteText');
+  const openPersonNote=()=>{
+    personNoteModal.hidden=false;
+    document.body.classList.add('modal-open');
+    setTimeout(()=>personNoteText.focus(),80);
+  };
+  const closePersonNote=()=>{
+    personNoteModal.hidden=true;
+    document.body.classList.remove('modal-open');
+  };
+  personNoteButton.onclick=openPersonNote;
+  document.getElementById('personNoteBackdrop').onclick=closePersonNote;
+  document.getElementById('personNoteClose').onclick=closePersonNote;
+  personNoteText.oninput=async()=>{
+    p.privateNote=personNoteText.value;
+    await put('people',p);
+    personNoteButton.classList.toggle('has-note',!!personNoteText.value.trim());
+  };
+
+  const modal=document.getElementById('deleteModal');
+  const openDelete=()=>{modal.hidden=false;document.body.classList.add('modal-open')};
+  const closeDelete=()=>{modal.hidden=true;document.body.classList.remove('modal-open')};
+  document.getElementById('deletePerson').onclick=openDelete;
+  document.getElementById('deleteBackdrop').onclick=closeDelete;
+  document.getElementById('cancelDelete').onclick=closeDelete;
+  document.getElementById('confirmDelete').onclick=async()=>{
+    for(const e of encounters) await remove('encounters',e.id);
+    await remove('people',p.id);
+    document.body.classList.remove('modal-open');
+    state.selectedPersonId=null;
+    state.selectedEncounterId=null;
+    state.screen='collection';
+    render();
+  };
+
+  attachNav();
+}
 async function renderEncounter(){
  const e=await get('encounters',state.selectedEncounterId); const p=await get('people',e.personId); state.selectedPersonId=p.id;
  const chips=(label,arr)=>arr?.length?`<div class="encounter-section"><span>${label}</span><div class="chips readonly">${arr.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div></div>`:'';
@@ -907,6 +1194,52 @@ async function renderEncounter(){
  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{state.detailsReturn='person';state.screen='encounterEdit';render()});
 }
 
+function timelineSortKey(e){
+  const w=e.when||{};
+  if(w.precision==='range')return new Date(Number(w.to||w.from)||0,11,31).getTime();
+  if(w.precision==='year')return new Date(Number(w.year)||0,6,1).getTime();
+  if(w.precision==='season')return new Date(Number(w.year)||0,({Winter:1,Spring:4,Summer:7,Autumn:10,Fall:10}[w.season]||7)-1,15).getTime();
+  if(w.precision==='month')return new Date(Number(w.year)||0,(Number(w.month)||1)-1,15).getTime();
+  const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
+  return Number.isNaN(d.getTime())?new Date(e.date||0).getTime():d.getTime();
+}
+function timelineGroupLabel(e){
+  const w=e.when||{},m=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  if(w.precision==='month'&&w.month&&w.year)return `${m[+w.month-1]} ${w.year}`;
+  if(w.precision==='season'&&w.season&&w.year)return `${String(w.season).toUpperCase()} ${w.year}`;
+  if(w.precision==='year'&&w.year)return String(w.year);
+  if(w.precision==='range'&&w.from)return `${w.from}${w.to?` — ${w.to}`:''}`;
+  const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
+  return Number.isNaN(d.getTime())?'UNDATED':`${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+function timelineShortDate(e){
+  const w=e.when||{};
+  if(w.precision==='exact'||!w.precision){
+    const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
+    if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short'}).format(d);
+  }
+  return w.precision==='month'?'Month':w.precision==='season'?String(w.season||'Season'):w.precision==='year'?String(w.year||'Year'):w.precision==='range'?'Range':encounterWhenLabel(e);
+}
+async function renderTimeline(){
+  const people=await all('people'), encounters=(await all('encounters')).sort((a,b)=>timelineSortKey(b)-timelineSortKey(a));
+  const pm=new Map(people.map(p=>[p.id,p])); let last=null;
+  const items=encounters.map(e=>{
+    const p=pm.get(e.personId); if(!p)return '';
+    const g=timelineGroupLabel(e),gm=g!==last?`<div class="timeline-group"><span>${esc(g)}</span></div>`:''; last=g;
+    const lines=encounterSummaryLines(e),memory=(p.lastMemory||'').trim();
+    return `${gm}<article class="timeline-item"><div class="timeline-rail"><div class="timeline-date">${esc(timelineShortDate(e))}</div><span class="timeline-dot"></span></div>
+      <button class="timeline-card" data-timeline-encounter="${e.id}"><div class="timeline-card-top"><strong>${esc(displayName(p))}</strong><span class="timeline-meta">
+      ${String(e.privateNote||'').trim()?`<span class="timeline-note">${noteIconMarkup()}</span>`:''}${e.rating?`<span class="timeline-rating">★ ${e.rating}</span>`:''}</span></div>
+      ${memory?`<div class="timeline-memory">${esc(memory)}</div>`:''}${lines.map(x=>`<div class="timeline-line">${esc(x)}</div>`).join('')}</button></article>`;
+  }).join('');
+  app.innerHTML=`<main class="people-timeline"><header class="people-head"><div><div class="people-eyebrow">PEOPLE</div><h1>People</h1></div><button class="people-add" id="timelineAdd">+</button></header>
+  <div class="people-view-switch"><button id="openCollection">COLLECTION</button><button class="active">TIMELINE</button></div>
+  <div class="timeline-list">${items||`<div class="timeline-empty">Your encounters will appear here.</div>`}</div>${nav('collection')}</main>`;
+  openCollection.onclick=()=>{state.screen='collection';render()};
+  timelineAdd.onclick=()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()};
+  document.querySelectorAll('[data-timeline-encounter]').forEach(c=>c.onclick=()=>{state.selectedEncounterId=+c.dataset.timelineEncounter;const e=encounters.find(x=>x.id===state.selectedEncounterId);if(e)state.selectedPersonId=e.personId;state.detailsReturn='timeline';state.screen='encounterEdit';render()});
+  attachNav();
+}
 function collectionDescription(p){
   const a=p.about||{};
   const age={young:'young','30s':'in his 30s',middle:'middle-aged',older:'older'}[a.ageBand];
@@ -934,8 +1267,9 @@ async function renderCollection(){
   }).sort((a,b)=>new Date(b.last?.date||b.p.createdAt||0)-new Date(a.last?.date||a.p.createdAt||0));
 
   app.innerHTML=`<main class="people-collection">
-    <header class="people-head"><div><div class="people-eyebrow">PEOPLE</div><h1>Collection</h1></div>
+    <header class="people-head"><div><div class="people-eyebrow">PEOPLE</div><h1>People</h1></div>
     <button class="people-add" id="peopleAdd" type="button" aria-label="Add a new guy">+</button></header>
+    <div class="people-view-switch"><button class="active">COLLECTION</button><button id="openTimeline">TIMELINE</button></div>
     <div class="people-search"><input id="search" type="search" placeholder="Find someone…" autocomplete="off"></div>
     <div id="collectionList" class="collection-list">${collectionMarkup(rows,state.collectionHighlight)}</div>
     ${nav('collection')}</main>`;
@@ -946,6 +1280,7 @@ async function renderCollection(){
     collectionList.innerHTML=collectionMarkup(filtered,null); attachCollectionRows();
   };
   peopleAdd.onclick=()=>{state.quick={rating:0,mode:'new'};state.screen='add';render()};
+  document.getElementById('openTimeline').onclick=()=>{state.screen='timeline';render()};
   attachCollectionRows();attachNav();
 
   if(state.collectionHighlight){
@@ -974,7 +1309,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=8.2');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=8.7');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

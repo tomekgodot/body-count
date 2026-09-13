@@ -4227,7 +4227,7 @@ body.modal-open{
 }
 
 
-/* v10.12 — legible gradient action labels */
+/* v10.15 — legible gradient action labels */
 .quick-save,
 .flow-done,
 .about-done-wide{
@@ -4255,7 +4255,7 @@ body.modal-open{
   -webkit-text-fill-color:rgba(255,255,255,.42)!important;
 }
 
-/* v10.12 — five stars form one purple-to-peach gradient */
+/* v10.15 — five stars form one purple-to-peach gradient */
 .enc-stars button.on{
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
@@ -4270,7 +4270,7 @@ body.modal-open{
 .enc-stars button.on:nth-child(4){background-position:75% 50%!important}
 .enc-stars button.on:nth-child(5){background-position:100% 50%!important}
 
-/* v10.12 — profile spicy icons: larger and vertically aligned with copy */
+/* v10.15 — profile spicy icons: larger and vertically aligned with copy */
 .spicy-summary-row{
   grid-template-columns:40px 1fr!important;
   gap:12px!important;
@@ -4281,4 +4281,51 @@ body.modal-open{
   height:36px!important;
   align-self:center!important;
   opacity:1!important;
+}
+
+
+/* v10.15 — final polish */
+.spicy-summary-row{
+  grid-template-columns:46px 1fr!important;
+  gap:13px!important;
+}
+.spicy-summary-row img{
+  width:42px!important;
+  height:42px!important;
+}
+
+/* Completion/action labels stay white inside gradient outlines. */
+.profile-add-encounter-wide,
+#deleteSuccessDone{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+}
+
+
+/* v10.15 — custom Type + compact ethnicity row */
+.about-custom-input{
+  width:100%;
+  box-sizing:border-box;
+  margin-top:9px;
+  min-height:44px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:13px;
+  background:#0a0a0b;
+  color:#fff;
+  padding:0 13px;
+  font:inherit;
+  font-size:13px;
+  outline:none;
+}
+.about-custom-input::placeholder{color:rgba(255,255,255,.28)}
+.about-custom-input:focus{
+  border-color:transparent;
+  background:
+    linear-gradient(#0a0a0b,#0a0a0b) padding-box,
+    var(--bc-gradient) border-box;
 }

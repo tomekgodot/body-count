@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.0';
+const APP_VERSION='10.15';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -219,7 +219,7 @@ const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
 const fmt=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(new Date(d));
 const dateValue=d=>{const x=new Date(d||Date.now()),off=x.getTimezoneOffset();return new Date(x.getTime()-off*60000).toISOString().slice(0,10)};
-const displayName=p=>p?.name?.trim()||`G${p?.anonymousNumber||p?.id}`;
+const displayName=p=>p?.name?.trim()||`Guy #${p?.anonymousNumber||p?.id}`;
 const avgRating=es=>{const r=es.filter(e=>e.rating>0);return r.length?(r.reduce((s,e)=>s+e.rating,0)/r.length).toFixed(1):'—'};
 
 let activePhotoUrls=[];
@@ -914,11 +914,13 @@ async function renderAboutHim(){
   const heightBand=a.heightBand||'';
   const build=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
   const type=(Array.isArray(a.types)&&a.types[0])||a.type||'';
+  const ethnicity=a.ethnicity||'';
 
   const ageBands=[['young','Young'],['30s','30s'],['middle','Middle age'],['older','Older']];
   const heightBands=[['short','Short'],['medium','Medium'],['tall','Tall']];
   const builds=[['slim','Slim'],['average','Average'],['athletic','Athletic'],['big','Big']];
-  const types=[['twink','Twink'],['bear','Bear'],['daddy','Daddy'],['otter','Otter']];
+  const types=[['twink','Twink'],['bear','Bear'],['daddy','Daddy'],['otter','Otter'],['regular','Regular'],['jock','Jock'],['twunk','Twunk'],['other','Other']];
+  const ethnicities=[['white','White'],['black','Black'],['asian','Asian'],['mixed','Mixed']];
 
   app.innerHTML=`<main class="about-minimal">
     <div class="about-minimal-top">
@@ -974,6 +976,14 @@ async function renderAboutHim(){
       <div class="about-minimal-options four">
         ${types.map(([k,l])=>`<button data-type="${k}" class="${type===k?'on':''}">${l}</button>`).join('')}
       </div>
+      ${type==='other'?`<input id="typeOtherText" class="about-custom-input" type="text" maxlength="60" placeholder="Type your own…" value="${esc(a.typeOther||'')}">`:''}
+    </section>
+
+    <section class="about-minimal-section">
+      <div class="about-minimal-label">ETHNICITY</div>
+      <div class="about-minimal-options four">
+        ${ethnicities.map(([k,l])=>`<button data-ethnicity="${k}" class="${ethnicity===k?'on':''}">${l}</button>`).join('')}
+      </div>
     </section>
 
     <section class="about-minimal-section spicy-details-section">
@@ -1024,10 +1034,32 @@ async function renderAboutHim(){
     if(b){p.about.build=[b.dataset.build];p.about.buildVisual=b.dataset.build}
     else{delete p.about.build;delete p.about.buildVisual}
   });
-  bindChoice('[data-type]',b=>{
-    if(b){p.about.types=[b.dataset.type];p.about.type=b.dataset.type}
-    else{delete p.about.types;delete p.about.type}
+  document.querySelectorAll('[data-type]').forEach(b=>b.onclick=async()=>{
+    const value=b.dataset.type;
+    const wasOn=type===value;
+    if(wasOn){
+      delete p.about.types;
+      delete p.about.type;
+      if(value==='other') delete p.about.typeOther;
+    }else{
+      p.about.types=[value];
+      p.about.type=value;
+      if(value!=='other') delete p.about.typeOther;
+    }
+    await persist();
+    renderAboutHim();
   });
+
+  bindChoice('[data-ethnicity]',b=>{
+    if(b)p.about.ethnicity=b.dataset.ethnicity;
+    else delete p.about.ethnicity;
+  });
+
+  const typeOtherText=document.getElementById('typeOtherText');
+  if(typeOtherText) typeOtherText.oninput=async()=>{
+    p.about.typeOther=typeOtherText.value;
+    await persist();
+  };
 
 
   const photoInput=document.getElementById('photoInput');
@@ -1396,7 +1428,7 @@ async function renderEncounterEdit(){
       <div class="activity-grid">
         ${activityCard('Handjob')}
         ${activityCard('Blowjob')}
-        ${activityCard('Fucking')}
+        ${activityCard('Anal')}
       </div>
 
       <div class="other-unit">
@@ -1692,8 +1724,11 @@ function personAboutSummary(p){
   const br=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
   const build={slim:'Slim',average:'Average',athletic:'Athletic',big:'Big'}[String(br).toLowerCase()];
   const tr=(Array.isArray(a.types)&&a.types[0])||a.type||'';
-  const type={twink:'Twink',bear:'Bear',daddy:'Daddy',otter:'Otter'}[String(tr).toLowerCase()];
-  [age,height,build,type].filter(Boolean).forEach(x=>vals.push(x));
+  const typeMap={twink:'Twink',twunk:'Twunk',bear:'Bear',daddy:'Daddy',otter:'Otter',regular:'Regular',jock:'Jock',cub:'Cub',other:'Other'};
+  let type=typeMap[String(tr).toLowerCase()];
+  if(String(tr).toLowerCase()==='other' && String(a.typeOther||'').trim()) type=String(a.typeOther).trim();
+  const ethnicity={white:'White',black:'Black',asian:'Asian',mixed:'Mixed'}[String(a.ethnicity||'').toLowerCase()];
+  [age,height,build,type,ethnicity].filter(Boolean).forEach(x=>vals.push(x));
   return vals;
 }
 
@@ -2240,7 +2275,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.12');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.15');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

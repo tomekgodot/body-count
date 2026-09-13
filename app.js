@@ -240,10 +240,32 @@ async function renderHome(){
   const count=people.length;
 
   app.innerHTML=`<main class="count-home">
-    <div class="count-brand">BODY COUNT</div>
+    <div class="count-brand"><span>BODY</span> <span class="count-brand-accent">COUNTER</span></div>
     <button class="home-privacy-slogan" id="homePrivacy" type="button">Stored privately on this device</button>
 
     <div class="count-center">
+      <div class="home-male-silhouette" aria-hidden="true">
+        <svg viewBox="0 0 420 620" focusable="false">
+          <defs>
+            <linearGradient id="homeBodyStroke" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#7d2cff"/>
+              <stop offset=".52" stop-color="#c94bd8"/>
+              <stop offset="1" stop-color="#ffb08f"/>
+            </linearGradient>
+            <radialGradient id="homeBodyGlow" cx=".55" cy=".32" r=".75">
+              <stop offset="0" stop-color="#8c34d9" stop-opacity=".16"/>
+              <stop offset=".68" stop-color="#ff9b83" stop-opacity=".035"/>
+              <stop offset="1" stop-color="#000" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="224" cy="308" rx="170" ry="270" fill="url(#homeBodyGlow)"/>
+          <path class="home-body-fill" d="M214 62c-37 0-66 30-66 67 0 28 16 51 39 62-7 17-19 30-37 38-40 17-78 39-91 82-14 47-1 98 17 136 17 37 30 74 35 112 3 23 2 42 1 61h204c-2-21-3-42 0-64 5-38 18-75 35-112 18-39 31-90 17-137-13-43-51-64-91-81-18-8-31-21-38-38 24-11 40-35 40-63 0-37-29-67-65-67z"/>
+          <path class="home-body-line left" d="M187 190c-9 29-32 39-67 54-37 16-58 38-65 72-8 39 4 79 21 116 22 47 37 92 40 142"/>
+          <path class="home-body-line right" d="M240 188c10 29 33 39 68 54 37 16 58 38 65 72 8 39-4 79-21 116-22 47-37 92-40 142"/>
+          <path class="home-body-line shoulder" d="M116 250c31 6 61 18 98 48 37-30 67-42 98-48"/>
+          <path class="home-body-line spine" d="M214 202c-9 65-7 128 0 190"/>
+        </svg>
+      </div>
       <div class="count-lockup count-digits-${Math.min(3,String(count).length)}">
         <div class="count-number" id="countNumber">0</div>
         <button class="count-add" id="countAdd" aria-label="Add a person">+</button>
@@ -264,20 +286,26 @@ async function renderHome(){
   </main>`;
 
   const number=document.getElementById('countNumber');
+  const paintCount=value=>{
+    const text=String(value);
+    number.innerHTML=text.split('').map(d=>`<span class="flip-digit"><span>${d}</span></span>`).join('');
+  };
   const startCountPulse=()=>number.classList.add('count-settled');
   if(count===0){
-    number.textContent='0';
+    paintCount(0);
     startCountPulse();
   }else{
     const duration=1100;
     const start=performance.now();
+    let lastValue=-1;
     const tick=now=>{
       const t=Math.min(1,(now-start)/duration);
       const eased=1-Math.pow(1-t,3);
-      number.textContent=String(Math.min(count,Math.floor(eased*count)));
+      const value=Math.min(count,Math.floor(eased*count));
+      if(value!==lastValue){paintCount(value);lastValue=value}
       if(t<1) requestAnimationFrame(tick);
       else{
-        number.textContent=String(count);
+        paintCount(count);
         startCountPulse();
       }
     };

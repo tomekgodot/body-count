@@ -3970,3 +3970,150 @@ body.modal-open{
 .backup-action strong{color:#f1c18e;font-size:11px;letter-spacing:.12em}
 .backup-action span{color:rgba(255,255,255,.45);font-size:11px}
 .backup-error{margin-top:10px;color:#ef9292;font-size:11px;line-height:1.4}
+
+
+/* v10.1 — Body Counter visual identity: flip count + purple/peach */
+:root{
+  --bc-purple:#8f32d8;
+  --bc-violet:#a43de2;
+  --bc-peach:#ffae8f;
+  --bc-gradient:linear-gradient(105deg,var(--bc-purple) 0%,#c64dcc 48%,var(--bc-peach) 100%);
+}
+.count-home .count-brand{
+  font-size:20px!important;
+  font-weight:650!important;
+  letter-spacing:.16em!important;
+  color:#f8f5f1!important;
+}
+.count-brand-accent{
+  background:var(--bc-gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+.count-home .home-privacy-slogan{
+  top:calc(49px + env(safe-area-inset-top))!important;
+  color:rgba(255,255,255,.48)!important;
+}
+.count-home .count-center{
+  overflow:hidden;
+}
+.home-male-silhouette{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:min(96vw,470px);
+  height:min(72dvh,650px);
+  transform:translate(-50%,-48%);
+  opacity:.74;
+  pointer-events:none;
+  z-index:0;
+}
+.home-male-silhouette svg{width:100%;height:100%;display:block;overflow:visible}
+.home-body-fill{fill:#070708;stroke:none}
+.home-body-line{
+  fill:none;
+  stroke:url(#homeBodyStroke);
+  stroke-width:5;
+  stroke-linecap:round;
+  opacity:.52;
+  filter:drop-shadow(0 0 10px rgba(154,51,220,.16));
+}
+.home-body-line.right{opacity:.72}
+.home-body-line.shoulder{stroke-width:3.2;opacity:.20}
+.home-body-line.spine{stroke-width:2.2;opacity:.16}
+.count-home .count-lockup{
+  width:min(92vw,430px)!important;
+  height:min(54dvh,450px)!important;
+  z-index:2!important;
+}
+.count-home .count-number{
+  position:absolute!important;
+  left:50%!important;
+  top:48%!important;
+  transform:translate(-50%,-50%)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  width:auto!important;
+  font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif!important;
+  font-size:clamp(96px,31vw,142px)!important;
+  line-height:1!important;
+  letter-spacing:0!important;
+  font-weight:700!important;
+  color:#f7f2ec!important;
+  white-space:nowrap!important;
+}
+.flip-digit{
+  position:relative;
+  display:grid;
+  place-items:center;
+  width:.72em;
+  height:1.12em;
+  border:2px solid rgba(255,255,255,.17);
+  border-radius:.14em;
+  background:linear-gradient(180deg,rgba(20,20,21,.97),rgba(8,8,9,.98));
+  box-shadow:0 10px 30px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.035);
+  overflow:hidden;
+}
+.flip-digit::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:50%;
+  height:2px;
+  transform:translateY(-1px);
+  background:#020203;
+  box-shadow:0 -1px rgba(255,255,255,.045),0 1px rgba(0,0,0,.9);
+  z-index:2;
+}
+.flip-digit::after{
+  content:"";
+  position:absolute;
+  left:5px;right:5px;top:50%;
+  height:8px;
+  transform:translateY(-50%);
+  border-left:4px solid #050506;
+  border-right:4px solid #050506;
+  z-index:3;
+}
+.flip-digit>span{position:relative;z-index:1;transform:scaleX(.78);font-variant-numeric:tabular-nums}
+.count-number.count-settled{
+  animation:count-flip-glow-v101 2.5s ease-in-out infinite!important;
+}
+@keyframes count-flip-glow-v101{
+  0%,100%{filter:drop-shadow(0 0 0 rgba(156,57,220,0))}
+  50%{filter:drop-shadow(0 0 10px rgba(173,65,214,.16))}
+}
+.count-home .count-add{
+  right:8%!important;
+  bottom:4%!important;
+  width:66px!important;
+  height:66px!important;
+  border-radius:50%!important;
+  border:2px solid transparent!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+  color:transparent!important;
+  font-size:0!important;
+  box-shadow:0 0 18px rgba(172,61,213,.08),0 0 20px rgba(255,174,143,.05)!important;
+  animation:count-add-bc-pulse 2.25s ease-in-out infinite!important;
+}
+.count-home .count-add::before{
+  content:"+";
+  display:block;
+  font-size:38px;
+  line-height:56px;
+  font-weight:250;
+  background:var(--bc-gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+@keyframes count-add-bc-pulse{
+  0%,100%{transform:scale(1);filter:brightness(.92);box-shadow:0 0 12px rgba(155,51,216,.08)}
+  50%{transform:scale(1.055);filter:brightness(1.15);box-shadow:0 0 24px rgba(164,61,226,.18),0 0 20px rgba(255,174,143,.10)}
+}

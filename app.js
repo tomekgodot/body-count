@@ -407,7 +407,6 @@ async function renderAboutHim(){
     </div>
 
     <section class="about-minimal-section about-photo-section">
-      <div class="about-minimal-label">PHOTO</div>
       ${photoUrl?`
         <button class="about-photo-preview" id="aboutPhotoPreview" type="button" aria-label="View photo">
           <img src="${photoUrl}" alt="">
@@ -459,9 +458,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=95" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=97" alt=""></button>
       </div>
     </section>
 
@@ -583,9 +582,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=95" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=97" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -663,9 +662,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=95" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=97" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -708,9 +707,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=95" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=95" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=95" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=97" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=97" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=97" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -901,7 +900,7 @@ async function renderEncounterEdit(){
           <button class="note-close" id="encNoteClose" type="button" aria-label="Close">×</button>
         </div>
         <textarea class="note-textarea" id="encNoteText" placeholder="">${esc(e.privateNote||'')}</textarea>
-        <div class="note-autosave">Saved automatically</div>
+        <button class="note-done" id="encNoteDone" type="button">DONE</button>
       </section>
     </div>
   </main>`;
@@ -947,6 +946,7 @@ async function renderEncounterEdit(){
   encNoteButton.onclick=openEncNote;
   document.getElementById('encNoteBackdrop').onclick=closeEncNote;
   document.getElementById('encNoteClose').onclick=closeEncNote;
+  document.getElementById('encNoteDone').onclick=closeEncNote;
   encNoteText.oninput=async()=>{
     e.privateNote=encNoteText.value;
     await save();
@@ -1084,7 +1084,7 @@ async function renderDetails(){
  const p=await get('people',state.selectedPersonId);
  let e=state.selectedEncounterId?await get('encounters',state.selectedEncounterId):null;
  const tab=state.detailsTab;
- if(!e && ['position','happened','health'].includes(tab)){const es=(await all('encounters')).filter(x=>x.personId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date));e=es[0];state.selectedEncounterId=e?.id||null;}
+ if(!e && ['position','happened','health'].includes(tab)){const es=(await all('encounters')).filter(x=>x.personId===p.id).sort(compareEncountersNewest);e=es[0];state.selectedEncounterId=e?.id||null;}
  let body='';
  if(tab==='position') body=chipEditor('Position',['Top','Bottom','Vers','Side / other'],e?.position||[],'position');
  if(tab==='happened') body=chipEditor('What happened',['Kiss','Oral','Anal','Rimming','Fisting','Other'],e?.happened||[],'happened');
@@ -1160,13 +1160,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=95',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=97',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=95',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=97',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -1174,7 +1174,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=95',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=97',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1189,9 +1189,57 @@ function encounterWhenLabel(e){
   const raw=String(w.date||e.date||'').slice(0,10);
   if(raw){
     const d=new Date(`${raw}T12:00:00`);
-    if(!Number.isNaN(d.getTime())) return new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(d);
+    if(!Number.isNaN(d.getTime())) return new Intl.DateTimeFormat('en-US',{day:'numeric',month:'short',year:'numeric'}).format(d);
   }
   return 'Unknown date';
+}
+
+
+function encounterChronology(e){
+  const w=e.when||{};
+  const precision=w.precision||'exact';
+  const mk=(y,m=1,d=1)=>Date.UTC(Number(y),Number(m)-1,Number(d));
+  const yearEnd=y=>mk(y,12,31);
+  if(precision==='exact'){
+    const raw=String(w.date||e.date||'').slice(0,10);
+    const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m){const t=mk(m[1],m[2],m[3]);return {start:t,end:t,specificity:5}}
+  }
+  if(precision==='month' && w.year && w.month){
+    const y=Number(w.year),m=Number(w.month);
+    return {start:mk(y,m,1),end:mk(y,m+1,0),specificity:4};
+  }
+  if(precision==='season' && w.year && w.season){
+    const y=Number(w.year),s=String(w.season).toLowerCase();
+    const map={spring:[3,5],summer:[6,8],autumn:[9,11],fall:[9,11],winter:[12,2]};
+    const mm=map[s];
+    if(mm){
+      if(s==='winter') return {start:mk(y,12,1),end:yearEnd(y),specificity:3};
+      return {start:mk(y,mm[0],1),end:mk(y,mm[1]+1,0),specificity:3};
+    }
+  }
+  if(precision==='year' && w.year){
+    const y=Number(w.year);return {start:mk(y,1,1),end:yearEnd(y),specificity:2};
+  }
+  if(precision==='range' && w.from){
+    const a=Number(w.from),b=Math.max(a,Number(w.to)||a);
+    return {start:mk(a,1,1),end:yearEnd(b),specificity:1};
+  }
+  const raw=String(e.date||'').slice(0,10);
+  const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m){const t=mk(m[1],m[2],m[3]);return {start:t,end:t,specificity:5}}
+  return {start:0,end:0,specificity:0};
+}
+function compareEncountersNewest(a,b){
+  const A=encounterChronology(a),B=encounterChronology(b);
+  // If the represented periods overlap, the more precise entry comes first.
+  const overlap=A.start<=B.end && B.start<=A.end;
+  if(overlap && A.specificity!==B.specificity) return B.specificity-A.specificity;
+  // Otherwise order by the latest point each encounter can represent.
+  if(A.end!==B.end) return B.end-A.end;
+  if(A.start!==B.start) return B.start-A.start;
+  if(A.specificity!==B.specificity) return B.specificity-A.specificity;
+  return Number(b.createdAt||b.id||0)-Number(a.createdAt||a.id||0);
 }
 
 function encounterSummaryLines(e){
@@ -1278,9 +1326,13 @@ async function renderPerson(){
           const lines=encounterSummaryLines(e);
           return `<button class="profile-encounter-card" data-encounter="${e.id}" type="button">
             <div class="profile-encounter-top">
-              <strong>${esc(encounterWhenLabel(e))}</strong>
+              <span class="profile-encounter-date-note">
+                <strong>${esc(encounterWhenLabel(e))}</strong>
+                <span class="profile-note-marker profile-note-action ${String(e.privateNote||'').trim()?'has-note':''}" data-enc-note="${e.id}" role="button" tabindex="0" aria-label="Private note">
+                  ${noteIconMarkup()}<span class="note-dot"></span>
+                </span>
+              </span>
               <span class="profile-encounter-meta">
-                ${String(e.privateNote||'').trim()?`<span class="profile-note-marker" aria-label="Has private note">${noteIconMarkup()}</span>`:''}
                 ${e.rating?`<span class="profile-encounter-rating">★ ${e.rating}</span>`:''}
               </span>
             </div>
@@ -1308,6 +1360,21 @@ async function renderPerson(){
       </section>
     </div>
 
+    <div class="note-modal" id="profileEncounterNoteModal" hidden>
+      <button class="note-modal-backdrop" id="profileEncounterNoteBackdrop" type="button" aria-label="Close note"></button>
+      <section class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="profileEncounterNoteTitle">
+        <div class="note-sheet-head">
+          <div>
+            <div class="note-sheet-kicker">PRIVATE NOTE</div>
+            <h2 id="profileEncounterNoteTitle">This encounter</h2>
+          </div>
+          <button class="note-close" id="profileEncounterNoteClose" type="button" aria-label="Close">×</button>
+        </div>
+        <textarea class="note-textarea" id="profileEncounterNoteText" placeholder=""></textarea>
+        <button class="note-done" id="profileEncounterNoteDone" type="button">DONE</button>
+      </section>
+    </div>
+
     <div class="note-modal" id="personNoteModal" hidden>
       <button class="note-modal-backdrop" id="personNoteBackdrop" type="button" aria-label="Close note"></button>
       <section class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="personNoteTitle">
@@ -1319,7 +1386,7 @@ async function renderPerson(){
           <button class="note-close" id="personNoteClose" type="button" aria-label="Close">×</button>
         </div>
         <textarea class="note-textarea" id="personNoteText" placeholder="">${esc(p.privateNote||'')}</textarea>
-        <div class="note-autosave">Saved automatically</div>
+        <button class="note-done" id="personNoteDone" type="button">DONE</button>
       </section>
     </div>
 
@@ -1382,6 +1449,42 @@ async function renderPerson(){
     render();
   });
 
+
+  const profileEncounterNoteModal=document.getElementById('profileEncounterNoteModal');
+  const profileEncounterNoteText=document.getElementById('profileEncounterNoteText');
+  let profileEncounterNoteId=null;
+  const closeProfileEncounterNote=()=>{
+    profileEncounterNoteModal.hidden=true;
+    document.body.classList.remove('modal-open');
+    profileEncounterNoteId=null;
+  };
+  const openProfileEncounterNote=async(id)=>{
+    const item=await get('encounters',Number(id));
+    if(!item)return;
+    profileEncounterNoteId=item.id;
+    profileEncounterNoteText.value=item.privateNote||'';
+    profileEncounterNoteModal.hidden=false;
+    document.body.classList.add('modal-open');
+    setTimeout(()=>profileEncounterNoteText.focus(),80);
+  };
+  document.querySelectorAll('[data-enc-note]').forEach(b=>{
+    const open=ev=>{ev.preventDefault();ev.stopPropagation();openProfileEncounterNote(b.dataset.encNote)};
+    b.onclick=open;
+    b.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();ev.stopPropagation();openProfileEncounterNote(b.dataset.encNote)}};
+  });
+  document.getElementById('profileEncounterNoteBackdrop').onclick=closeProfileEncounterNote;
+  document.getElementById('profileEncounterNoteClose').onclick=closeProfileEncounterNote;
+  document.getElementById('profileEncounterNoteDone').onclick=closeProfileEncounterNote;
+  profileEncounterNoteText.oninput=async()=>{
+    if(!profileEncounterNoteId)return;
+    const item=await get('encounters',profileEncounterNoteId);
+    if(!item)return;
+    item.privateNote=profileEncounterNoteText.value;
+    await put('encounters',item);
+    const marker=document.querySelector(`[data-enc-note="${profileEncounterNoteId}"]`);
+    if(marker)marker.classList.toggle('has-note',!!profileEncounterNoteText.value.trim());
+  };
+
   const nameEditModal=document.getElementById('nameEditModal');
   const nameEditInput=document.getElementById('nameEditInput');
   const editNameButton=document.getElementById('editName');
@@ -1409,6 +1512,7 @@ async function renderPerson(){
   personNoteButton.onclick=openPersonNote;
   document.getElementById('personNoteBackdrop').onclick=closePersonNote;
   document.getElementById('personNoteClose').onclick=closePersonNote;
+  document.getElementById('personNoteDone').onclick=closePersonNote;
   personNoteText.oninput=async()=>{
     p.privateNote=personNoteText.value;
     await put('people',p);
@@ -1467,13 +1571,17 @@ function timelineShortDate(e){
   const w=e.when||{};
   if(w.precision==='exact'||!w.precision){
     const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
-    if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short'}).format(d);
+    if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{day:'numeric',month:'short'}).format(d);
   }
   if(w.precision==='month'){
     const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     return `${m[(Number(w.month)||1)-1]} ${w.year||''}`.trim();
   }
-  if(w.precision==='season')return `${String(w.season||'Season')} ${w.year||''}`.trim();
+  if(w.precision==='season'){
+    const s=String(w.season||'').toLowerCase();
+    const seasons={spring:'Spring',summer:'Summer',autumn:'Autumn',fall:'Autumn',winter:'Winter'};
+    return `${seasons[s]||'Season'} ${w.year||''}`.trim();
+  }
   if(w.precision==='year')return String(w.year||'');
   if(w.precision==='range')return `${w.from||''}${w.to?`–${w.to}`:''}`.trim();
   return encounterWhenLabel(e);
@@ -1580,7 +1688,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=9.5');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=9.7');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

@@ -4487,3 +4487,16 @@ body.modal-open{
   right:-10px!important;
   bottom:17%!important;
 }
+
+
+/* v10.6 — enlarge flip numerals and lower the add button */
+.count-home .count-number{
+  font-size:clamp(190px,51.5vw,259px)!important;
+}
+.flip-digit>span{
+  transform:scaleX(.64) scaleY(1.04)!important;
+}
+.count-home .count-add{
+  right:-10px!important;
+  bottom:10.5%!important;
+}

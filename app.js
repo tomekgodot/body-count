@@ -175,8 +175,9 @@ async function renderAdd(){
     <div class="quick-field mental-note-field">
       <div class="quick-memory-block">
         <label class="quick-memory-label" for="lastMemory">MEMORY CUE</label>
-        <textarea id="memory" maxlength="60" placeholder="One thing you’ll remember him by…">
+        <textarea id="lastMemory" placeholder="One thing you’ll remember him by…"></textarea>
         <div class="quick-memory-helper">You can add more details later.</div>
+      </div>
       </div>${esc(state.quick.memory||'')}</textarea>
     </div>
 
@@ -301,9 +302,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=87" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=88" alt=""></button>
       </div>
     </section>
   </main>`;
@@ -378,9 +379,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=87" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=88" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -462,9 +463,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=87" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=88" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -507,9 +508,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=87" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=87" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=87" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=88" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -959,13 +960,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=87',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=88',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=87',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=88',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -973,7 +974,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=87',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=88',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1029,7 +1030,10 @@ async function renderPerson(){
       <button class="profile-back" id="profileBack" type="button" aria-label="Back">‹</button>
       <div class="profile-head-copy">
         <div class="profile-kicker">PERSON</div>
-        <h1>${esc(displayName(p))}</h1>
+        <div class="profile-name-row">
+          <h1 id="profileNameText">${esc(displayName(p))}</h1>
+          <button class="profile-name-edit" id="editName" type="button" aria-label="Edit name">✎</button>
+        </div>
         ${note?`<p>${esc(note)}</p>`:''}
       </div>
       <div class="profile-head-tools">
@@ -1051,7 +1055,6 @@ async function renderPerson(){
         ${spicy.map(x=>`<div class="spicy-summary-row">
           <img src="${x.icon}" alt="">
           <div>
-            <div class="spicy-summary-label">${x.label}</div>
             ${x.bits.length?`<div class="spicy-summary-bits">${x.bits.map(esc).join(' · ')}</div>`:''}
             ${x.note?`<div class="spicy-summary-note">${esc(x.note)}</div>`:''}
           </div>
@@ -1084,6 +1087,18 @@ async function renderPerson(){
     <div class="profile-actions">
       <button class="profile-edit" id="editPerson" type="button">Edit profile</button>
       <button class="profile-delete" id="deletePerson" type="button">Delete person</button>
+    </div>
+
+    <div class="note-modal" id="nameEditModal" hidden>
+      <button class="note-modal-backdrop" id="nameEditBackdrop" type="button" aria-label="Close"></button>
+      <section class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="nameEditTitle">
+        <div class="note-sheet-head">
+          <div><div class="note-sheet-kicker">NAME / NICK</div><h2 id="nameEditTitle">Who is he?</h2></div>
+          <button class="note-close" id="nameEditClose" type="button" aria-label="Close">×</button>
+        </div>
+        <input class="name-edit-input" id="nameEditInput" value="${esc(p.name||'')}" placeholder="Name / Nick">
+        <div class="note-autosave">Saved automatically</div>
+      </section>
     </div>
 
     <div class="note-modal" id="personNoteModal" hidden>
@@ -1143,6 +1158,17 @@ async function renderPerson(){
     state.screen='encounterEdit';
     render();
   });
+
+  const nameEditModal=document.getElementById('nameEditModal');
+  const nameEditInput=document.getElementById('nameEditInput');
+  const editNameButton=document.getElementById('editName');
+  const profileNameText=document.getElementById('profileNameText');
+  const openNameEdit=()=>{nameEditModal.hidden=false;document.body.classList.add('modal-open');setTimeout(()=>{nameEditInput.focus();nameEditInput.select()},80)};
+  const closeNameEdit=()=>{nameEditModal.hidden=true;document.body.classList.remove('modal-open')};
+  editNameButton.onclick=openNameEdit;
+  document.getElementById('nameEditBackdrop').onclick=closeNameEdit;
+  document.getElementById('nameEditClose').onclick=closeNameEdit;
+  nameEditInput.oninput=async()=>{p.name=nameEditInput.value.trim();await put('people',p);profileNameText.textContent=displayName(p)};
 
   const personNoteModal=document.getElementById('personNoteModal');
   const personNoteButton=document.getElementById('personNoteButton');
@@ -1218,21 +1244,28 @@ function timelineShortDate(e){
     const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
     if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short'}).format(d);
   }
-  return w.precision==='month'?'Month':w.precision==='season'?String(w.season||'Season'):w.precision==='year'?String(w.year||'Year'):w.precision==='range'?'Range':encounterWhenLabel(e);
+  if(w.precision==='month'){
+    const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${m[(Number(w.month)||1)-1]} ${w.year||''}`.trim();
+  }
+  if(w.precision==='season')return `${String(w.season||'Season')} ${w.year||''}`.trim();
+  if(w.precision==='year')return String(w.year||'');
+  if(w.precision==='range')return `${w.from||''}${w.to?`–${w.to}`:''}`.trim();
+  return encounterWhenLabel(e);
 }
 async function renderTimeline(){
   const people=await all('people'), encounters=(await all('encounters')).sort((a,b)=>timelineSortKey(b)-timelineSortKey(a));
   const pm=new Map(people.map(p=>[p.id,p])); let last=null;
   const items=encounters.map(e=>{
     const p=pm.get(e.personId); if(!p)return '';
-    const g=timelineGroupLabel(e),gm=g!==last?`<div class="timeline-group"><span>${esc(g)}</span></div>`:''; last=g;
+    const g=timelineGroupLabel(e),gm=''; last=g;
     const lines=encounterSummaryLines(e),memory=(p.lastMemory||'').trim();
     return `${gm}<article class="timeline-item"><div class="timeline-rail"><div class="timeline-date">${esc(timelineShortDate(e))}</div><span class="timeline-dot"></span></div>
       <button class="timeline-card" data-timeline-encounter="${e.id}"><div class="timeline-card-top"><strong>${esc(displayName(p))}</strong><span class="timeline-meta">
       ${String(e.privateNote||'').trim()?`<span class="timeline-note">${noteIconMarkup()}</span>`:''}${e.rating?`<span class="timeline-rating">★ ${e.rating}</span>`:''}</span></div>
       ${memory?`<div class="timeline-memory">${esc(memory)}</div>`:''}${lines.map(x=>`<div class="timeline-line">${esc(x)}</div>`).join('')}</button></article>`;
   }).join('');
-  app.innerHTML=`<main class="people-timeline"><header class="people-head"><div><div class="people-eyebrow">PEOPLE</div><h1>People</h1></div><button class="people-add" id="timelineAdd">+</button></header>
+  app.innerHTML=`<main class="people-timeline"><header class="people-head"><div><h1>People</h1></div><button class="people-add" id="timelineAdd">+</button></header>
   <div class="people-view-switch"><button id="openCollection">COLLECTION</button><button class="active">TIMELINE</button></div>
   <div class="timeline-list">${items||`<div class="timeline-empty">Your encounters will appear here.</div>`}</div>${nav('collection')}</main>`;
   openCollection.onclick=()=>{state.screen='collection';render()};
@@ -1267,7 +1300,7 @@ async function renderCollection(){
   }).sort((a,b)=>new Date(b.last?.date||b.p.createdAt||0)-new Date(a.last?.date||a.p.createdAt||0));
 
   app.innerHTML=`<main class="people-collection">
-    <header class="people-head"><div><div class="people-eyebrow">PEOPLE</div><h1>People</h1></div>
+    <header class="people-head"><div><h1>People</h1></div>
     <button class="people-add" id="peopleAdd" type="button" aria-label="Add a new guy">+</button></header>
     <div class="people-view-switch"><button class="active">COLLECTION</button><button id="openTimeline">TIMELINE</button></div>
     <div class="people-search"><input id="search" type="search" placeholder="Find someone…" autocomplete="off"></div>
@@ -1309,7 +1342,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=8.7');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=8.8');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

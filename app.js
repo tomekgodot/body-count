@@ -98,11 +98,84 @@ async function makeEncryptedBackup(password){
     data:bytesToBase64(new Uint8Array(ciphertext))
   };
 }
+const MAX_BACKUP_FILE_BYTES=200*1024*1024;
+const MAX_BACKUP_PEOPLE=10000;
+const MAX_BACKUP_ENCOUNTERS=50000;
+const MAX_BACKUP_PHOTOS=10000;
+const MAX_BACKUP_PHOTO_BYTES=12*1024*1024;
+
+function assertSafeBackupTree(value,depth=0){
+  if(depth>20) throw new Error('Backup nesting is too deep');
+  if(typeof value==='string'){
+    if(value.length>100000) throw new Error('Backup text field is too large');
+    return;
+  }
+  if(value===null || ['number','boolean'].includes(typeof value)) return;
+  if(Array.isArray(value)){
+    if(value.length>100000) throw new Error('Backup array is too large');
+    value.forEach(v=>assertSafeBackupTree(v,depth+1));
+    return;
+  }
+  if(typeof value==='object'){
+    for(const [k,v] of Object.entries(value)){
+      if(k==='__proto__'||k==='prototype'||k==='constructor') throw new Error('Unsafe backup key');
+      assertSafeBackupTree(v,depth+1);
+    }
+    return;
+  }
+  throw new Error('Unsupported backup value');
+}
+function assertSafeId(value,label){
+  if(!Number.isSafeInteger(value)||value<=0) throw new Error(`Invalid ${label}`);
+}
+function validateBackupPayload(payload){
+  if(payload?.format!=='body-count-backup'||payload?.version!==1) throw new Error('Unsupported backup data');
+  if(!Array.isArray(payload.people)||!Array.isArray(payload.encounters)||!Array.isArray(payload.photos)) throw new Error('Invalid backup data');
+  payload.settings=Array.isArray(payload.settings)?payload.settings:[];
+  if(payload.people.length>MAX_BACKUP_PEOPLE||payload.encounters.length>MAX_BACKUP_ENCOUNTERS||payload.photos.length>MAX_BACKUP_PHOTOS) throw new Error('Backup is too large');
+
+  assertSafeBackupTree(payload);
+
+  const personIds=new Set();
+  payload.people.forEach(p=>{
+    assertSafeId(p?.id,'person id');
+    if(personIds.has(p.id)) throw new Error('Duplicate person id');
+    personIds.add(p.id);
+  });
+
+  const encounterIds=new Set();
+  payload.encounters.forEach(e=>{
+    assertSafeId(e?.id,'encounter id');
+    assertSafeId(e?.personId,'encounter person id');
+    if(encounterIds.has(e.id)) throw new Error('Duplicate encounter id');
+    if(!personIds.has(e.personId)) throw new Error('Encounter references a missing person');
+    encounterIds.add(e.id);
+    if(e.rating!==undefined && (!Number.isFinite(Number(e.rating))||Number(e.rating)<0||Number(e.rating)>5)) throw new Error('Invalid rating');
+  });
+
+  const allowedPhotoTypes=new Set(['image/jpeg','image/png','image/webp','image/heic','image/heif']);
+  const photoIds=new Set();
+  payload.photos.forEach(x=>{
+    assertSafeId(Number(x?.personId),'photo person id');
+    const personId=Number(x.personId);
+    if(!personIds.has(personId)||photoIds.has(personId)) throw new Error('Invalid photo reference');
+    photoIds.add(personId);
+    if(!x?.blob||typeof x.blob.data!=='string'||!allowedPhotoTypes.has(String(x.blob.type||'').toLowerCase())) throw new Error('Invalid photo');
+    const approxBytes=Math.floor(x.blob.data.length*3/4);
+    if(approxBytes>MAX_BACKUP_PHOTO_BYTES) throw new Error('Photo is too large');
+  });
+  return payload;
+}
 async function decryptBackupFile(file,password){
+  if(!file||file.size>MAX_BACKUP_FILE_BYTES) throw new Error('Backup file is too large');
   const wrapper=JSON.parse(await file.text());
   if(wrapper?.format!=='body-count-encrypted-backup'||wrapper?.version!==1) throw new Error('Unsupported backup file');
+  if(wrapper?.kdf?.name!=='PBKDF2'||wrapper?.kdf?.hash!=='SHA-256'||wrapper?.kdf?.iterations!==250000) throw new Error('Unsupported backup encryption');
+  if(wrapper?.cipher?.name!=='AES-GCM') throw new Error('Unsupported backup cipher');
+  if(typeof wrapper.data!=='string'||wrapper.data.length>MAX_BACKUP_FILE_BYTES*2) throw new Error('Invalid encrypted payload');
   const salt=base64ToBytes(wrapper.kdf?.salt||'');
   const iv=base64ToBytes(wrapper.cipher?.iv||'');
+  if(salt.length!==16||iv.length!==12) throw new Error('Invalid encryption parameters');
   const key=await deriveBackupKey(password,salt);
   const plain=await crypto.subtle.decrypt(
     {name:'AES-GCM',iv},
@@ -110,10 +183,7 @@ async function decryptBackupFile(file,password){
     base64ToBytes(wrapper.data||'')
   );
   const payload=JSON.parse(new TextDecoder().decode(plain));
-  if(payload?.format!=='body-count-backup'||payload?.version!==1) throw new Error('Unsupported backup data');
-  if(!Array.isArray(payload.people)||!Array.isArray(payload.encounters)||!Array.isArray(payload.photos)) throw new Error('Invalid backup data');
-  payload.settings=Array.isArray(payload.settings)?payload.settings:[];
-  return payload;
+  return validateBackupPayload(payload);
 }
 async function replaceAllData(payload){
   const names=['people','encounters','settings','photos'];
@@ -319,12 +389,12 @@ async function renderStats(){
     return Array.isArray(vals)?vals.includes(value):vals===value;
   };
   const sexStats=[
-    ['DICKS I SUCKED',uniquePeopleWith(e=>hasDetail(e,'Oral','I sucked'))],
-    ['GUYS WHO SUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Oral','He sucked'))],
-    ['ASSES I FUCKED',uniquePeopleWith(e=>hasDetail(e,'Anal','I topped'))],
-    ['GUYS WHO FUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Anal','He topped'))],
-    ['ASSES I RIMMED',uniquePeopleWith(e=>hasDetail(e,'Rim','I rimmed'))],
-    ['GUYS WHO RIMMED ME',uniquePeopleWith(e=>hasDetail(e,'Rim','He rimmed'))]
+    ['GUYS I JERKED OFF',uniquePeopleWith(e=>hasDetail(e,'Handjob','I jerked him off'))],
+    ['GUYS WHO JERKED ME OFF',uniquePeopleWith(e=>hasDetail(e,'Handjob','He jerked me off'))],
+    ['DICKS I SUCKED',uniquePeopleWith(e=>hasDetail(e,'Blowjob','I sucked')||hasDetail(e,'Oral','I sucked'))],
+    ['GUYS WHO BLEW ME',uniquePeopleWith(e=>hasDetail(e,'Blowjob','He blew me')||hasDetail(e,'Oral','He sucked'))],
+    ['GUYS I FUCKED',uniquePeopleWith(e=>hasDetail(e,'Fucking','I fucked him')||hasDetail(e,'Anal','I topped'))],
+    ['GUYS WHO FUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Fucking','He fucked me')||hasDetail(e,'Anal','He topped')||hasDetail(e,'Anal','I bottomed'))]
   ];
 
   const dist=(getter,order,labels)=>{
@@ -452,6 +522,16 @@ async function renderSettings(){
       </section>
     </div>
 
+    <div class="settings-modal settings-success-modal" id="deleteSuccessModal" hidden>
+      <button class="settings-modal-backdrop" id="deleteSuccessBackdrop" type="button" aria-label="Close"></button>
+      <section class="settings-modal-sheet settings-success-sheet" role="status" aria-live="polite">
+        <div class="settings-success-mark">✓</div>
+        <h2>All data deleted.</h2>
+        <p>People, encounters, notes and photos have been removed from this device.</p>
+        <button class="backup-modal-action" id="deleteSuccessDone" type="button">DONE</button>
+      </section>
+    </div>
+
     ${nav('you')}
   </main>`;
 
@@ -465,6 +545,11 @@ async function renderSettings(){
   document.getElementById('deleteAllBackdrop').onclick=closeDelete;
   document.getElementById('deleteAllClose').onclick=closeDelete;
   input.oninput=()=>{confirm.disabled=input.value.trim()!=='DELETE'};
+  const successModal=document.getElementById('deleteSuccessModal');
+  const closeSuccess=()=>{successModal.hidden=true;document.body.classList.remove('modal-open')};
+  document.getElementById('deleteSuccessBackdrop').onclick=closeSuccess;
+  document.getElementById('deleteSuccessDone').onclick=closeSuccess;
+
   confirm.onclick=async()=>{
     if(input.value.trim()!=='DELETE')return;
     confirm.disabled=true;confirm.textContent='DELETING…';
@@ -472,7 +557,8 @@ async function renderSettings(){
       await deleteAllData();
       closeDelete();
       state.selectedPersonId=null;state.selectedEncounterId=null;
-      renderSettings();
+      successModal.hidden=false;
+      document.body.classList.add('modal-open');
     }catch(err){
       confirm.disabled=false;confirm.textContent='DELETE ALL DATA';
       alert('Your data could not be deleted.');
@@ -575,7 +661,7 @@ async function renderBackup(){
     const pw=password.value;
     if(!pw){error.textContent='Enter a password.';error.hidden=false;return}
     if(mode==='export'){
-      if(pw.length<8){error.textContent='Use at least 8 characters.';error.hidden=false;return}
+      if(pw.length<12){error.textContent='Use at least 12 characters.';error.hidden=false;return}
       if(pw!==again.value){error.textContent='The passwords do not match.';error.hidden=false;return}
       action.disabled=true;action.textContent='ENCRYPTING…';
       try{
@@ -812,6 +898,16 @@ async function renderAboutHim(){
   p.about ||= {};
   const a=p.about;
 
+  const hasPrivateValue=obj=>Object.values(obj||{}).some(v=>
+    typeof v==='string' ? v.trim().length>0 :
+    typeof v==='boolean' ? v :
+    Array.isArray(v) ? v.length>0 :
+    v!==null && v!==undefined && v!==''
+  );
+  const hasPenisDetails=hasPrivateValue(a.penis);
+  const hasPeachDetails=hasPrivateValue(a.peach);
+  const hasDropsDetails=hasPrivateValue(a.drops);
+
   const ageBand=a.ageBand||'';
   const heightBand=a.heightBand||'';
   const build=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
@@ -881,9 +977,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=100" alt=""></button>
+        <button class="about-symbol art-symbol spicy-egg ${hasPenisDetails?'has-data':''}" data-subopen="egg"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
+        <button class="about-symbol art-symbol spicy-peach ${hasPeachDetails?'has-data':''}" data-subopen="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
+        <button class="about-symbol art-symbol spicy-drops ${hasDropsDetails?'has-data':''}" data-subopen="drop"><img src="assets/detail-drops.png?v=109" alt=""></button>
       </div>
     </section>
 
@@ -1005,9 +1101,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=100" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=109" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -1028,7 +1124,7 @@ async function renderPenis(){
       ${d.sideways?`<div class="detail-pills two subchoice-row">
         ${['Left','Right'].map(v=>`<button data-penis-key="curveSide" data-penis-value="${v}" class="${d.curveSide===v?'on':''}">${v}</button>`).join('')}
       </div>`:''}
-    </section><section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="penisNote" class="private-note" placeholder="">${d.note||''}</textarea></section>
+    </section><section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="penisNote" class="private-note" placeholder="">${esc(d.note||'')}</textarea></section>
     <button class="flow-done" id="donePenis">DONE</button>
   </main>`;
 
@@ -1085,15 +1181,15 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=100" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=109" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
     ${row('FIRMNESS','firmness',[['soft','Soft'],['medium','Medium'],['firm','Firm']])}
     ${row('HAIR','hair',[['smooth','Smooth'],['trimmed','Trimmed'],['natural','Natural'],['hairy','Hairy']])}
-  <section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="peachNote" class="private-note" placeholder="">${d.note||""}</textarea></section>
+  <section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="peachNote" class="private-note" placeholder="">${esc(d.note||"")}</textarea></section>
   <button class="flow-done" id="donePeach">DONE</button></main>`;
 
   const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.peach={...d};await put('people',c)};
@@ -1130,9 +1226,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=100" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=109" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -1151,7 +1247,7 @@ async function renderDrops(){
         <button data-distance="long" class="${d.distance==='long'?'on':''}">Long shot</button>
       </div>
     </section>
-  <section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="dropsNote" class="private-note" placeholder="">${d.note||""}</textarea></section>
+  <section class="detail-block private-note-block"><div class="detail-label">ANYTHING ELSE?</div><textarea id="dropsNote" class="private-note" placeholder="">${esc(d.note||"")}</textarea></section>
   <button class="flow-done" id="doneDrops">DONE</button></main>`;
 
   const save=async()=>{const c=await get('people',state.selectedPersonId);c.about||={};c.about.drops={...d};await put('people',c)};
@@ -1182,19 +1278,37 @@ async function renderEncounterEdit(){
   e.protection ||= [];
   e.when ||= {precision:'exact',date:e.date||new Date().toISOString().slice(0,10)};
 
+  // v10.9 vocabulary migration: keep existing records, but surface them as Blowjob/Fucking.
+  const renameActivity=(from,to)=>{
+    if(e.happened.includes(from) && !e.happened.includes(to)) e.happened.push(to);
+    e.happened=e.happened.filter(x=>x!==from);
+    if(e.happenedDetails[from]!==undefined && e.happenedDetails[to]===undefined) e.happenedDetails[to]=e.happenedDetails[from];
+    delete e.happenedDetails[from];
+  };
+  renameActivity('Oral','Blowjob');
+  renameActivity('Anal','Fucking');
+
   // Compatibility with older single-string details.
   const normalize=(a)=>{
     const old=e.happenedDetails[a];
     if(Array.isArray(old)) return;
     if(!old){e.happenedDetails[a]=[];return;}
     const map={
-      Oral:{'69':['I sucked','He sucked'],'I sucked':['I sucked'],'He sucked':['He sucked']},
-      Anal:{'We switched':['I topped','He topped'],'switch':['I topped','He topped'],'I topped':['I topped'],'I bottomed':['He topped'],'He topped':['He topped']},
-      Rim:{'Both':['I rimmed','He rimmed'],'both':['I rimmed','He rimmed'],'I rimmed':['I rimmed'],'He rimmed':['He rimmed']}
+      Handjob:{'Both':['I jerked him off','He jerked me off'],'I jerked him off':['I jerked him off'],'He jerked me off':['He jerked me off']},
+      Blowjob:{'69':['I sucked','He blew me'],'I sucked':['I sucked'],'He sucked':['He blew me'],'He blew me':['He blew me']},
+      Fucking:{'We switched':['I fucked him','He fucked me'],'switch':['I fucked him','He fucked me'],'I topped':['I fucked him'],'I bottomed':['He fucked me'],'He topped':['He fucked me'],'I fucked him':['I fucked him'],'He fucked me':['He fucked me']}
     };
     e.happenedDetails[a]=(map[a]&&map[a][old])||[old];
   };
-  ['Oral','Anal','Rim'].forEach(normalize);
+  ['Handjob','Blowjob','Fucking'].forEach(normalize);
+
+  // Normalize legacy array labels too.
+  if(Array.isArray(e.happenedDetails.Blowjob)){
+    e.happenedDetails.Blowjob=e.happenedDetails.Blowjob.map(v=>v==='He sucked'?'He blew me':v);
+  }
+  if(Array.isArray(e.happenedDetails.Fucking)){
+    e.happenedDetails.Fucking=e.happenedDetails.Fucking.map(v=>v==='I topped'?'I fucked him':v==='He topped'||v==='I bottomed'?'He fucked me':v);
+  }
 
   const now=new Date();
   const rawBaseDate=String(e.when.date||e.date||now.toISOString()).slice(0,10);
@@ -1212,9 +1326,9 @@ async function renderEncounterEdit(){
 
   const has=a=>e.happened.includes(a);
   const detailOptions={
-    Oral:['I sucked','He sucked'],
-    Anal:['I topped','He topped'],
-    Rim:['I rimmed','He rimmed']
+    Handjob:['I jerked him off','He jerked me off'],
+    Blowjob:['I sucked','He blew me'],
+    Fucking:['I fucked him','He fucked me']
   };
 
   const activityCard=a=>{
@@ -1278,14 +1392,14 @@ async function renderEncounterEdit(){
     <section class="enc-section">
       <div class="enc-section-title">WHAT HAPPENED</div>
       <div class="activity-grid">
-        ${activityCard('Oral')}
-        ${activityCard('Anal')}
-        ${activityCard('Rim')}
+        ${activityCard('Handjob')}
+        ${activityCard('Blowjob')}
+        ${activityCard('Fucking')}
       </div>
 
       <div class="other-unit">
         <button class="other-tile ${has('Other')?'on':''}" data-act="Other">OTHER</button>
-        ${has('Other')?`<input class="enc-other" id="otherText" placeholder="What else?" value="${String(e.other||'').replace(/"/g,'&quot;')}">`:''}
+        ${has('Other')?`<input class="enc-other" id="otherText" placeholder="What else?" value="${esc(e.other||'')}">`:''}
       </div>
     </section>
 
@@ -1302,6 +1416,11 @@ async function renderEncounterEdit(){
         ${[['exact','Exact'],['month','Month'],['season','Season'],['year','Year'],['range','Range']].map(([v,t])=>`<button class="${precision===v?'on':''}" data-prec="${v}">${t}</button>`).join('')}
       </div>
       ${whenControl}
+      ${precision!=='exact'?`<label class="multiple-encounters-row">
+        <input id="multipleEncounters" type="checkbox" ${e.when.multipleEncounters?'checked':''}>
+        <span class="multiple-encounters-box" aria-hidden="true"></span>
+        <span>MULTIPLE ENCOUNTERS</span>
+      </label>`:''}
     </section>
 
     <section class="enc-section how-section">
@@ -1397,8 +1516,15 @@ async function renderEncounterEdit(){
 
   document.querySelectorAll('[data-prec]').forEach(b=>b.onclick=async()=>{
     e.when.precision=b.dataset.prec;
+    if(e.when.precision==='exact') delete e.when.multipleEncounters;
     await save();renderEncounterEdit();
   });
+
+  const multipleEncounters=document.getElementById('multipleEncounters');
+  if(multipleEncounters) multipleEncounters.onchange=async()=>{
+    e.when.multipleEncounters=multipleEncounters.checked;
+    await save();
+  };
 
   const stars=document.querySelector('.enc-stars');
   if(stars){
@@ -1583,13 +1709,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=100',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=109',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=100',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=109',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -1597,7 +1723,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=100',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=109',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1671,7 +1797,7 @@ function encounterSummaryLines(e){
   if(happened.length) lines.push(happened.join(' · '));
 
   const details=[];
-  ['Oral','Anal','Rim'].forEach(k=>{
+  ['Handjob','Blowjob','Fucking','Oral','Anal','Rim'].forEach(k=>{
     const vals=e.happenedDetails?.[k];
     if(Array.isArray(vals)) details.push(...vals);
     else if(vals) details.push(vals);
@@ -1681,6 +1807,7 @@ function encounterSummaryLines(e){
 
   const protection=(e.protection||e.health||[]).filter(Boolean);
   if(protection.length) lines.push(protection.join(' · '));
+  if(e.when?.precision!=='exact' && e.when?.multipleEncounters) lines.push('Multiple encounters');
   return lines;
 }
 
@@ -2111,7 +2238,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.0');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.11');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

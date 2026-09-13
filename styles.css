@@ -3970,3 +3970,258 @@ body.modal-open{
 .backup-action strong{color:#f1c18e;font-size:11px;letter-spacing:.12em}
 .backup-action span{color:rgba(255,255,255,.45);font-size:11px}
 .backup-error{margin-top:10px;color:#ef9292;font-size:11px;line-height:1.4}
+
+
+/* v10.7 — purple → peach accent system, built directly on v10.0 */
+:root{
+  --bc-purple:#8d32d7;
+  --bc-violet:#b143d4;
+  --bc-peach:#ffad8d;
+  --bc-gradient:linear-gradient(105deg,var(--bc-purple) 0%,var(--bc-violet) 48%,var(--bc-peach) 100%);
+  --bc-gradient-soft:linear-gradient(105deg,rgba(141,50,215,.11),rgba(177,67,212,.10) 48%,rgba(255,173,141,.10));
+}
+
+/* Gradient text accents */
+.stats-kicker,
+.stats-section-title,
+.settings-section-title,
+.backup-kicker,
+.settings-modal-kicker,
+.collection-rating,
+.profile-average,
+.profile-encounter-rating,
+.timeline-rating,
+.about-one-heading strong,
+.about-photo-actions button:first-child,
+.backup-action strong,
+.profile-add-encounter,
+.quick-save,
+.flow-done,
+.about-done-wide,
+.name-edit-done,
+.note-done,
+.backup-modal-action,
+.settings-row-button>b{
+  background:var(--bc-gradient)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+}
+
+/* Gradient fills */
+.stats-bar-track i,
+.note-dot,
+.profile-note-action .note-dot,
+.people-view-switch button.active::after{
+  background:var(--bc-gradient)!important;
+}
+.timeline-list::before{
+  background:linear-gradient(to bottom,
+    rgba(141,50,215,.25),
+    rgba(177,67,212,.13) 18%,
+    rgba(255,255,255,.07) 48%,
+    rgba(255,173,141,.18) 82%,
+    rgba(255,173,141,.10))!important;
+}
+
+/* Primary circular accent buttons */
+.count-add,
+.people-add,
+.postadd-plus,
+.postadd-plus-right{
+  border:1px solid transparent!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+  color:#d96ab7!important;
+  box-shadow:0 0 17px rgba(141,50,215,.08),0 0 18px rgba(255,173,141,.055)!important;
+}
+
+/* Selected chips / tiles keep the v10.0 geometry, but use both accent hues */
+.activity-chip.on,
+.precision-chips button.on,
+.detail-chip.on,
+.activity-tile.on,
+.other-tile.on,
+.activity-sub.on,
+.protection-chip.on,
+.about-one-options button.on,
+.about-minimal-options button.on{
+  border-color:transparent!important;
+  background:
+    linear-gradient(#0b0b0c,#0b0b0c) padding-box,
+    var(--bc-gradient) border-box!important;
+  color:#e37eb0!important;
+  box-shadow:0 0 14px rgba(141,50,215,.05),0 0 14px rgba(255,173,141,.035)!important;
+}
+
+/* Outline actions */
+.flow-done,
+.quick-save,
+.profile-add-encounter-wide,
+.about-done-wide,
+.name-edit-done,
+.note-done,
+.backup-modal-action{
+  border:1px solid transparent!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+}
+
+/* Accent markers and icon states */
+.timeline-dot{
+  border-color:#b94bc7!important;
+}
+.profile-note-marker,
+.profile-note-action.has-note,
+.note-icon-button.has-note{
+  color:#d96ab7!important;
+}
+.about-photo-icon svg{
+  stroke:#d96ab7!important;
+}
+
+/* Subtle accent surfaces that used to be peach-only */
+.collection-person.just-added,
+.note-icon-button.has-note{
+  background:var(--bc-gradient-soft)!important;
+  border-color:rgba(184,73,200,.24)!important;
+}
+.bc-wheel-highlight{
+  border-top-color:rgba(141,50,215,.16)!important;
+  border-bottom-color:rgba(255,173,141,.16)!important;
+  background:var(--bc-gradient-soft)!important;
+}
+
+/* Center only the destructive confirmation and its success state */
+#deleteAllModal,
+#deleteSuccessModal{
+  align-items:center!important;
+  padding:18px!important;
+  box-sizing:border-box!important;
+}
+#deleteAllModal .settings-modal-sheet,
+#deleteSuccessModal .settings-modal-sheet{
+  width:min(calc(100% - 36px),440px)!important;
+  border-radius:22px!important;
+  padding:20px 18px!important;
+}
+.settings-success-sheet{
+  text-align:center!important;
+}
+.settings-success-mark{
+  width:48px;
+  height:48px;
+  margin:2px auto 13px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  border:1px solid transparent;
+  background:
+    linear-gradient(#0b0b0c,#0b0b0c) padding-box,
+    var(--bc-gradient) border-box;
+  font-size:22px;
+  font-weight:700;
+  color:#dd77b4;
+}
+.settings-success-sheet h2{
+  margin:0;
+  font-size:24px;
+  font-weight:640;
+  letter-spacing:-.03em;
+}
+.settings-success-sheet p{
+  margin:10px auto 2px;
+  max-width:300px;
+  color:rgba(255,255,255,.50);
+  font-size:12px;
+  line-height:1.5;
+}
+
+
+/* v10.8 — semantic spicy-detail icon colors + completion rings on About Him only */
+.persistent-symbols .about-symbol.art-symbol{
+  opacity:1!important;
+  border-radius:18px!important;
+  border:1px solid transparent!important;
+  transition:transform .16s ease, opacity .16s ease, box-shadow .18s ease, border-color .18s ease!important;
+}
+.persistent-symbols .about-symbol.art-symbol img{
+  opacity:1!important;
+}
+
+/* The ring appears only when that About Him subsection contains saved data. */
+.persistent-symbols .spicy-egg.has-data{
+  border-color:rgba(141,50,215,.70)!important;
+  box-shadow:0 0 0 1px rgba(141,50,215,.08) inset,0 0 18px rgba(141,50,215,.10)!important;
+}
+.persistent-symbols .spicy-peach.has-data{
+  border-color:rgba(255,173,141,.72)!important;
+  box-shadow:0 0 0 1px rgba(255,173,141,.08) inset,0 0 18px rgba(255,173,141,.09)!important;
+}
+.persistent-symbols .spicy-drops.has-data{
+  border-color:transparent!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+  box-shadow:0 0 18px rgba(177,67,212,.07),0 0 18px rgba(255,173,141,.055)!important;
+}
+
+/* Everywhere else the icon itself carries the identity; no completion ring is added. */
+.private-tabs img,
+.spicy-summary-row img{
+  opacity:1!important;
+}
+
+
+/* v10.9 — optional fuzzy-date flag */
+.multiple-encounters-row{
+  width:max-content;
+  max-width:100%;
+  margin:14px auto 0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:rgba(255,255,255,.48);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.11em;
+  cursor:pointer;
+  user-select:none;
+}
+.multiple-encounters-row input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.multiple-encounters-box{
+  width:16px;
+  height:16px;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:5px;
+  background:#080808;
+  position:relative;
+}
+.multiple-encounters-row input:checked + .multiple-encounters-box{
+  border-color:transparent;
+  background:
+    linear-gradient(#080808,#080808) padding-box,
+    var(--bc-gradient) border-box;
+}
+.multiple-encounters-row input:checked + .multiple-encounters-box::after{
+  content:"";
+  position:absolute;
+  left:4px;
+  top:1px;
+  width:5px;
+  height:9px;
+  border-right:1.5px solid #e77bad;
+  border-bottom:1.5px solid #e77bad;
+  transform:rotate(42deg);
+}
+.multiple-encounters-row:has(input:checked){
+  color:rgba(255,255,255,.74);
+}

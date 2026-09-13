@@ -240,30 +240,48 @@ async function renderHome(){
   const count=people.length;
 
   app.innerHTML=`<main class="count-home">
-    <div class="count-brand"><span>BODY</span> <span class="count-brand-accent">COUNTER</span></div>
+    <div class="count-brand"><span class="count-brand-body">BODY</span><span class="count-brand-accent">COUNT</span></div>
     <button class="home-privacy-slogan" id="homePrivacy" type="button">Stored privately on this device</button>
 
     <div class="count-center">
       <div class="home-male-silhouette" aria-hidden="true">
-        <svg viewBox="0 0 420 620" focusable="false">
+        <svg viewBox="0 0 500 720" focusable="false">
           <defs>
             <linearGradient id="homeBodyStroke" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#7d2cff"/>
-              <stop offset=".52" stop-color="#c94bd8"/>
-              <stop offset="1" stop-color="#ffb08f"/>
+              <stop offset="0" stop-color="#7b31d8"/>
+              <stop offset=".50" stop-color="#be48d0"/>
+              <stop offset="1" stop-color="#ffad8e"/>
             </linearGradient>
-            <radialGradient id="homeBodyGlow" cx=".55" cy=".32" r=".75">
-              <stop offset="0" stop-color="#8c34d9" stop-opacity=".16"/>
-              <stop offset=".68" stop-color="#ff9b83" stop-opacity=".035"/>
+            <linearGradient id="homeBodyFill" x1=".18" y1=".1" x2=".85" y2=".9">
+              <stop offset="0" stop-color="#171019"/>
+              <stop offset=".42" stop-color="#0b090c"/>
+              <stop offset="1" stop-color="#050506"/>
+            </linearGradient>
+            <radialGradient id="homeBodyGlow" cx=".68" cy=".45" r=".65">
+              <stop offset="0" stop-color="#ff9f85" stop-opacity=".15"/>
+              <stop offset=".43" stop-color="#a842d2" stop-opacity=".08"/>
               <stop offset="1" stop-color="#000" stop-opacity="0"/>
             </radialGradient>
+            <filter id="homeSoftGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="8"/>
+            </filter>
           </defs>
-          <ellipse cx="224" cy="308" rx="170" ry="270" fill="url(#homeBodyGlow)"/>
-          <path class="home-body-fill" d="M214 62c-37 0-66 30-66 67 0 28 16 51 39 62-7 17-19 30-37 38-40 17-78 39-91 82-14 47-1 98 17 136 17 37 30 74 35 112 3 23 2 42 1 61h204c-2-21-3-42 0-64 5-38 18-75 35-112 18-39 31-90 17-137-13-43-51-64-91-81-18-8-31-21-38-38 24-11 40-35 40-63 0-37-29-67-65-67z"/>
-          <path class="home-body-line left" d="M187 190c-9 29-32 39-67 54-37 16-58 38-65 72-8 39 4 79 21 116 22 47 37 92 40 142"/>
-          <path class="home-body-line right" d="M240 188c10 29 33 39 68 54 37 16 58 38 65 72 8 39-4 79-21 116-22 47-37 92-40 142"/>
-          <path class="home-body-line shoulder" d="M116 250c31 6 61 18 98 48 37-30 67-42 98-48"/>
-          <path class="home-body-line spine" d="M214 202c-9 65-7 128 0 190"/>
+          <ellipse cx="290" cy="390" rx="190" ry="300" fill="url(#homeBodyGlow)" filter="url(#homeSoftGlow)"/>
+          <!-- head + neck, turned slightly away -->
+          <path d="M281 73c38 1 67 31 67 69 0 29-15 53-39 66-5 3-9 8-10 14l-6 37-78 4-8-38c-2-8-6-13-13-17-20-14-32-37-31-63 1-41 33-72 73-72z"
+                fill="url(#homeBodyFill)"/>
+          <!-- torso seen from the back with right shoulder/arm and lower body -->
+          <path d="M205 226c-38 13-81 32-104 73-20 36-22 78-12 119 11 47 36 82 50 124 12 35 16 77 18 117h228c-1-24 0-49 5-75 7-38 25-75 37-111 14-41 18-84 2-123-16-39-48-65-91-84-23-10-40-27-48-49-18 14-40 21-65 21-26 0-48-4-68-12z"
+                fill="url(#homeBodyFill)"/>
+          <!-- right arm -->
+          <path d="M334 265c45 19 79 47 91 91 13 48-2 99-17 146-11 35-15 72-18 112-1 18-10 30-23 34-14 4-25-5-24-24 2-42 7-82 17-120 11-44 17-86 2-118-10-22-26-37-50-49z"
+                fill="#080709"/>
+          <!-- contour/rim light -->
+          <path class="home-body-rim left" d="M207 225c-47 15-89 36-110 77-19 37-18 80-7 121 13 48 36 83 49 123 10 31 15 70 18 113"/>
+          <path class="home-body-rim right" d="M291 218c11 23 31 39 55 49 42 18 72 43 86 81 16 43 8 87-6 128-11 34-29 73-34 111-3 25-4 48-4 70"/>
+          <path class="home-body-rim shoulder" d="M132 284c53-4 91 8 128 42 28-28 56-42 93-48"/>
+          <path class="home-body-rim back" d="M260 326c-11 62-12 126 0 191"/>
+          <path class="home-body-rim hip" d="M165 555c33-18 68-21 97-4 29-17 64-15 101 4"/>
         </svg>
       </div>
       <div class="count-lockup count-digits-${Math.min(3,String(count).length)}">
@@ -287,7 +305,7 @@ async function renderHome(){
 
   const number=document.getElementById('countNumber');
   const paintCount=value=>{
-    const text=String(value);
+    const text=String(Math.max(0,Math.min(999,Number(value)||0))).padStart(3,'0');
     number.innerHTML=text.split('').map(d=>`<span class="flip-digit"><span>${d}</span></span>`).join('');
   };
   const startCountPulse=()=>number.classList.add('count-settled');

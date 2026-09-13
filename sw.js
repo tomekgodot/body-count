@@ -1,10 +1,10 @@
-const CACHE='body-count-v10.15';
+const CACHE='body-count-v10.17';
 const ASSETS=[
   './',
   './index.html',
-  './styles.css?v=10.15',
-  './app.js?v=10.15',
-  './manifest.webmanifest?v=10.15',
+  './styles.css?v=10.17',
+  './app.js?v=10.17',
+  './manifest.webmanifest?v=10.17',
   './icon.svg',
   './brand-mark.png',
   './assets/age-young.jpg?v=109',
@@ -23,7 +23,7 @@ const ASSETS=[
   './assets/type-daddy.jpg?v=109',
   './assets/detail-eggplant.png?v=109',
   './assets/detail-peach.png?v=109',
-  './assets/detail-drops.png?v=109',
+  './assets/detail-drops.png?v=117',
   './assets/apple-touch-icon.png?v=1010',
   './assets/icon-192.png?v=1010',
   './assets/icon-512.png?v=1010'

@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.15';
+const APP_VERSION='10.17';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -991,7 +991,7 @@ async function renderAboutHim(){
       <div class="about-symbols persistent-symbols about-minimal-symbols">
         <button class="about-symbol art-symbol spicy-egg ${hasPenisDetails?'has-data':''}" data-subopen="egg"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
         <button class="about-symbol art-symbol spicy-peach ${hasPeachDetails?'has-data':''}" data-subopen="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
-        <button class="about-symbol art-symbol spicy-drops ${hasDropsDetails?'has-data':''}" data-subopen="drop"><img src="assets/detail-drops.png?v=109" alt=""></button>
+        <button class="about-symbol art-symbol spicy-drops ${hasDropsDetails?'has-data':''}" data-subopen="drop"><img src="assets/detail-drops.png?v=117" alt=""></button>
       </div>
     </section>
 
@@ -1137,7 +1137,7 @@ async function renderPenis(){
     <nav class="private-tabs">
       <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
       <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=109" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=117" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -1217,7 +1217,7 @@ async function renderPeach(){
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
       <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
       <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=109" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=117" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -1262,7 +1262,7 @@ async function renderDrops(){
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
       <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=109" alt=""></button>
       <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=109" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=109" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=117" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -1277,7 +1277,7 @@ async function renderDrops(){
       <div class="detail-label">SHOT</div>
       <div class="shot-options">
         <button data-distance="flow" class="${d.distance==='flow'?'on':''}">Flow</button>
-        <button data-distance="short" class="${d.distance==='short'?'on':''}">Quick shot</button>
+        <button data-distance="short" class="${d.distance==='short'?'on':''}">Medium Distance</button>
         <button data-distance="long" class="${d.distance==='long'?'on':''}">Long shot</button>
       </div>
     </section>
@@ -1320,7 +1320,7 @@ async function renderEncounterEdit(){
     delete e.happenedDetails[from];
   };
   renameActivity('Oral','Blowjob');
-  renameActivity('Anal','Fucking');
+  renameActivity('Fucking','Anal');
 
   // Compatibility with older single-string details.
   const normalize=(a)=>{
@@ -1330,18 +1330,18 @@ async function renderEncounterEdit(){
     const map={
       Handjob:{'Both':['I jerked him off','He jerked me off'],'I jerked him off':['I jerked him off'],'He jerked me off':['He jerked me off']},
       Blowjob:{'69':['I sucked','He blew me'],'I sucked':['I sucked'],'He sucked':['He blew me'],'He blew me':['He blew me']},
-      Fucking:{'We switched':['I fucked him','He fucked me'],'switch':['I fucked him','He fucked me'],'I topped':['I fucked him'],'I bottomed':['He fucked me'],'He topped':['He fucked me'],'I fucked him':['I fucked him'],'He fucked me':['He fucked me']}
+      Anal:{'We switched':['I fucked him','He fucked me'],'switch':['I fucked him','He fucked me'],'I topped':['I fucked him'],'I bottomed':['He fucked me'],'He topped':['He fucked me'],'I fucked him':['I fucked him'],'He fucked me':['He fucked me']}
     };
     e.happenedDetails[a]=(map[a]&&map[a][old])||[old];
   };
-  ['Handjob','Blowjob','Fucking'].forEach(normalize);
+  ['Handjob','Blowjob','Anal'].forEach(normalize);
 
   // Normalize legacy array labels too.
   if(Array.isArray(e.happenedDetails.Blowjob)){
     e.happenedDetails.Blowjob=e.happenedDetails.Blowjob.map(v=>v==='He sucked'?'He blew me':v);
   }
-  if(Array.isArray(e.happenedDetails.Fucking)){
-    e.happenedDetails.Fucking=e.happenedDetails.Fucking.map(v=>v==='I topped'?'I fucked him':v==='He topped'||v==='I bottomed'?'He fucked me':v);
+  if(Array.isArray(e.happenedDetails.Anal)){
+    e.happenedDetails.Anal=e.happenedDetails.Anal.map(v=>v==='I topped'?'I fucked him':v==='He topped'||v==='I bottomed'?'He fucked me':v);
   }
 
   const now=new Date();
@@ -1362,7 +1362,7 @@ async function renderEncounterEdit(){
   const detailOptions={
     Handjob:['I jerked him off','He jerked me off'],
     Blowjob:['I sucked','He blew me'],
-    Fucking:['I fucked him','He fucked me']
+    Anal:['I fucked him','He fucked me']
   };
 
   const activityCard=a=>{
@@ -1757,10 +1757,10 @@ function privateSummary(p){
 
   const drops=a.drops||{};
   const amount={low:'Small Load',medium:'Medium Load',high:'Big Load'}[drops.amount];
-  const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
+  const distance={flow:'Flow',short:'Medium Distance',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=109',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=117',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1931,7 +1931,7 @@ async function renderPerson(){
     </section>
 
     <div class="profile-actions">
-      <button class="profile-edit" id="editPerson" type="button">Edit profile</button>
+      <button class="profile-edit" id="editPerson" type="button">MORE ABOUT HIM</button>
       <button class="profile-delete" id="deletePerson" type="button">Delete person</button>
     </div>
 
@@ -2275,7 +2275,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.15');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.17');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

@@ -4227,7 +4227,7 @@ body.modal-open{
 }
 
 
-/* v10.15 — legible gradient action labels */
+/* v10.17 — legible gradient action labels */
 .quick-save,
 .flow-done,
 .about-done-wide{
@@ -4255,7 +4255,7 @@ body.modal-open{
   -webkit-text-fill-color:rgba(255,255,255,.42)!important;
 }
 
-/* v10.15 — five stars form one purple-to-peach gradient */
+/* v10.17 — five stars form one purple-to-peach gradient */
 .enc-stars button.on{
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
@@ -4270,7 +4270,7 @@ body.modal-open{
 .enc-stars button.on:nth-child(4){background-position:75% 50%!important}
 .enc-stars button.on:nth-child(5){background-position:100% 50%!important}
 
-/* v10.15 — profile spicy icons: larger and vertically aligned with copy */
+/* v10.17 — profile spicy icons: larger and vertically aligned with copy */
 .spicy-summary-row{
   grid-template-columns:40px 1fr!important;
   gap:12px!important;
@@ -4284,7 +4284,7 @@ body.modal-open{
 }
 
 
-/* v10.15 — final polish */
+/* v10.17 — final polish */
 .spicy-summary-row{
   grid-template-columns:46px 1fr!important;
   gap:13px!important;
@@ -4307,7 +4307,7 @@ body.modal-open{
 }
 
 
-/* v10.15 — custom Type + compact ethnicity row */
+/* v10.17 — custom Type + compact ethnicity row */
 .about-custom-input{
   width:100%;
   box-sizing:border-box;
@@ -4328,4 +4328,36 @@ body.modal-open{
   background:
     linear-gradient(#0a0a0b,#0a0a0b) padding-box,
     var(--bc-gradient) border-box;
+}
+
+
+/* v10.17 — profile action polish */
+.profile-add-encounter-wide{
+  border:1px solid transparent!important;
+  background:
+    linear-gradient(#050505,#050505) padding-box,
+    var(--bc-gradient) border-box!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+}
+
+
+/* v10.17 — restore drops icon visibility */
+.persistent-symbols .spicy-drops img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.spicy-summary-row img[src*="detail-drops"]{
+  display:block!important;
+  width:42px!important;
+  height:42px!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  visibility:visible!important;
 }

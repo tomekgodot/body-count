@@ -9,6 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
+const APP_VERSION='10.0';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -32,6 +33,117 @@ function get(name,id){return new Promise((r,j)=>{const q=store(name).get(id);q.o
 function put(name,value){return new Promise((r,j)=>{const q=store(name,'readwrite').put(value);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
 function add(name,value){return new Promise((r,j)=>{const q=store(name,'readwrite').add(value);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
 function remove(name,id){return new Promise((r,j)=>{const q=store(name,'readwrite').delete(id);q.onsuccess=()=>r();q.onerror=()=>j(q.error)})}
+
+function bytesToBase64(bytes){
+  let out='';
+  const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk) out+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  return btoa(out);
+}
+function base64ToBytes(value){
+  const raw=atob(value);
+  const out=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++) out[i]=raw.charCodeAt(i);
+  return out;
+}
+async function blobToBackup(blob){
+  const bytes=new Uint8Array(await blob.arrayBuffer());
+  return {type:blob.type||'application/octet-stream',data:bytesToBase64(bytes)};
+}
+function backupToBlob(value){
+  return new Blob([base64ToBytes(value.data)],{type:value.type||'application/octet-stream'});
+}
+async function deriveBackupKey(password,salt){
+  const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},
+    material,
+    {name:'AES-GCM',length:256},
+    false,
+    ['encrypt','decrypt']
+  );
+}
+async function makeEncryptedBackup(password){
+  const [people,encounters,settings,photos]=await Promise.all([
+    all('people'),all('encounters'),all('settings'),all('photos')
+  ]);
+  const photoRows=[];
+  for(const p of photos){
+    photoRows.push({
+      personId:p.personId,
+      updatedAt:p.updatedAt||null,
+      blob:await blobToBackup(p.blob)
+    });
+  }
+  const payload={
+    format:'body-count-backup',
+    version:1,
+    appVersion:APP_VERSION,
+    exportedAt:new Date().toISOString(),
+    people,encounters,settings,photos:photoRows
+  };
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveBackupKey(password,salt);
+  const ciphertext=await crypto.subtle.encrypt(
+    {name:'AES-GCM',iv},
+    key,
+    new TextEncoder().encode(JSON.stringify(payload))
+  );
+  return {
+    format:'body-count-encrypted-backup',
+    version:1,
+    kdf:{name:'PBKDF2',hash:'SHA-256',iterations:250000,salt:bytesToBase64(salt)},
+    cipher:{name:'AES-GCM',iv:bytesToBase64(iv)},
+    data:bytesToBase64(new Uint8Array(ciphertext))
+  };
+}
+async function decryptBackupFile(file,password){
+  const wrapper=JSON.parse(await file.text());
+  if(wrapper?.format!=='body-count-encrypted-backup'||wrapper?.version!==1) throw new Error('Unsupported backup file');
+  const salt=base64ToBytes(wrapper.kdf?.salt||'');
+  const iv=base64ToBytes(wrapper.cipher?.iv||'');
+  const key=await deriveBackupKey(password,salt);
+  const plain=await crypto.subtle.decrypt(
+    {name:'AES-GCM',iv},
+    key,
+    base64ToBytes(wrapper.data||'')
+  );
+  const payload=JSON.parse(new TextDecoder().decode(plain));
+  if(payload?.format!=='body-count-backup'||payload?.version!==1) throw new Error('Unsupported backup data');
+  if(!Array.isArray(payload.people)||!Array.isArray(payload.encounters)||!Array.isArray(payload.photos)) throw new Error('Invalid backup data');
+  payload.settings=Array.isArray(payload.settings)?payload.settings:[];
+  return payload;
+}
+async function replaceAllData(payload){
+  const names=['people','encounters','settings','photos'];
+  const tx=db.transaction(names,'readwrite');
+  const stores=Object.fromEntries(names.map(n=>[n,tx.objectStore(n)]));
+  names.forEach(n=>stores[n].clear());
+  (payload.people||[]).forEach(x=>stores.people.put(x));
+  (payload.encounters||[]).forEach(x=>stores.encounters.put(x));
+  (payload.settings||[]).forEach(x=>stores.settings.put(x));
+  (payload.photos||[]).forEach(x=>stores.photos.put({
+    personId:Number(x.personId),
+    updatedAt:x.updatedAt||Date.now(),
+    blob:backupToBlob(x.blob)
+  }));
+  await new Promise((resolve,reject)=>{
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+    tx.onabort=()=>reject(tx.error||new Error('Restore aborted'));
+  });
+}
+async function deleteAllData(){
+  const names=['people','encounters','settings','photos'];
+  const tx=db.transaction(names,'readwrite');
+  names.forEach(n=>tx.objectStore(n).clear());
+  await new Promise((resolve,reject)=>{
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+    tx.onabort=()=>reject(tx.error||new Error('Delete aborted'));
+  });
+}
 
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
@@ -98,7 +210,8 @@ async function render(){
   if(state.screen==='collection') return renderCollection();
   if(state.screen==='timeline') return renderTimeline();
   if(state.screen==='insights') return renderStats();
-  if(state.screen==='you') return renderPlaceholder('You','Privacy, health, backup and settings will live here.','you');
+  if(state.screen==='you') return renderSettings();
+  if(state.screen==='backup') return renderBackup();
   if(state.screen==='details') return renderDetails();
   if(state.screen==='encounter') return renderEncounter();
   if(state.screen==='encounterEdit') return renderEncounterEdit();
@@ -117,7 +230,7 @@ function nav(active='home'){
     <button class="navbtn ${active==='home'?'active':''}" data-nav="home"><span class="nav-ico">○</span><span>COUNT</span></button>
     <button class="navbtn ${active==='collection'?'active':''}" data-nav="collection"><span class="nav-ico">◫</span><span>PEOPLE</span></button>
     <button class="navbtn ${active==='insights'?'active':''}" data-nav="insights"><span class="nav-ico">⌁</span><span>STATS</span></button>
-    <button class="navbtn ${active==='you'?'active':''}" data-nav="you"><span class="nav-ico">◌</span><span>YOU</span></button>
+    <button class="navbtn ${active==='you'?'active':''}" data-nav="you"><span class="nav-ico">◌</span><span>SETTINGS</span></button>
   </nav>`;
 }
 function attachNav(){document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{state.screen=b.dataset.nav;render()})}
@@ -283,6 +396,219 @@ async function renderStats(){
     ${(yourType||mostSeenN>1)?`<section class="stats-section stats-fun"><div class="stats-section-title">FUN STATS</div>${yourType?`<div class="stats-fun-row"><span>YOUR TYPE</span><strong>${esc(yourType)}</strong></div>`:''}${mostSeenN>1?`<div class="stats-fun-row"><span>COMEBACK KING</span><strong>${esc(displayName(mostSeen))} · ${mostSeenN} encounters</strong></div>`:''}${busiest?`<div class="stats-fun-row"><span>BUSIEST MONTH</span><strong>${busiestLabel}</strong></div>`:''}</section>`:''}
     ${nav('insights')}
   </main>`;
+  attachNav();
+}
+
+
+function settingsPrivacyCopy(){
+  return `<div class="settings-copy">
+    <strong>Your data stays on this device.</strong>
+    <p>People, encounters, private notes and photos are stored locally in this browser. Body Count does not upload them to a Body Count server.</p>
+    <p>Local browser data can still be removed by the browser, the device or you, so it is not a backup. Exported backups are encrypted with the password you choose.</p>
+  </div>`;
+}
+
+async function renderSettings(){
+  app.innerHTML=`<main class="settings-screen">
+    <header class="settings-head"><h1>Settings</h1></header>
+
+    <section class="settings-section">
+      <div class="settings-section-title">DATA</div>
+      <button class="settings-row settings-row-button" id="openBackup" type="button">
+        <span><strong>Backup</strong><small>Export or restore your data</small></span><b>›</b>
+      </button>
+    </section>
+
+    <section class="settings-section">
+      <div class="settings-section-title">PRIVACY</div>
+      ${settingsPrivacyCopy()}
+    </section>
+
+    <section class="settings-section">
+      <div class="settings-section-title">APP</div>
+      <div class="settings-copy settings-app-copy">
+        <strong>Body Count</strong>
+        <p>Private hookup tracker · Version ${APP_VERSION}</p>
+      </div>
+    </section>
+
+    <section class="settings-section settings-danger">
+      <div class="settings-section-title">DANGER ZONE</div>
+      <button class="settings-delete" id="deleteAllButton" type="button">
+        <strong>Delete all data</strong><span>Permanently erase people, encounters, notes and photos</span>
+      </button>
+    </section>
+
+    <div class="settings-modal" id="deleteAllModal" hidden>
+      <button class="settings-modal-backdrop" id="deleteAllBackdrop" type="button" aria-label="Cancel"></button>
+      <section class="settings-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="deleteAllTitle">
+        <div class="settings-modal-head">
+          <div><div class="settings-modal-kicker">DELETE EVERYTHING</div><h2 id="deleteAllTitle">This cannot be undone.</h2></div>
+          <button class="settings-modal-close" id="deleteAllClose" type="button" aria-label="Cancel">×</button>
+        </div>
+        <p class="settings-modal-copy">Type <strong>DELETE</strong> to permanently erase all Body Count data on this device.</p>
+        <input class="settings-password" id="deleteAllInput" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="DELETE">
+        <button class="settings-confirm-delete" id="confirmDeleteAll" type="button" disabled>DELETE ALL DATA</button>
+      </section>
+    </div>
+
+    ${nav('you')}
+  </main>`;
+
+  document.getElementById('openBackup').onclick=()=>{state.screen='backup';render()};
+  const modal=document.getElementById('deleteAllModal');
+  const input=document.getElementById('deleteAllInput');
+  const confirm=document.getElementById('confirmDeleteAll');
+  const openDelete=()=>{modal.hidden=false;document.body.classList.add('modal-open');setTimeout(()=>input.focus(),80)};
+  const closeDelete=()=>{modal.hidden=true;document.body.classList.remove('modal-open');input.value='';confirm.disabled=true};
+  document.getElementById('deleteAllButton').onclick=openDelete;
+  document.getElementById('deleteAllBackdrop').onclick=closeDelete;
+  document.getElementById('deleteAllClose').onclick=closeDelete;
+  input.oninput=()=>{confirm.disabled=input.value.trim()!=='DELETE'};
+  confirm.onclick=async()=>{
+    if(input.value.trim()!=='DELETE')return;
+    confirm.disabled=true;confirm.textContent='DELETING…';
+    try{
+      await deleteAllData();
+      closeDelete();
+      state.selectedPersonId=null;state.selectedEncounterId=null;
+      renderSettings();
+    }catch(err){
+      confirm.disabled=false;confirm.textContent='DELETE ALL DATA';
+      alert('Your data could not be deleted.');
+    }
+  };
+  attachNav();
+}
+
+async function renderBackup(){
+  app.innerHTML=`<main class="backup-screen">
+    <header class="backup-head">
+      <button class="backup-back" id="backupBack" type="button" aria-label="Back">‹</button>
+      <div><div class="backup-kicker">DATA</div><h1>Backup</h1></div>
+      <span></span>
+    </header>
+
+    <section class="backup-intro">
+      <p>Make one encrypted copy of your people, encounters, private notes and photos.</p>
+      <div class="backup-lock-note">Nothing is uploaded anywhere.</div>
+    </section>
+
+    <section class="backup-actions">
+      <button class="backup-action" id="exportBackup" type="button">
+        <strong>EXPORT BACKUP</strong>
+        <span>Create an encrypted .bodycount file</span>
+      </button>
+      <button class="backup-action" id="restoreBackup" type="button">
+        <strong>RESTORE BACKUP</strong>
+        <span>Replace this device’s data from a backup</span>
+      </button>
+      <input id="backupFileInput" type="file" accept=".bodycount,application/json" hidden>
+    </section>
+
+    <div class="settings-modal" id="backupPasswordModal" hidden>
+      <button class="settings-modal-backdrop" id="backupPasswordBackdrop" type="button" aria-label="Cancel"></button>
+      <section class="settings-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="backupPasswordTitle">
+        <div class="settings-modal-head">
+          <div><div class="settings-modal-kicker" id="backupPasswordKicker">ENCRYPTED BACKUP</div><h2 id="backupPasswordTitle">Choose a password</h2></div>
+          <button class="settings-modal-close" id="backupPasswordClose" type="button" aria-label="Cancel">×</button>
+        </div>
+        <p class="settings-modal-copy" id="backupPasswordCopy">You’ll need this password to restore the backup. Body Count cannot recover it for you.</p>
+        <input class="settings-password" id="backupPassword" type="password" autocomplete="new-password" placeholder="Password">
+        <input class="settings-password" id="backupPasswordAgain" type="password" autocomplete="new-password" placeholder="Repeat password">
+        <div class="backup-error" id="backupError" hidden></div>
+        <button class="backup-modal-action" id="backupPasswordAction" type="button">EXPORT</button>
+      </section>
+    </div>
+
+    ${nav('you')}
+  </main>`;
+
+  document.getElementById('backupBack').onclick=()=>{state.screen='you';render()};
+  const modal=document.getElementById('backupPasswordModal');
+  const backdrop=document.getElementById('backupPasswordBackdrop');
+  const close=document.getElementById('backupPasswordClose');
+  const password=document.getElementById('backupPassword');
+  const again=document.getElementById('backupPasswordAgain');
+  const action=document.getElementById('backupPasswordAction');
+  const title=document.getElementById('backupPasswordTitle');
+  const copy=document.getElementById('backupPasswordCopy');
+  const error=document.getElementById('backupError');
+  const fileInput=document.getElementById('backupFileInput');
+  let mode='export',restoreFile=null;
+
+  const closeModal=()=>{
+    modal.hidden=true;document.body.classList.remove('modal-open');
+    password.value='';again.value='';error.hidden=true;error.textContent='';restoreFile=null;
+  };
+  const openExport=()=>{
+    mode='export';
+    title.textContent='Choose a password';
+    copy.textContent='You’ll need this password to restore the backup. Body Count cannot recover it for you.';
+    again.hidden=false;again.value='';
+    action.textContent='EXPORT';
+    password.autocomplete='new-password';
+    modal.hidden=false;document.body.classList.add('modal-open');
+    setTimeout(()=>password.focus(),80);
+  };
+  const openRestore=file=>{
+    mode='restore';restoreFile=file;
+    title.textContent='Enter backup password';
+    copy.textContent='Restoring will replace the Body Count data currently stored on this device.';
+    again.hidden=true;
+    action.textContent='RESTORE';
+    password.autocomplete='current-password';
+    modal.hidden=false;document.body.classList.add('modal-open');
+    setTimeout(()=>password.focus(),80);
+  };
+  document.getElementById('exportBackup').onclick=openExport;
+  document.getElementById('restoreBackup').onclick=()=>fileInput.click();
+  fileInput.onchange=()=>{
+    const file=fileInput.files?.[0];
+    fileInput.value='';
+    if(file)openRestore(file);
+  };
+  backdrop.onclick=closeModal;close.onclick=closeModal;
+
+  action.onclick=async()=>{
+    error.hidden=true;error.textContent='';
+    const pw=password.value;
+    if(!pw){error.textContent='Enter a password.';error.hidden=false;return}
+    if(mode==='export'){
+      if(pw.length<8){error.textContent='Use at least 8 characters.';error.hidden=false;return}
+      if(pw!==again.value){error.textContent='The passwords do not match.';error.hidden=false;return}
+      action.disabled=true;action.textContent='ENCRYPTING…';
+      try{
+        const backup=await makeEncryptedBackup(pw);
+        const blob=new Blob([JSON.stringify(backup)],{type:'application/json'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        const stamp=new Date().toISOString().slice(0,10);
+        a.href=url;a.download=`body-count-${stamp}.bodycount`;
+        document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+        closeModal();
+      }catch(err){
+        error.textContent='The backup could not be created.';error.hidden=false;
+      }finally{
+        action.disabled=false;action.textContent='EXPORT';
+      }
+    }else{
+      action.disabled=true;action.textContent='RESTORING…';
+      try{
+        const payload=await decryptBackupFile(restoreFile,pw);
+        await replaceAllData(payload);
+        clearPhotoUrls();
+        closeModal();
+        alert('Backup restored.');
+        state.screen='you';render();
+      }catch(err){
+        error.textContent='Could not restore this backup. Check the file and password.';error.hidden=false;
+      }finally{
+        action.disabled=false;action.textContent='RESTORE';
+      }
+    }
+  };
   attachNav();
 }
 
@@ -555,9 +881,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=99" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=99" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=99" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=100" alt=""></button>
       </div>
     </section>
 
@@ -679,9 +1005,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=99" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=99" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=99" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=100" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -759,9 +1085,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=99" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=99" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=99" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=100" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -804,9 +1130,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=99" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=99" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=99" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=100" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=100" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=100" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -1257,13 +1583,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=99',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=100',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=99',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=100',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -1271,7 +1597,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=99',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=100',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1785,7 +2111,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=9.9');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.0');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

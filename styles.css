@@ -4225,3 +4225,60 @@ body.modal-open{
 .multiple-encounters-row:has(input:checked){
   color:rgba(255,255,255,.74);
 }
+
+
+/* v10.12 — legible gradient action labels */
+.quick-save,
+.flow-done,
+.about-done-wide{
+  background:
+    var(--bc-gradient) border-box!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  position:relative!important;
+  isolation:isolate!important;
+}
+.quick-save::before,
+.flow-done::before,
+.about-done-wide::before{
+  content:""!important;
+  position:absolute!important;
+  inset:1px!important;
+  border-radius:calc(14px - 1px)!important;
+  background:#050505!important;
+  z-index:-1!important;
+}
+.quick-save:disabled{
+  color:rgba(255,255,255,.42)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.42)!important;
+}
+
+/* v10.12 — five stars form one purple-to-peach gradient */
+.enc-stars button.on{
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+  background-image:var(--bc-gradient)!important;
+  background-size:500% 100%!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+}
+.enc-stars button.on:nth-child(1){background-position:0% 50%!important}
+.enc-stars button.on:nth-child(2){background-position:25% 50%!important}
+.enc-stars button.on:nth-child(3){background-position:50% 50%!important}
+.enc-stars button.on:nth-child(4){background-position:75% 50%!important}
+.enc-stars button.on:nth-child(5){background-position:100% 50%!important}
+
+/* v10.12 — profile spicy icons: larger and vertically aligned with copy */
+.spicy-summary-row{
+  grid-template-columns:40px 1fr!important;
+  gap:12px!important;
+  align-items:center!important;
+}
+.spicy-summary-row img{
+  width:36px!important;
+  height:36px!important;
+  align-self:center!important;
+  opacity:1!important;
+}

@@ -219,7 +219,7 @@ const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
 const fmt=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(new Date(d));
 const dateValue=d=>{const x=new Date(d||Date.now()),off=x.getTimezoneOffset();return new Date(x.getTime()-off*60000).toISOString().slice(0,10)};
-const displayName=p=>p?.name?.trim()||`Guy #${p?.id}`;
+const displayName=p=>p?.name?.trim()||`G${p?.anonymousNumber||p?.id}`;
 const avgRating=es=>{const r=es.filter(e=>e.rating>0);return r.length?(r.reduce((s,e)=>s+e.rating,0)/r.length).toFixed(1):'—'};
 
 let activePhotoUrls=[];
@@ -851,7 +851,9 @@ async function saveQuick(){
 
   const memory=(document.getElementById('memory')?.value||'').trim();
   const name=(document.getElementById('name')?.value||'').trim();
-  const personId=await add('people',{name,createdAt:new Date().toISOString(),about:{}});
+  const peopleBefore=await all('people');
+  const anonymousNumber=name ? null : peopleBefore.length+1;
+  const personId=await add('people',{name,anonymousNumber,createdAt:new Date().toISOString(),about:{}});
   const encounterId=await add('encounters',{
     personId,
     date:new Date().toISOString(),
@@ -1398,7 +1400,7 @@ async function renderEncounterEdit(){
       </div>
 
       <div class="other-unit">
-        <button class="other-tile ${has('Other')?'on':''}" data-act="Other">OTHER</button>
+        <button class="other-tile ${has('Other')?'on':''}" data-act="Other">MORE</button>
         ${has('Other')?`<input class="enc-other" id="otherText" placeholder="What else?" value="${esc(e.other||'')}">`:''}
       </div>
     </section>
@@ -1719,7 +1721,7 @@ function privateSummary(p){
   }
 
   const drops=a.drops||{};
-  const amount={low:'Small',medium:'Medium',high:'Large'}[drops.amount];
+  const amount={low:'Small Load',medium:'Medium Load',high:'Big Load'}[drops.amount];
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
@@ -2238,7 +2240,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.11');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.12');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

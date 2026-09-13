@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.17';
+const APP_VERSION='10.18';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -393,8 +393,8 @@ async function renderStats(){
     ['GUYS WHO JERKED ME OFF',uniquePeopleWith(e=>hasDetail(e,'Handjob','He jerked me off'))],
     ['DICKS I SUCKED',uniquePeopleWith(e=>hasDetail(e,'Blowjob','I sucked')||hasDetail(e,'Oral','I sucked'))],
     ['GUYS WHO BLEW ME',uniquePeopleWith(e=>hasDetail(e,'Blowjob','He blew me')||hasDetail(e,'Oral','He sucked'))],
-    ['GUYS I FUCKED',uniquePeopleWith(e=>hasDetail(e,'Fucking','I fucked him')||hasDetail(e,'Anal','I topped'))],
-    ['GUYS WHO FUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Fucking','He fucked me')||hasDetail(e,'Anal','He topped')||hasDetail(e,'Anal','I bottomed'))]
+    ['GUYS I FUCKED',uniquePeopleWith(e=>hasDetail(e,'Anal','I fucked him')||hasDetail(e,'Fucking','I fucked him')||hasDetail(e,'Anal','I topped'))],
+    ['GUYS WHO FUCKED ME',uniquePeopleWith(e=>hasDetail(e,'Anal','He fucked me')||hasDetail(e,'Fucking','He fucked me')||hasDetail(e,'Anal','He topped')||hasDetail(e,'Anal','I bottomed'))]
   ];
 
   const dist=(getter,order,labels)=>{
@@ -414,8 +414,15 @@ async function renderStats(){
     return `<section class="stats-chart"><div class="stats-section-title">${title}</div><div class="stats-bars">${d.rows.map(r=>`<div class="stats-bar-row"><span>${r.label}</span><div class="stats-bar-track"><i style="width:${(r.value/max)*100}%"></i></div><strong>${r.value}</strong></div>`).join('')}</div><div class="stats-based">Based on ${d.known} ${d.known===1?'guy':'guys'}</div></section>`;
   };
 
-  const repeaters=people.filter(p=>(byPerson.get(p.id)||[]).length>1);
-  const oneHits=people.filter(p=>(byPerson.get(p.id)||[]).length===1);
+  const isEncore=p=>{
+    const es=byPerson.get(p.id)||[];
+    return es.length>1 || es.some(e=>e.when?.multipleEncounters===true);
+  };
+  const repeaters=people.filter(isEncore);
+  const oneHits=people.filter(p=>{
+    const es=byPerson.get(p.id)||[];
+    return es.length===1 && !es.some(e=>e.when?.multipleEncounters===true);
+  });
   const mostSeen=[...people].sort((a,b)=>(byPerson.get(b.id)||[]).length-(byPerson.get(a.id)||[]).length)[0];
   const mostSeenN=mostSeen?(byPerson.get(mostSeen.id)||[]).length:0;
   const repeatRate=people.length?Math.round(repeaters.length/people.length*100):0;
@@ -689,7 +696,11 @@ async function renderBackup(){
         alert('Backup restored.');
         state.screen='you';render();
       }catch(err){
-        error.textContent='Could not restore this backup. Check the file and password.';error.hidden=false;
+        const msg=String(err?.message||'');
+        error.textContent=/decrypt|operation|data/i.test(msg)
+          ? 'Could not unlock this backup. Check the password and file.'
+          : 'The backup opened, but its data could not be restored.';
+        error.hidden=false;
       }finally{
         action.disabled=false;action.textContent='RESTORE';
       }
@@ -2275,7 +2286,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.17');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.18');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

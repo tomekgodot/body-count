@@ -174,17 +174,29 @@ async function renderAdd(){
 
     <div class="quick-field mental-note-field">
       <div class="quick-memory-block">
-        <label class="quick-memory-label" for="lastMemory">MEMORY CUE</label>
-        <textarea id="lastMemory" placeholder="One thing you’ll remember him by…"></textarea>
-        <div class="quick-memory-helper">You can add more details later.</div>
+        <label class="quick-memory-label" for="memory">MEMORY CUE</label>
+        <div class="quick-memory-field">
+          <textarea id="memory" aria-label="Memory cue">${esc(state.quick.memory||'')}</textarea>
+          <div class="quick-memory-placeholder" id="quickMemoryPlaceholder">
+            <div class="quick-memory-primary">One thing you’ll remember him by…</div>
+            <div class="quick-memory-secondary">You can add more details later.</div>
+          </div>
+        </div>
       </div>
-      </div>${esc(state.quick.memory||'')}</textarea>
     </div>
 
     <button class="primary quick-save" id="save" ${mode==='existing'&&!selected?'disabled':''}>ADD</button>
   </section>`;
 
   document.getElementById('back').onclick=()=>{state.screen='home';render()};
+
+  const memoryField=document.getElementById('memory');
+  const quickMemoryPlaceholder=document.getElementById('quickMemoryPlaceholder');
+  const syncQuickMemoryPlaceholder=()=>{
+    if(quickMemoryPlaceholder) quickMemoryPlaceholder.hidden=Boolean((memoryField?.value||'').length);
+  };
+  syncQuickMemoryPlaceholder();
+  memoryField?.addEventListener('input',syncQuickMemoryPlaceholder);
 
   document.getElementById('existingLink')?.addEventListener('click',()=>{
     state.quick={
@@ -302,9 +314,9 @@ async function renderAboutHim(){
     <section class="about-minimal-section spicy-details-section">
       <div class="about-minimal-label">SPICY DETAILS</div>
       <div class="about-symbols persistent-symbols about-minimal-symbols">
-        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
-        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=88" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="egg"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
+        <button class="about-symbol art-symbol" data-subopen="drop"><img src="assets/detail-drops.png?v=89" alt=""></button>
       </div>
     </section>
   </main>`;
@@ -379,9 +391,9 @@ async function renderPenis(){
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen penis-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPenis">‹</button><div></div><span></span></div>
     <nav class="private-tabs">
-      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=88" alt=""></button>
+      <button class="on" data-go-private="penis"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=89" alt=""></button>
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
@@ -463,9 +475,9 @@ async function renderPeach(){
 
   app.innerHTML=`<main class="private-detail-screen compact-choice-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backPeach">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
-      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
-      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=88" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
+      <button class="on" data-go-private="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
+      <button class="" data-go-private="drops"><img src="assets/detail-drops.png?v=89" alt=""></button>
     </nav>
 ${row('SIZE','size',[['small','Small'],['average','Average'],['big','Big']])}
     ${row('SHAPE','shape',[['flat','Flat'],['round','Round'],['bubble','Bubble'],['wide','Wide']])}
@@ -508,9 +520,9 @@ async function renderDrops(){
 
   app.innerHTML=`<main class="private-detail-screen detail-natural drops-screen">
     <div class="about-top compact-detail-top"><button class="about-back" id="backDrops">‹</button><div></div><span></span></div><nav class="private-tabs">
-      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=88" alt=""></button>
-      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=88" alt=""></button>
-      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=88" alt=""></button>
+      <button class="" data-go-private="penis"><img src="assets/detail-eggplant.png?v=89" alt=""></button>
+      <button class="" data-go-private="peach"><img src="assets/detail-peach.png?v=89" alt=""></button>
+      <button class="on" data-go-private="drops"><img src="assets/detail-drops.png?v=89" alt=""></button>
     </nav>
 <section class="detail-block drops-block">
       <div class="detail-label">LOAD</div>
@@ -960,13 +972,13 @@ function privateSummary(p){
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
   ].filter(Boolean);
   if(penisBits.length || (penis.note||'').trim()){
-    out.push({icon:'assets/detail-eggplant.png?v=88',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
+    out.push({icon:'assets/detail-eggplant.png?v=89',label:'Penis',bits:penisBits,note:(penis.note||'').trim()});
   }
 
   const peach=a.peach||{};
   const peachBits=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).map(titleCase);
   if(peachBits.length || (peach.note||'').trim()){
-    out.push({icon:'assets/detail-peach.png?v=88',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
+    out.push({icon:'assets/detail-peach.png?v=89',label:'Ass',bits:peachBits,note:(peach.note||'').trim()});
   }
 
   const drops=a.drops||{};
@@ -974,7 +986,7 @@ function privateSummary(p){
   const distance={flow:'Flow',short:'Quick shot',long:'Long shot'}[drops.distance];
   const dropBits=[amount,distance].filter(Boolean);
   if(dropBits.length || (drops.note||'').trim()){
-    out.push({icon:'assets/detail-drops.png?v=88',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
+    out.push({icon:'assets/detail-drops.png?v=89',label:'Cum',bits:dropBits,note:(drops.note||'').trim()});
   }
   return out;
 }
@@ -1342,7 +1354,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=8.8');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=8.9');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

@@ -3567,3 +3567,35 @@ body.modal-open{
 .name-edit-input:focus{border-color:rgba(239,189,134,.20)}
 .spicy-summary-label{display:none!important}
 .timeline-group{display:none!important}.timeline-list::before{top:8px!important}
+
+/* v8.9 — Memory Cue helper sits inside the textarea field */
+.quick-memory-field{position:relative}
+.quick-memory-field textarea{
+  position:relative;
+  z-index:1;
+  width:100%;
+  min-height:88px;
+  box-sizing:border-box;
+  resize:none;
+}
+.quick-memory-placeholder{
+  position:absolute;
+  z-index:2;
+  left:14px;
+  right:14px;
+  top:13px;
+  pointer-events:none;
+}
+.quick-memory-placeholder[hidden]{display:none!important}
+.quick-memory-primary{
+  color:rgba(255,255,255,.42);
+  font-size:13px;
+  line-height:1.35;
+}
+.quick-memory-secondary{
+  margin-top:5px;
+  color:rgba(255,255,255,.22);
+  font-size:10.5px;
+  line-height:1.3;
+}
+.quick-memory-helper{display:none!important}

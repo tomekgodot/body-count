@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.25';
+const APP_VERSION='10.27';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -104,22 +104,28 @@ const MAX_BACKUP_ENCOUNTERS=50000;
 const MAX_BACKUP_PHOTOS=10000;
 const MAX_BACKUP_PHOTO_BYTES=12*1024*1024;
 
-function assertSafeBackupTree(value,depth=0){
+function assertSafeBackupTree(value,depth=0,path=[]){
   if(depth>20) throw new Error('Backup nesting is too deep');
   if(typeof value==='string'){
-    if(value.length>100000) throw new Error('Backup text field is too large');
+    const isPhotoData=
+      path.length===4 &&
+      path[0]==='photos' &&
+      Number.isInteger(path[1]) &&
+      path[2]==='blob' &&
+      path[3]==='data';
+    if(!isPhotoData && value.length>100000) throw new Error('Backup text field is too large');
     return;
   }
   if(value===null || ['number','boolean'].includes(typeof value)) return;
   if(Array.isArray(value)){
     if(value.length>100000) throw new Error('Backup array is too large');
-    value.forEach(v=>assertSafeBackupTree(v,depth+1));
+    value.forEach((v,i)=>assertSafeBackupTree(v,depth+1,[...path,i]));
     return;
   }
   if(typeof value==='object'){
     for(const [k,v] of Object.entries(value)){
       if(k==='__proto__'||k==='prototype'||k==='constructor') throw new Error('Unsafe backup key');
-      assertSafeBackupTree(v,depth+1);
+      assertSafeBackupTree(v,depth+1,[...path,k]);
     }
     return;
   }
@@ -160,6 +166,8 @@ function validateBackupPayload(payload){
     if(e.rating!==undefined && (!Number.isFinite(Number(e.rating))||Number(e.rating)<0||Number(e.rating)>5)) throw new Error('Invalid rating');
   });
 
+  // Photo base64 is intentionally exempt from the generic 100k text limit above.
+  // It is validated here by MIME type, person reference and the dedicated 12 MB photo limit.
   const allowedPhotoTypes=new Set(['image/jpeg','image/png','image/webp','image/heic','image/heif']);
   const photoIds=new Set();
   payload.photos.forEach(x=>{
@@ -1138,7 +1146,7 @@ async function renderPenis(){
   p.about ||= {};
   p.about.penis ||= {};
   const d=p.about.penis;
-  if(d.girth==='Massive') d.girth='Thick';
+  if(d.girth==='Massive' || d.girth==='Thick') d.girth='Extra Thick';
   if('veins' in d) delete d.veins;
   if(!d.curveVertical && ['Curved up','Straight','Curved down'].includes(d.curve)) d.curveVertical=d.curve;
   if(d.curve==='Sideways' && !d.sideways) d.sideways=true;
@@ -1160,7 +1168,7 @@ async function renderPenis(){
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
-    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Thick','Thick']])}
+    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Extra Thick','Extra Thick']])}
     ${row('FORESKIN','foreskin',[['Cut','Cut'],['Uncut','Uncut']])}
 
     <section class="detail-block compact-choice-block">
@@ -1757,9 +1765,10 @@ function privateSummary(p){
   const titleCase=s=>s ? String(s).charAt(0).toUpperCase()+String(s).slice(1) : '';
 
   const penis=a.penis||{};
+  const displayGirth=['Thick','Massive'].includes(penis.girth)?'Extra Thick':penis.girth;
   const penisBits=[
     penis.size,
-    penis.girth,
+    displayGirth,
     penis.foreskin,
     penis.curveVertical,
     penis.sideways ? (penis.curveSide ? `Sideways ${String(penis.curveSide).toLowerCase()}` : 'Sideways') : null
@@ -2256,10 +2265,13 @@ function collectionDescription(p){
   // "Impressive" private traits always deserve a mention.
   const size=String(penis.size||'').toUpperCase();
   const girth=String(penis.girth||'').toLowerCase();
+  const extraThick=['extra thick','thick','massive'].includes(girth);
   const impressive=[];
-  if(size==='XXL') impressive.push('an XXL dick');
+  if(size==='XXL' && extraThick) impressive.push('an enormous dick');
+  else if(size==='XL' && extraThick) impressive.push('a massive dick');
+  else if(size==='XXL') impressive.push('an XXL dick');
   else if(size==='XL') impressive.push('an XL dick');
-  if(girth==='massive' || girth==='thick') impressive.push('a massive dick');
+  else if(extraThick) impressive.push('an extra-thick dick');
   if(String(drops.amount||'').toLowerCase()==='high') impressive.push('a big load');
   if(String(drops.distance||'').toLowerCase()==='long') impressive.push('an impressive shot');
 
@@ -2286,15 +2298,6 @@ function collectionDescription(p){
       const buttWord=chosen.includes('bubble') ? 'butt' : 'ass';
       impressive.push(`a ${chosen.join(' ')} ${buttWord}`);
     }
-  }
-
-  // Avoid saying "XXL dick and massive dick": merge those into one natural phrase.
-  if(impressive.includes('an XXL dick') && impressive.includes('a massive dick')){
-    impressive.splice(impressive.indexOf('a massive dick'),1);
-    impressive[impressive.indexOf('an XXL dick')]='a massive XXL dick';
-  }else if(impressive.includes('an XL dick') && impressive.includes('a massive dick')){
-    impressive.splice(impressive.indexOf('a massive dick'),1);
-    impressive[impressive.indexOf('an XL dick')]='a massive XL dick';
   }
 
   const aboutCount=[age,height,build,type,ethnicity].filter(Boolean).length;
@@ -2402,7 +2405,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.25');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.27');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

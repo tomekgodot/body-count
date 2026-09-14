@@ -4227,7 +4227,7 @@ body.modal-open{
 }
 
 
-/* v10.18 — legible gradient action labels */
+/* v10.19 — legible gradient action labels */
 .quick-save,
 .flow-done,
 .about-done-wide{
@@ -4255,7 +4255,7 @@ body.modal-open{
   -webkit-text-fill-color:rgba(255,255,255,.42)!important;
 }
 
-/* v10.18 — five stars form one purple-to-peach gradient */
+/* v10.19 — five stars form one purple-to-peach gradient */
 .enc-stars button.on{
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
@@ -4270,7 +4270,7 @@ body.modal-open{
 .enc-stars button.on:nth-child(4){background-position:75% 50%!important}
 .enc-stars button.on:nth-child(5){background-position:100% 50%!important}
 
-/* v10.18 — profile spicy icons: larger and vertically aligned with copy */
+/* v10.19 — profile spicy icons: larger and vertically aligned with copy */
 .spicy-summary-row{
   grid-template-columns:40px 1fr!important;
   gap:12px!important;
@@ -4284,7 +4284,7 @@ body.modal-open{
 }
 
 
-/* v10.18 — final polish */
+/* v10.19 — final polish */
 .spicy-summary-row{
   grid-template-columns:46px 1fr!important;
   gap:13px!important;
@@ -4307,7 +4307,7 @@ body.modal-open{
 }
 
 
-/* v10.18 — custom Type + compact ethnicity row */
+/* v10.19 — custom Type + compact ethnicity row */
 .about-custom-input{
   width:100%;
   box-sizing:border-box;
@@ -4331,7 +4331,7 @@ body.modal-open{
 }
 
 
-/* v10.18 — profile action polish */
+/* v10.19 — profile action polish */
 .profile-add-encounter-wide{
   border:1px solid transparent!important;
   background:
@@ -4344,7 +4344,7 @@ body.modal-open{
 }
 
 
-/* v10.18 — restore drops icon visibility */
+/* v10.19 — restore drops icon visibility */
 .persistent-symbols .spicy-drops img{
   display:block!important;
   width:100%!important;
@@ -4363,9 +4363,71 @@ body.modal-open{
 }
 
 
-/* v10.18 — centered dialogs + consistently legible outlined actions */
+/* v10.19 — centered dialogs + consistently legible outlined actions */
 .settings-modal{align-items:center!important;padding:18px!important;box-sizing:border-box!important}
 .settings-modal-sheet{width:min(calc(100% - 36px),520px)!important;max-height:calc(100dvh - 36px)!important;overflow:auto!important;padding:20px 18px!important;border-radius:22px!important}
 .quick-save,.flow-done,.about-done-wide,.name-edit-done,.note-done,.backup-modal-action,.profile-add-encounter-wide{border:1px solid transparent!important;background:linear-gradient(#050505,#050505) padding-box,var(--bc-gradient) border-box!important;color:#fff!important;-webkit-text-fill-color:#fff!important;-webkit-background-clip:border-box!important;background-clip:border-box!important}
 .quick-save::before,.flow-done::before,.about-done-wide::before{content:none!important}
 .backup-modal-action:disabled,.quick-save:disabled{color:rgba(255,255,255,.42)!important;-webkit-text-fill-color:rgba(255,255,255,.42)!important}
+
+
+/* v10.19 — action buttons: white labels + visible purple→peach outline */
+.quick-save,
+.flow-done,
+.about-done-wide,
+.name-edit-done,
+.note-done,
+.backup-modal-action,
+.profile-add-encounter-wide{
+  position:relative!important;
+  isolation:isolate!important;
+  border:1px solid transparent!important;
+  background:#050505!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  background-clip:padding-box!important;
+}
+.quick-save::after,
+.flow-done::after,
+.about-done-wide::after,
+.name-edit-done::after,
+.note-done::after,
+.backup-modal-action::after,
+.profile-add-encounter-wide::after{
+  content:""!important;
+  position:absolute!important;
+  inset:-1px!important;
+  border-radius:inherit!important;
+  padding:1px!important;
+  background:var(--bc-gradient)!important;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)!important;
+  -webkit-mask-composite:xor!important;
+  mask-composite:exclude!important;
+  pointer-events:none!important;
+  z-index:1!important;
+}
+
+.profile-memory-edit-label{
+  margin:15px 0 7px;
+  color:rgba(255,255,255,.46);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.11em;
+}
+.profile-memory-edit{
+  min-height:86px!important;
+}
+.nav-ico{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.nav-ico svg{
+  width:21px!important;
+  height:21px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}

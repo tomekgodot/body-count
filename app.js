@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.18';
+const APP_VERSION='10.19';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -296,11 +296,15 @@ async function render(){
   });
 }
 function nav(active='home'){
+  const countIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>`;
+  const peopleIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.8 19c.6-4 2.8-6 6.2-6s5.6 2 6.2 6"/></svg>`;
+  const statsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19V11M12 19V6M18 19V9"/></svg>`;
+  const settingsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"/><circle cx="12" cy="12" r="8.2"/></svg>`;
   return `<nav class="bottom-nav">
-    <button class="navbtn ${active==='home'?'active':''}" data-nav="home"><span class="nav-ico">○</span><span>COUNT</span></button>
-    <button class="navbtn ${active==='collection'?'active':''}" data-nav="collection"><span class="nav-ico">◫</span><span>PEOPLE</span></button>
-    <button class="navbtn ${active==='insights'?'active':''}" data-nav="insights"><span class="nav-ico">⌁</span><span>STATS</span></button>
-    <button class="navbtn ${active==='you'?'active':''}" data-nav="you"><span class="nav-ico">◌</span><span>SETTINGS</span></button>
+    <button class="navbtn ${active==='home'?'active':''}" data-nav="home"><span class="nav-ico">${countIcon}</span><span>COUNT</span></button>
+    <button class="navbtn ${active==='collection'?'active':''}" data-nav="collection"><span class="nav-ico">${peopleIcon}</span><span>PEOPLE</span></button>
+    <button class="navbtn ${active==='insights'?'active':''}" data-nav="insights"><span class="nav-ico">${statsIcon}</span><span>STATS</span></button>
+    <button class="navbtn ${active==='you'?'active':''}" data-nav="you"><span class="nav-ico">${settingsIcon}</span><span>SETTINGS</span></button>
   </nav>`;
 }
 function attachNav(){document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{state.screen=b.dataset.nav;render()})}
@@ -578,7 +582,7 @@ async function renderBackup(){
   app.innerHTML=`<main class="backup-screen">
     <header class="backup-head">
       <button class="backup-back" id="backupBack" type="button" aria-label="Back">‹</button>
-      <div><div class="backup-kicker">DATA</div><h1>Backup</h1></div>
+      <div><h1>Backup</h1></div>
       <span></span>
     </header>
 
@@ -1950,10 +1954,12 @@ async function renderPerson(){
       <button class="note-modal-backdrop" id="nameEditBackdrop" type="button" aria-label="Close"></button>
       <section class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="nameEditTitle">
         <div class="note-sheet-head">
-          <div><div class="note-sheet-kicker">NAME / NICK</div><h2 id="nameEditTitle">Who is he?</h2></div>
+          <div><div class="note-sheet-kicker">EDIT</div><h2 id="nameEditTitle">Name & memory cue</h2></div>
           <button class="note-close" id="nameEditClose" type="button" aria-label="Close">×</button>
         </div>
         <input class="name-edit-input" id="nameEditInput" value="${esc(p.name||'')}" placeholder="Name / Nick">
+        <div class="profile-memory-edit-label">MEMORY CUE</div>
+        <textarea class="note-textarea profile-memory-edit" id="memoryEditInput" placeholder="One thing you’ll remember him by…">${esc(p.memory||'')}</textarea>
         <button class="name-edit-done" id="nameEditDone" type="button">DONE</button>
       </section>
     </div>
@@ -2085,6 +2091,7 @@ async function renderPerson(){
 
   const nameEditModal=document.getElementById('nameEditModal');
   const nameEditInput=document.getElementById('nameEditInput');
+  const memoryEditInput=document.getElementById('memoryEditInput');
   const editNameButton=document.getElementById('editName');
   const profileNameText=document.getElementById('profileNameText');
   const openNameEdit=()=>{nameEditModal.hidden=false;document.body.classList.add('modal-open');setTimeout(()=>{nameEditInput.focus();nameEditInput.select()},80)};
@@ -2094,6 +2101,12 @@ async function renderPerson(){
   document.getElementById('nameEditClose').onclick=closeNameEdit;
   document.getElementById('nameEditDone').onclick=closeNameEdit;
   nameEditInput.oninput=async()=>{p.name=nameEditInput.value.trim();await put('people',p);profileNameText.textContent=displayName(p)};
+  memoryEditInput.oninput=async()=>{
+    p.memory=memoryEditInput.value;
+    await put('people',p);
+    const memoryEl=document.getElementById('profileMemoryText');
+    if(memoryEl) memoryEl.textContent=p.memory;
+  };
 
   const personNoteModal=document.getElementById('personNoteModal');
   const personNoteButton=document.getElementById('personNoteButton');
@@ -2286,7 +2299,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.18');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.19');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

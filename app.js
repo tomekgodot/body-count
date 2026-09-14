@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.28';
+const APP_VERSION='10.29';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -2178,7 +2178,10 @@ async function renderEncounter(){
 
 function timelineSortKey(e){
   const w=e.when||{};
-  if(w.precision==='range')return new Date(Number(w.to||w.from)||0,11,31).getTime();
+  if(w.precision==='range'){
+    const from=Number(w.from)||0,to=Math.max(from,Number(w.to)||from);
+    return new Date((from+to)/2,6,1).getTime();
+  }
   if(w.precision==='year')return new Date(Number(w.year)||0,6,1).getTime();
   if(w.precision==='season')return new Date(Number(w.year)||0,({Winter:1,Spring:4,Summer:7,Autumn:10,Fall:10}[w.season]||7)-1,15).getTime();
   if(w.precision==='month')return new Date(Number(w.year)||0,(Number(w.month)||1)-1,15).getTime();
@@ -2198,7 +2201,7 @@ function timelineShortDate(e){
   const w=e.when||{};
   if(w.precision==='exact'||!w.precision){
     const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
-    if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{day:'numeric',month:'short'}).format(d);
+    if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{day:'numeric',month:'short',year:'numeric'}).format(d);
   }
   if(w.precision==='month'){
     const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -2432,7 +2435,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.28');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.29');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

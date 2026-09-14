@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.27';
+const APP_VERSION='10.28';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -1146,7 +1146,7 @@ async function renderPenis(){
   p.about ||= {};
   p.about.penis ||= {};
   const d=p.about.penis;
-  if(d.girth==='Massive' || d.girth==='Thick') d.girth='Extra Thick';
+  if(d.girth==='Massive') d.girth='Extra Thick';
   if('veins' in d) delete d.veins;
   if(!d.curveVertical && ['Curved up','Straight','Curved down'].includes(d.curve)) d.curveVertical=d.curve;
   if(d.curve==='Sideways' && !d.sideways) d.sideways=true;
@@ -1168,7 +1168,7 @@ async function renderPenis(){
     </nav>
 
     ${row('SIZE','size',[['S','S'],['M','M'],['L','L'],['XL','XL'],['XXL','XXL']])}
-    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Extra Thick','Extra Thick']])}
+    ${row('GIRTH','girth',[['Slim','Slim'],['Average','Average'],['Thick','Thick'],['Extra Thick','Extra Thick']])}
     ${row('FORESKIN','foreskin',[['Cut','Cut'],['Uncut','Uncut']])}
 
     <section class="detail-block compact-choice-block">
@@ -1765,7 +1765,7 @@ function privateSummary(p){
   const titleCase=s=>s ? String(s).charAt(0).toUpperCase()+String(s).slice(1) : '';
 
   const penis=a.penis||{};
-  const displayGirth=['Thick','Massive'].includes(penis.girth)?'Extra Thick':penis.girth;
+  const displayGirth=penis.girth==='Massive'?'Extra Thick':penis.girth;
   const penisBits=[
     penis.size,
     displayGirth,
@@ -2262,16 +2262,43 @@ function collectionDescription(p){
   if(String(tr).toLowerCase()==='other' && String(a.typeOther||'').trim()) type=String(a.typeOther).trim().toLowerCase();
   const ethnicity={white:'White',black:'Black',asian:'Asian',mixed:'Mixed'}[String(a.ethnicity||'').toLowerCase()]||'';
 
-  // "Impressive" private traits always deserve a mention.
+  // Natural penis wording from the combination of length and girth.
   const size=String(penis.size||'').toUpperCase();
-  const girth=String(penis.girth||'').toLowerCase();
-  const extraThick=['extra thick','thick','massive'].includes(girth);
+  const rawGirth=String(penis.girth||'').toLowerCase();
+  const girth=rawGirth==='massive'?'extra thick':rawGirth;
   const impressive=[];
-  if(size==='XXL' && extraThick) impressive.push('an enormous dick');
-  else if(size==='XL' && extraThick) impressive.push('a massive dick');
-  else if(size==='XXL') impressive.push('an XXL dick');
-  else if(size==='XL') impressive.push('an XL dick');
-  else if(extraThick) impressive.push('an extra-thick dick');
+
+  let penisPhrase='';
+  const stableVariant=(Number(p.id)||Number(p.anonymousNumber)||0)%2===0;
+
+  if(size==='S'){
+    if(girth==='slim') penisPhrase='a tiny dick';
+    else if(girth==='average') penisPhrase='a small dick';
+    else if(girth==='thick'||girth==='extra thick') penisPhrase='a small but fat dick';
+  }else if(size==='M'){
+    if(girth==='slim') penisPhrase='a slim dick';
+    else if(girth==='average') penisPhrase='a regular dick';
+    else if(girth==='thick') penisPhrase='a thick dick';
+    else if(girth==='extra thick') penisPhrase='a fat dick';
+  }else if(size==='L'){
+    if(girth==='slim') penisPhrase='a long, slim dick';
+    else if(girth==='average'||girth==='thick') penisPhrase='a big dick';
+    else if(girth==='extra thick') penisPhrase='a big, fat dick';
+  }else if(size==='XL'){
+    if(girth==='slim') penisPhrase='a long dick';
+    else if(girth==='average') penisPhrase=stableVariant?'an XL dick':'a very big dick';
+    else if(girth==='thick'||girth==='extra thick') penisPhrase='a massive dick';
+  }else if(size==='XXL'){
+    if(girth==='slim') penisPhrase='a very long dick';
+    else if(girth==='average') penisPhrase='an XXL dick';
+    else if(girth==='thick') penisPhrase='a massive dick';
+    else if(girth==='extra thick') penisPhrase='an enormous dick';
+  }else{
+    if(girth==='slim') penisPhrase='a slim dick';
+    else if(girth==='thick') penisPhrase='a thick dick';
+    else if(girth==='extra thick') penisPhrase='a fat dick';
+  }
+  if(penisPhrase) impressive.push(penisPhrase);
   if(String(drops.amount||'').toLowerCase()==='high') impressive.push('a big load');
   if(String(drops.distance||'').toLowerCase()==='long') impressive.push('an impressive shot');
 
@@ -2405,7 +2432,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.27');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.28');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

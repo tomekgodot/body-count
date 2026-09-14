@@ -1,10 +1,10 @@
-const CACHE='body-count-v10.22';
+const CACHE='body-count-v10.25';
 const ASSETS=[
   './',
   './index.html',
-  './styles.css?v=10.22',
-  './app.js?v=10.22',
-  './manifest.webmanifest?v=10.22',
+  './styles.css?v=10.25',
+  './app.js?v=10.25',
+  './manifest.webmanifest?v=10.25',
   './icon.svg',
   './brand-mark.png',
   './assets/age-young.jpg?v=109',

@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.22';
+const APP_VERSION='10.25';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -306,7 +306,7 @@ function nav(active='home'){
   const countIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>`;
   const peopleIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.8 19c.6-4 2.8-6 6.2-6s5.6 2 6.2 6"/></svg>`;
   const statsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19V11M12 19V6M18 19V9"/></svg>`;
-  const settingsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.35 6.35l1.4 1.4M16.25 16.25l1.4 1.4M17.65 6.35l-1.4 1.4M7.75 16.25l-1.4 1.4"/></svg>`;
+  const settingsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.5h4l.5 2 1.7 1 2-.6 2 3.4-1.5 1.4v2.6l1.5 1.4-2 3.4-2-.6-1.7 1-.5 2h-4l-.5-2-1.7-1-2 .6-2-3.4 1.5-1.4v-2.6L3.8 9.3l2-3.4 2 .6 1.7-1 .5-2Z"/><circle cx="12" cy="12" r="2.8"/></svg>`;
   return `<nav class="bottom-nav">
     <button class="navbtn ${active==='home'?'active':''}" data-nav="home"><span class="nav-ico">${countIcon}</span><span>COUNT</span></button>
     <button class="navbtn ${active==='collection'?'active':''}" data-nav="collection"><span class="nav-ico">${peopleIcon}</span><span>PEOPLE</span></button>
@@ -434,10 +434,6 @@ async function renderStats(){
     const es=byPerson.get(p.id)||[];
     return es.length===1 && !es.some(e=>e.when?.multipleEncounters===true);
   });
-  const mostSeen=[...people].sort((a,b)=>(byPerson.get(b.id)||[]).length-(byPerson.get(a.id)||[]).length)[0];
-  const mostSeenN=mostSeen?(byPerson.get(mostSeen.id)||[]).length:0;
-  const repeatRate=people.length?Math.round(repeaters.length/people.length*100):0;
-
   const rated=encounters.filter(e=>Number(e.rating)>0);
   const average=rated.length?(rated.reduce((n,e)=>n+Number(e.rating),0)/rated.length).toFixed(1):null;
   const fiveEnc=rated.filter(e=>Number(e.rating)===5).length;
@@ -473,7 +469,7 @@ async function renderStats(){
 
     <section class="stats-section"><div class="stats-section-title">THE NUMBERS</div><div class="stats-number-grid">${sexStats.map(([label,value])=>`<div class="stats-number-card"><strong>${value}</strong><span>${label}</span></div>`).join('')}</div><div class="stats-based">Unique guys · based on recorded encounter details</div></section>
 
-    <section class="stats-section"><div class="stats-section-title">ENCORES</div><div class="stats-mini-grid"><div><strong>${oneHits.length}</strong><span>ONE HIT WONDERS</span></div><div><strong>${repeaters.length}</strong><span>ENCORES</span></div><div><strong>${repeatRate}%</strong><span>ENCORE RATE</span></div><div><strong>${mostSeenN}</strong><span>MOST ENCOUNTERS</span></div></div>${mostSeenN>1?`<div class="stats-callout">${esc(displayName(mostSeen))}</div>`:''}</section>
+    <section class="stats-section"><div class="stats-section-title">ENCORES</div><div class="stats-mini-grid"><div><strong>${oneHits.length}</strong><span>ONE-NIGHT STANDS</span></div><div><strong>${repeaters.length}</strong><span>ENCORES</span></div></div></section>
 
     ${barBlock('TYPE',type)}${barBlock('BUILD',build)}${barBlock('HEIGHT',height)}${barBlock('AGE',age)}
 
@@ -481,7 +477,7 @@ async function renderStats(){
 
     <section class="stats-section"><div class="stats-section-title">TIME</div><div class="stats-mini-grid"><div><strong>${thisYearN}</strong><span>THIS YEAR</span></div><div><strong>${thisMonthN}</strong><span>THIS MONTH</span></div>${busiest?`<div class="stats-wide"><strong>${busiest[1]}</strong><span>MOST ACTIVE MONTH · ${busiestLabel.toUpperCase()}</span></div>`:''}</div>${exactMonths.length?`<div class="stats-based">Monthly stats use encounters with an exact date or month</div>`:''}</section>
 
-    ${(yourType||mostSeenN>1)?`<section class="stats-section stats-fun"><div class="stats-section-title">FUN STATS</div>${yourType?`<div class="stats-fun-row"><span>YOUR TYPE</span><strong>${esc(yourType)}</strong></div>`:''}${mostSeenN>1?`<div class="stats-fun-row"><span>COMEBACK KING</span><strong>${esc(displayName(mostSeen))} · ${mostSeenN} encounters</strong></div>`:''}${busiest?`<div class="stats-fun-row"><span>BUSIEST MONTH</span><strong>${busiestLabel}</strong></div>`:''}</section>`:''}
+    ${(yourType||busiest)?`<section class="stats-section stats-fun"><div class="stats-section-title">FUN STATS</div>${yourType?`<div class="stats-fun-row"><span>YOUR TYPE</span><strong>${esc(yourType)}</strong></div>`:''}${busiest?`<div class="stats-fun-row"><span>BUSIEST MONTH</span><strong>${busiestLabel}</strong></div>`:''}</section>`:''}
     ${nav('insights')}
   </main>`;
   attachNav();
@@ -1893,7 +1889,7 @@ async function renderPerson(){
           <h1 id="profileNameText">${esc(displayName(p))}</h1>
           <button class="profile-name-edit" id="editName" type="button" aria-label="Edit name">✎</button>
         </div>
-        ${note?`<p>${esc(note)}</p>`:''}
+        ${note?`<p id="profileMemoryText">${esc(note)}</p>`:`<p id="profileMemoryText" hidden></p>`}
       </div>
       <div class="profile-head-tools">
         ${avg==='—'?'':`<div class="profile-average"><span>★</span>${avg}</div>`}
@@ -1967,7 +1963,7 @@ async function renderPerson(){
         </div>
         <input class="name-edit-input" id="nameEditInput" value="${esc(p.name||'')}" placeholder="Name / Nick">
         <div class="profile-memory-edit-label">MEMORY CUE</div>
-        <textarea class="note-textarea profile-memory-edit" id="memoryEditInput" placeholder="One thing you’ll remember him by…">${esc(p.memory||'')}</textarea>
+        <textarea class="note-textarea profile-memory-edit" id="memoryEditInput" placeholder="One thing you’ll remember him by…">${esc(p.lastMemory||'')}</textarea>
         <button class="name-edit-done" id="nameEditDone" type="button">DONE</button>
       </section>
     </div>
@@ -2110,10 +2106,13 @@ async function renderPerson(){
   document.getElementById('nameEditDone').onclick=closeNameEdit;
   nameEditInput.oninput=async()=>{p.name=nameEditInput.value.trim();await put('people',p);profileNameText.textContent=displayName(p)};
   memoryEditInput.oninput=async()=>{
-    p.memory=memoryEditInput.value;
+    p.lastMemory=memoryEditInput.value;
     await put('people',p);
     const memoryEl=document.getElementById('profileMemoryText');
-    if(memoryEl) memoryEl.textContent=p.memory;
+    if(memoryEl){
+      memoryEl.textContent=p.lastMemory;
+      memoryEl.hidden=!p.lastMemory.trim();
+    }
   };
 
   const personNoteModal=document.getElementById('personNoteModal');
@@ -2240,22 +2239,118 @@ async function renderTimeline(){
 }
 function collectionDescription(p){
   const a=p.about||{};
-  const age={young:'young','30s':'in his 30s',middle:'middle-aged',older:'older'}[a.ageBand];
-  const height={short:'short',medium:'medium-height',tall:'tall'}[a.heightBand];
+  const penis=a.penis||{};
+  const peach=a.peach||{};
+  const drops=a.drops||{};
+
+  const age={young:'young','30s':'in his 30s',middle:'middle-aged',older:'older'}[a.ageBand]||'';
+  const height={short:'short',medium:'medium-height',tall:'tall'}[a.heightBand]||'';
   const br=(Array.isArray(a.build)&&a.build[0])||a.buildVisual||'';
-  const build={slim:'slim',average:'average-build',athletic:'athletic',big:'big'}[String(br).toLowerCase()];
+  const build={slim:'slim',average:'average-build',athletic:'athletic',big:'big'}[String(br).toLowerCase()]||'';
   const tr=(Array.isArray(a.types)&&a.types[0])||a.type||'';
-  const type={twink:'twink',bear:'bear',daddy:'daddy',otter:'otter'}[String(tr).toLowerCase()];
-  const traits=[height,build,type].filter(Boolean);
-  if(!traits.length&&!age)return '';
-  let lead=traits.join(' ');
-  if(lead)lead=lead[0].toUpperCase()+lead.slice(1);
-  if(age){
-    if(!lead)return age[0].toUpperCase()+age.slice(1)+'.';
-    if(age==='in his 30s')return `${lead} in his 30s.`;
-    return `${lead}, ${age}.`;
+  const typeMap={twink:'twink',twunk:'twunk',bear:'bear',daddy:'daddy',otter:'otter',regular:'guy',jock:'jock',cub:'cub'};
+  let type=typeMap[String(tr).toLowerCase()]||'';
+  if(String(tr).toLowerCase()==='other' && String(a.typeOther||'').trim()) type=String(a.typeOther).trim().toLowerCase();
+  const ethnicity={white:'White',black:'Black',asian:'Asian',mixed:'Mixed'}[String(a.ethnicity||'').toLowerCase()]||'';
+
+  // "Impressive" private traits always deserve a mention.
+  const size=String(penis.size||'').toUpperCase();
+  const girth=String(penis.girth||'').toLowerCase();
+  const impressive=[];
+  if(size==='XXL') impressive.push('an XXL dick');
+  else if(size==='XL') impressive.push('an XL dick');
+  if(girth==='massive' || girth==='thick') impressive.push('a massive dick');
+  if(String(drops.amount||'').toLowerCase()==='high') impressive.push('a big load');
+  if(String(drops.distance||'').toLowerCase()==='long') impressive.push('an impressive shot');
+
+  // If we know more about his ass than his dick, use one or two distinctive peach traits.
+  const penisDataCount=[penis.size,penis.girth,penis.foreskin,penis.curveVertical,penis.sideways,penis.curveSide].filter(Boolean).length;
+  const peachDataCount=[peach.size,peach.shape,peach.firmness,peach.hair].filter(Boolean).length;
+  if(peachDataCount>penisDataCount){
+    const peachTraits=[];
+    const peachSize=String(peach.size||'').toLowerCase();
+    const peachShape=String(peach.shape||'').toLowerCase();
+    const peachFirmness=String(peach.firmness||'').toLowerCase();
+    const peachHair=String(peach.hair||'').toLowerCase();
+
+    // Prefer distinctive traits; generic values only fill a gap when data is sparse.
+    if(peachSize==='big') peachTraits.push('big');
+    if(['bubble','round','wide'].includes(peachShape)) peachTraits.push(peachShape);
+    if(peachFirmness==='firm' && peachTraits.length<2) peachTraits.push('firm');
+    if(peachHair==='hairy' && peachTraits.length<2) peachTraits.push('hairy');
+    if(!peachTraits.length && peachShape) peachTraits.push(peachShape);
+    if(peachTraits.length<2 && peachSize && peachSize!=='average') peachTraits.unshift(peachSize);
+
+    const chosen=[...new Set(peachTraits)].slice(0,2);
+    if(chosen.length){
+      const buttWord=chosen.includes('bubble') ? 'butt' : 'ass';
+      impressive.push(`a ${chosen.join(' ')} ${buttWord}`);
+    }
   }
-  return `${lead}.`;
+
+  // Avoid saying "XXL dick and massive dick": merge those into one natural phrase.
+  if(impressive.includes('an XXL dick') && impressive.includes('a massive dick')){
+    impressive.splice(impressive.indexOf('a massive dick'),1);
+    impressive[impressive.indexOf('an XXL dick')]='a massive XXL dick';
+  }else if(impressive.includes('an XL dick') && impressive.includes('a massive dick')){
+    impressive.splice(impressive.indexOf('a massive dick'),1);
+    impressive[impressive.indexOf('an XL dick')]='a massive XL dick';
+  }
+
+  const aboutCount=[age,height,build,type,ethnicity].filter(Boolean).length;
+  const privateCount=[
+    penis.size,penis.girth,penis.foreskin,penis.curveVertical,
+    peach.size,peach.shape,peach.firmness,peach.hair,
+    drops.amount,drops.distance
+  ].filter(Boolean).length;
+  const dataCount=aboutCount+privateCount;
+
+  let descriptors=[];
+  let ageTail='';
+
+  if(dataCount<=3){
+    // With sparse data, use every useful About Him fact.
+    if(height) descriptors.push(height);
+    if(build) descriptors.push(build);
+    if(ethnicity) descriptors.push(ethnicity);
+    if(type && type!=='guy') descriptors.push(type);
+    if(age) ageTail=age;
+  }else{
+    // With richer profiles, pick distinctive appearance rather than generic values.
+    if(height==='short'||height==='tall') descriptors.push(height);
+    else if(build==='slim'||build==='athletic'||build==='big') descriptors.push(build);
+
+    if(ethnicity==='Asian'||ethnicity==='Black') descriptors.push(ethnicity);
+    else if(ethnicity==='Mixed' && descriptors.length<2) descriptors.push(ethnicity);
+
+    if(type && type!=='guy') descriptors.push(type);
+    if(age && descriptors.length<3) ageTail=age;
+  }
+
+  // Keep the visual identity concise.
+  descriptors=descriptors.slice(0,3);
+  let nounIncluded=descriptors.some(x=>['twink','twunk','bear','daddy','otter','jock','cub'].includes(String(x).toLowerCase()));
+  if(!nounIncluded) descriptors.push('guy');
+
+  let lead=descriptors.join(' ').replace(/\s+/g,' ').trim();
+  if(ageTail){
+    if(ageTail==='in his 30s') lead+=` ${ageTail}`;
+    else if(ageTail==='young') lead=`young ${lead}`;
+    else lead=`${ageTail} ${lead}`;
+  }
+  lead=lead.replace(/\s+/g,' ').trim();
+
+  let sentence=lead;
+  if(impressive.length===1){
+    sentence+=` with ${impressive[0]}`;
+  }else if(impressive.length===2){
+    sentence+=` with ${impressive[0]} and ${impressive[1]}`;
+  }else if(impressive.length>2){
+    sentence+=` with ${impressive.slice(0,-1).join(', ')}, and ${impressive.at(-1)}`;
+  }
+
+  if(!sentence)return '';
+  return sentence[0].toUpperCase()+sentence.slice(1)+'.';
 }
 async function renderCollection(){
   const people=await all('people'), encounters=await all('encounters');
@@ -2307,7 +2402,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.22');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.25');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.19';
+const APP_VERSION='10.22';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -132,24 +132,31 @@ function validateBackupPayload(payload){
   if(payload?.format!=='body-count-backup'||payload?.version!==1) throw new Error('Unsupported backup data');
   if(!Array.isArray(payload.people)||!Array.isArray(payload.encounters)||!Array.isArray(payload.photos)) throw new Error('Invalid backup data');
   payload.settings=Array.isArray(payload.settings)?payload.settings:[];
+  payload.settings=payload.settings.filter(x=>x && typeof x==='object' && typeof x.key==='string' && x.key.length>0);
   if(payload.people.length>MAX_BACKUP_PEOPLE||payload.encounters.length>MAX_BACKUP_ENCOUNTERS||payload.photos.length>MAX_BACKUP_PHOTOS) throw new Error('Backup is too large');
 
   assertSafeBackupTree(payload);
 
   const personIds=new Set();
   payload.people.forEach(p=>{
-    assertSafeId(p?.id,'person id');
-    if(personIds.has(p.id)) throw new Error('Duplicate person id');
-    personIds.add(p.id);
+    const id=Number(p?.id);
+    assertSafeId(id,'person id');
+    p.id=id;
+    if(personIds.has(id)) throw new Error('Duplicate person id');
+    personIds.add(id);
   });
 
   const encounterIds=new Set();
   payload.encounters.forEach(e=>{
-    assertSafeId(e?.id,'encounter id');
-    assertSafeId(e?.personId,'encounter person id');
-    if(encounterIds.has(e.id)) throw new Error('Duplicate encounter id');
-    if(!personIds.has(e.personId)) throw new Error('Encounter references a missing person');
-    encounterIds.add(e.id);
+    const id=Number(e?.id);
+    const personId=Number(e?.personId);
+    assertSafeId(id,'encounter id');
+    assertSafeId(personId,'encounter person id');
+    e.id=id;
+    e.personId=personId;
+    if(encounterIds.has(id)) throw new Error('Duplicate encounter id');
+    if(!personIds.has(personId)) throw new Error('Encounter references a missing person');
+    encounterIds.add(id);
     if(e.rating!==undefined && (!Number.isFinite(Number(e.rating))||Number(e.rating)<0||Number(e.rating)>5)) throw new Error('Invalid rating');
   });
 
@@ -299,7 +306,7 @@ function nav(active='home'){
   const countIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>`;
   const peopleIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.8 19c.6-4 2.8-6 6.2-6s5.6 2 6.2 6"/></svg>`;
   const statsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19V11M12 19V6M18 19V9"/></svg>`;
-  const settingsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"/><circle cx="12" cy="12" r="8.2"/></svg>`;
+  const settingsIcon=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.35 6.35l1.4 1.4M16.25 16.25l1.4 1.4M17.65 6.35l-1.4 1.4M7.75 16.25l-1.4 1.4"/></svg>`;
   return `<nav class="bottom-nav">
     <button class="navbtn ${active==='home'?'active':''}" data-nav="home"><span class="nav-ico">${countIcon}</span><span>COUNT</span></button>
     <button class="navbtn ${active==='collection'?'active':''}" data-nav="collection"><span class="nav-ico">${peopleIcon}</span><span>PEOPLE</span></button>
@@ -329,7 +336,7 @@ async function renderHome(){
       <section class="privacy-sheet" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
         <button class="privacy-close" id="privacyClose" aria-label="Close">×</button>
         <h2 id="privacyTitle">Your data stays here.</h2>
-        <p>Body Count stores your data locally on this device. Nothing is sent to a Body Count server.</p>
+        <p>Body Counter stores your data locally on this device. Nothing is sent to a Body Counter server.</p>
         <p class="privacy-note">Browser or device storage can still be removed, so local storage is not a backup.</p>
       </section>
     </div>
@@ -484,7 +491,7 @@ async function renderStats(){
 function settingsPrivacyCopy(){
   return `<div class="settings-copy">
     <strong>Your data stays on this device.</strong>
-    <p>People, encounters, private notes and photos are stored locally in this browser. Body Count does not upload them to a Body Count server.</p>
+    <p>People, encounters, private notes and photos are stored locally in this browser. Body Counter does not upload them to a Body Counter server.</p>
     <p>Local browser data can still be removed by the browser, the device or you, so it is not a backup. Exported backups are encrypted with the password you choose.</p>
   </div>`;
 }
@@ -508,7 +515,7 @@ async function renderSettings(){
     <section class="settings-section">
       <div class="settings-section-title">APP</div>
       <div class="settings-copy settings-app-copy">
-        <strong>Body Count</strong>
+        <strong>Body Counter</strong>
         <p>Private hookup tracker · Version ${APP_VERSION}</p>
       </div>
     </section>
@@ -527,7 +534,7 @@ async function renderSettings(){
           <div><div class="settings-modal-kicker">DELETE EVERYTHING</div><h2 id="deleteAllTitle">This cannot be undone.</h2></div>
           <button class="settings-modal-close" id="deleteAllClose" type="button" aria-label="Cancel">×</button>
         </div>
-        <p class="settings-modal-copy">Type <strong>DELETE</strong> to permanently erase all Body Count data on this device.</p>
+        <p class="settings-modal-copy">Type <strong>DELETE</strong> to permanently erase all Body Counter data on this device.</p>
         <input class="settings-password" id="deleteAllInput" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="DELETE">
         <button class="settings-confirm-delete" id="confirmDeleteAll" type="button" disabled>DELETE ALL DATA</button>
       </section>
@@ -610,7 +617,7 @@ async function renderBackup(){
           <div><div class="settings-modal-kicker" id="backupPasswordKicker">ENCRYPTED BACKUP</div><h2 id="backupPasswordTitle">Choose a password</h2></div>
           <button class="settings-modal-close" id="backupPasswordClose" type="button" aria-label="Cancel">×</button>
         </div>
-        <p class="settings-modal-copy" id="backupPasswordCopy">You’ll need this password to restore the backup. Body Count cannot recover it for you.</p>
+        <p class="settings-modal-copy" id="backupPasswordCopy">You’ll need this password to restore the backup. Body Counter cannot recover it for you.</p>
         <input class="settings-password" id="backupPassword" type="password" autocomplete="new-password" placeholder="Password">
         <input class="settings-password" id="backupPasswordAgain" type="password" autocomplete="new-password" placeholder="Repeat password">
         <div class="backup-error" id="backupError" hidden></div>
@@ -641,7 +648,7 @@ async function renderBackup(){
   const openExport=()=>{
     mode='export';
     title.textContent='Choose a password';
-    copy.textContent='You’ll need this password to restore the backup. Body Count cannot recover it for you.';
+    copy.textContent='You’ll need this password to restore the backup. Body Counter cannot recover it for you.';
     again.hidden=false;again.value='';
     action.textContent='EXPORT';
     password.autocomplete='new-password';
@@ -651,7 +658,7 @@ async function renderBackup(){
   const openRestore=file=>{
     mode='restore';restoreFile=file;
     title.textContent='Enter backup password';
-    copy.textContent='Restoring will replace the Body Count data currently stored on this device.';
+    copy.textContent='Restoring will replace the Body Counter data currently stored on this device.';
     again.hidden=true;
     action.textContent='RESTORE';
     password.autocomplete='current-password';
@@ -700,10 +707,11 @@ async function renderBackup(){
         alert('Backup restored.');
         state.screen='you';render();
       }catch(err){
-        const msg=String(err?.message||'');
-        error.textContent=/decrypt|operation|data/i.test(msg)
+        const msg=String(err?.message||'').trim();
+        const unlock=/decrypt|operationerror|cipher|encryption/i.test(msg);
+        error.textContent=unlock
           ? 'Could not unlock this backup. Check the password and file.'
-          : 'The backup opened, but its data could not be restored.';
+          : `The backup opened, but restore failed${msg?`: ${msg}`:''}.`;
         error.hidden=false;
       }finally{
         action.disabled=false;action.textContent='RESTORE';
@@ -714,7 +722,7 @@ async function renderBackup(){
 }
 
 function renderPlaceholder(title,copy,active){
-  app.innerHTML=`<div class="topbar"><div><h1 class="screen-title" style="margin:0">${title}</h1><p class="sub" style="margin:6px 0 0">${copy}</p></div></div><div class="card empty" style="margin-top:24px">Coming next. For now, Body Count stays focused on one thing: adding and remembering people.</div>${nav(active)}`;
+  app.innerHTML=`<div class="topbar"><div><h1 class="screen-title" style="margin:0">${title}</h1><p class="sub" style="margin:6px 0 0">${copy}</p></div></div><div class="card empty" style="margin-top:24px">Coming next. For now, Body Counter stays focused on one thing: adding and remembering people.</div>${nav(active)}`;
   attachNav();
 }
 
@@ -2299,7 +2307,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.19');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.22');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

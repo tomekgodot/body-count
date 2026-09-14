@@ -4227,7 +4227,7 @@ body.modal-open{
 }
 
 
-/* v10.19 — legible gradient action labels */
+/* v10.22 — legible gradient action labels */
 .quick-save,
 .flow-done,
 .about-done-wide{
@@ -4255,7 +4255,7 @@ body.modal-open{
   -webkit-text-fill-color:rgba(255,255,255,.42)!important;
 }
 
-/* v10.19 — five stars form one purple-to-peach gradient */
+/* v10.22 — five stars form one purple-to-peach gradient */
 .enc-stars button.on{
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
@@ -4270,7 +4270,7 @@ body.modal-open{
 .enc-stars button.on:nth-child(4){background-position:75% 50%!important}
 .enc-stars button.on:nth-child(5){background-position:100% 50%!important}
 
-/* v10.19 — profile spicy icons: larger and vertically aligned with copy */
+/* v10.22 — profile spicy icons: larger and vertically aligned with copy */
 .spicy-summary-row{
   grid-template-columns:40px 1fr!important;
   gap:12px!important;
@@ -4284,7 +4284,7 @@ body.modal-open{
 }
 
 
-/* v10.19 — final polish */
+/* v10.22 — final polish */
 .spicy-summary-row{
   grid-template-columns:46px 1fr!important;
   gap:13px!important;
@@ -4307,7 +4307,7 @@ body.modal-open{
 }
 
 
-/* v10.19 — custom Type + compact ethnicity row */
+/* v10.22 — custom Type + compact ethnicity row */
 .about-custom-input{
   width:100%;
   box-sizing:border-box;
@@ -4331,7 +4331,7 @@ body.modal-open{
 }
 
 
-/* v10.19 — profile action polish */
+/* v10.22 — profile action polish */
 .profile-add-encounter-wide{
   border:1px solid transparent!important;
   background:
@@ -4344,7 +4344,7 @@ body.modal-open{
 }
 
 
-/* v10.19 — restore drops icon visibility */
+/* v10.22 — restore drops icon visibility */
 .persistent-symbols .spicy-drops img{
   display:block!important;
   width:100%!important;
@@ -4363,7 +4363,7 @@ body.modal-open{
 }
 
 
-/* v10.19 — centered dialogs + consistently legible outlined actions */
+/* v10.22 — centered dialogs + consistently legible outlined actions */
 .settings-modal{align-items:center!important;padding:18px!important;box-sizing:border-box!important}
 .settings-modal-sheet{width:min(calc(100% - 36px),520px)!important;max-height:calc(100dvh - 36px)!important;overflow:auto!important;padding:20px 18px!important;border-radius:22px!important}
 .quick-save,.flow-done,.about-done-wide,.name-edit-done,.note-done,.backup-modal-action,.profile-add-encounter-wide{border:1px solid transparent!important;background:linear-gradient(#050505,#050505) padding-box,var(--bc-gradient) border-box!important;color:#fff!important;-webkit-text-fill-color:#fff!important;-webkit-background-clip:border-box!important;background-clip:border-box!important}
@@ -4371,7 +4371,7 @@ body.modal-open{
 .backup-modal-action:disabled,.quick-save:disabled{color:rgba(255,255,255,.42)!important;-webkit-text-fill-color:rgba(255,255,255,.42)!important}
 
 
-/* v10.19 — action buttons: white labels + visible purple→peach outline */
+/* v10.22 — action buttons: white labels + visible purple→peach outline */
 .quick-save,
 .flow-done,
 .about-done-wide,

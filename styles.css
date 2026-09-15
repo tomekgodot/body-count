@@ -4445,3 +4445,8 @@ body.modal-open{
 .settings-baseline input{box-sizing:border-box;width:100%;height:48px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.045);color:#fff;font:inherit;font-size:20px;padding:0 14px;outline:none}
 .settings-baseline input:focus{border-color:rgba(255,255,255,.38)}
 .settings-baseline p{margin:10px 0 0;color:rgba(255,255,255,.58);font-size:13px;line-height:1.45}
+
+/* v10.34 — Previous Life copy hierarchy */
+.settings-baseline-label{display:block;margin:0 0 10px;color:#fff;font-size:15px;font-weight:700;letter-spacing:0;text-transform:none}
+.settings-baseline-copy span{display:block}
+.settings-baseline-copy span+span{margin-top:7px}

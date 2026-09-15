@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.33';
+const APP_VERSION='10.34';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -512,10 +512,15 @@ async function renderSettings(){
     <header class="settings-head"><h1>Settings</h1></header>
 
     <section class="settings-section">
-      <div class="settings-section-title">BODY COUNT BEFORE THIS APP</div>
+      <div class="settings-section-title">PREVIOUS LIFE</div>
       <div class="settings-baseline">
+        <label for="initialBodyCount" class="settings-baseline-label">Body Count before this app</label>
         <input id="initialBodyCount" type="number" inputmode="numeric" min="0" step="1" value="${baseline}" aria-label="Body Count before this app">
-        <p>Already know your Body Count? Enter your previous count here. Guys you add individually will be added on top of this number, so leave it at 0 if you’re adding past guys retrospectively. Your stats are based only on guys added individually.</p>
+        <p class="settings-baseline-copy">
+          <span>Already know your Body Count? Enter your previous count here.</span>
+          <span>Guys you add individually will be added on top of this number, so leave it at 0 if you’re adding past guys retrospectively.</span>
+          <span>Your stats are based only on guys added individually.</span>
+        </p>
       </div>
     </section>
 
@@ -2504,7 +2509,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.33');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.34');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

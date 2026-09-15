@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.32';
+const APP_VERSION='10.33';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -512,12 +512,15 @@ async function renderSettings(){
     <header class="settings-head"><h1>Settings</h1></header>
 
     <section class="settings-section">
-      <div class="settings-section-title">DATA</div>
+      <div class="settings-section-title">BODY COUNT BEFORE THIS APP</div>
       <div class="settings-baseline">
-        <label for="initialBodyCount"><strong>BODY COUNT BEFORE THIS APP</strong></label>
-        <input id="initialBodyCount" type="number" inputmode="numeric" min="0" step="1" value="${baseline}">
-        <p>Already know your Body Count? Enter your previous count here, or add past guys individually if you prefer. Only individually added guys appear in your stats.</p>
+        <input id="initialBodyCount" type="number" inputmode="numeric" min="0" step="1" value="${baseline}" aria-label="Body Count before this app">
+        <p>Already know your Body Count? Enter your previous count here. Guys you add individually will be added on top of this number, so leave it at 0 if you’re adding past guys retrospectively. Your stats are based only on guys added individually.</p>
       </div>
+    </section>
+
+    <section class="settings-section">
+      <div class="settings-section-title">DATA</div>
       <button class="settings-row settings-row-button" id="openBackup" type="button">
         <span><strong>Backup</strong><small>Export or restore your data</small></span><b>›</b>
       </button>
@@ -2501,7 +2504,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.32');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.33');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

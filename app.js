@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.29';
+const APP_VERSION='10.30';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -970,7 +970,7 @@ async function renderAboutHim(){
           <span class="about-photo-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M4 6.5h3l1.3-2h7.4l1.3 2h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="3.7"/></svg>
           </span>
-          <span>ADD PHOTO OR SCREENSHOT</span>
+          <span>ADD PHOTO OR HIS PROFILE SCREENSHOT</span>
         </button>
       `}
       <div class="about-photo-privacy">Stored only on this device.</div>
@@ -1476,6 +1476,11 @@ async function renderEncounterEdit(){
       <div class="precision-chips">
         ${[['exact','Exact'],['month','Month'],['season','Season'],['year','Year'],['range','Range']].map(([v,t])=>`<button class="${precision===v?'on':''}" data-prec="${v}">${t}</button>`).join('')}
       </div>
+      <label class="multiple-encounters-row">
+        <input id="dontRememberDate" type="checkbox" ${precision==='unknown'?'checked':''}>
+        <span class="multiple-encounters-box" aria-hidden="true"></span>
+        <span>DON'T REMEMBER</span>
+      </label>
       ${whenControl}
       ${precision!=='exact'?`<label class="multiple-encounters-row">
         <input id="multipleEncounters" type="checkbox" ${e.when.multipleEncounters?'checked':''}>
@@ -1509,6 +1514,11 @@ async function renderEncounterEdit(){
   </main>`;
 
   const save=async()=>{
+    if(e.when.precision==='unknown'){
+      delete e.when.date; delete e.when.day; delete e.when.month; delete e.when.year;
+      delete e.when.season; delete e.when.from; delete e.when.to;
+      e.date='';
+    }
     if(e.when.precision==='exact'){
       const yy=Number(e.when.year)||curYear;
       const mm=Number(e.when.month)||curMonth;
@@ -1580,6 +1590,18 @@ async function renderEncounterEdit(){
     if(e.when.precision==='exact') delete e.when.multipleEncounters;
     await save();renderEncounterEdit();
   });
+
+  const dontRememberDate=document.getElementById('dontRememberDate');
+  if(dontRememberDate) dontRememberDate.onchange=async()=>{
+    if(dontRememberDate.checked){
+      e.when.precision='unknown';
+    }else{
+      e.when.precision='exact';
+      const today=new Date().toISOString().slice(0,10);
+      e.when.date=today; e.date=today;
+    }
+    await save(); renderEncounterEdit();
+  };
 
   const multipleEncounters=document.getElementById('multipleEncounters');
   if(multipleEncounters) multipleEncounters.onchange=async()=>{
@@ -1805,7 +1827,7 @@ function encounterWhenLabel(e){
     const d=new Date(`${raw}T12:00:00`);
     if(!Number.isNaN(d.getTime())) return new Intl.DateTimeFormat('en-US',{day:'numeric',month:'short',year:'numeric'}).format(d);
   }
-  return 'Unknown date';
+  return w.precision==='unknown'?"Can't remember":'Unknown date';
 }
 
 
@@ -1813,6 +1835,7 @@ function encounterChronology(e){
   const w=e.when||{};
   const precision=w.precision||'exact';
   const mk=(y,m=1,d=1)=>Date.UTC(Number(y),Number(m)-1,Number(d));
+  if(precision==='unknown') return {start:0,end:0,specificity:0};
   const yearEnd=y=>mk(y,12,31);
   if(precision==='exact'){
     const raw=String(w.date||e.date||'').slice(0,10);
@@ -1959,7 +1982,7 @@ async function renderPerson(){
     </section>
 
     <div class="profile-actions">
-      <button class="profile-edit" id="editPerson" type="button">MORE ABOUT HIM</button>
+      <button class="profile-edit" id="editPerson" type="button">ADD MORE ABOUT HIM</button>
       <button class="profile-delete" id="deletePerson" type="button">Delete person</button>
     </div>
 
@@ -2168,7 +2191,7 @@ async function renderPerson(){
 async function renderEncounter(){
  const e=await get('encounters',state.selectedEncounterId); const p=await get('people',e.personId); state.selectedPersonId=p.id;
  const chips=(label,arr)=>arr?.length?`<div class="encounter-section"><span>${label}</span><div class="chips readonly">${arr.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div></div>`:'';
- app.innerHTML=`<button class="linkbtn" id="back">← ${esc(displayName(p))}</button><div class="encounter-head"><div class="eyebrow">ENCOUNTER</div><h1>${fmt(e.date)}</h1><div class="big-rating">${e.rating?`★ ${e.rating}`:'Not rated'}</div></div>
+ app.innerHTML=`<button class="linkbtn" id="back">← ${esc(displayName(p))}</button><div class="encounter-head"><div class="eyebrow">ENCOUNTER</div><h1>${esc(encounterWhenLabel(e))}</h1><div class="big-rating">${e.rating?`★ ${e.rating}`:'Not rated'}</div></div>
  <div class="card"><div class="eyebrow">MENTAL NOTE</div><p class="encounter-note">${esc(e.memory||'Nothing written down.')}</p>${chips('POSITION',e.position)}${chips('WHAT HAPPENED',e.happened)}${chips('HEALTH',e.health)}</div>
  <div class="section-title"><h2>Add / edit</h2><span>this encounter</span></div><div class="encounter-actions"><button class="secondary" data-edit="position">Position</button><button class="secondary" data-edit="happened">What happened</button><button class="secondary" data-edit="health">Health</button></div>
  <p class="small" style="text-align:center;margin-top:16px">🔒 Stored on this device</p>`;
@@ -2178,6 +2201,7 @@ async function renderEncounter(){
 
 function timelineSortKey(e){
   const w=e.when||{};
+  if(w.precision==='unknown') return Number.NEGATIVE_INFINITY;
   if(w.precision==='range'){
     const from=Number(w.from)||0,to=Math.max(from,Number(w.to)||from);
     return new Date((from+to)/2,6,1).getTime();
@@ -2190,6 +2214,7 @@ function timelineSortKey(e){
 }
 function timelineGroupLabel(e){
   const w=e.when||{},m=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  if(w.precision==='unknown')return 'CAN’T REMEMBER';
   if(w.precision==='month'&&w.month&&w.year)return `${m[+w.month-1]} ${w.year}`;
   if(w.precision==='season'&&w.season&&w.year)return `${String(w.season).toUpperCase()} ${w.year}`;
   if(w.precision==='year'&&w.year)return String(w.year);
@@ -2199,6 +2224,7 @@ function timelineGroupLabel(e){
 }
 function timelineShortDate(e){
   const w=e.when||{};
+  if(w.precision==='unknown')return "Can't remember";
   if(w.precision==='exact'||!w.precision){
     const raw=String(w.date||e.date||'').slice(0,10),d=new Date(`${raw}T12:00:00`);
     if(!Number.isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{day:'numeric',month:'short',year:'numeric'}).format(d);
@@ -2435,7 +2461,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.29');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.30');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{

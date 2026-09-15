@@ -9,7 +9,7 @@ async function ensureFirstEncounter(personId){
 }
 const DB_NAME='bodycount-db-v2';
 const DB_VERSION=2;
-const APP_VERSION='10.30';
+const APP_VERSION='10.32';
 const app=document.getElementById('app');
 let db;
 let state={screen:'home',selectedPersonId:null,selectedEncounterId:null,quick:{rating:0,mode:'new'},detailsTab:'overview',detailsReturn:'postadd'};
@@ -231,6 +231,11 @@ async function deleteAllData(){
 }
 
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+async function initialBodyCount(){
+  const row=await get('settings','initialBodyCount');
+  const n=Number(row?.value);
+  return Number.isSafeInteger(n)&&n>=0?n:0;
+}
 const initials=s=>{const t=(s||'?').trim(); return t==='?'?'?':t.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()};
 const fmt=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'short',year:'numeric'}).format(new Date(d));
 const dateValue=d=>{const x=new Date(d||Date.now()),off=x.getTimezoneOffset();return new Date(x.getTime()-off*60000).toISOString().slice(0,10)};
@@ -326,7 +331,7 @@ function attachNav(){document.querySelectorAll('[data-nav]').forEach(b=>b.onclic
 
 async function renderHome(){
   const people=await all('people');
-  const count=people.length;
+  const count=(await initialBodyCount())+people.length;
 
   app.innerHTML=`<main class="count-home">
     <div class="count-brand">BODY COUNT</div>
@@ -394,6 +399,7 @@ async function renderHome(){
 async function renderStats(){
   const people=await all('people');
   const encounters=await all('encounters');
+  const totalBodyCount=(await initialBodyCount())+people.length;
   const byPerson=new Map(people.map(p=>[p.id,[]]));
   encounters.forEach(e=>{if(byPerson.has(e.personId))byPerson.get(e.personId).push(e)});
 
@@ -473,7 +479,7 @@ async function renderStats(){
 
   app.innerHTML=`<main class="stats-screen">
     <header class="stats-head"><h1>Stats</h1></header>
-    <section class="stats-hero"><div class="stats-kicker">BODY COUNT</div><div class="stats-count">${people.length}</div><div class="stats-encounters">${encounters.length} ${encounters.length===1?'ENCOUNTER':'ENCOUNTERS'}</div></section>
+    <section class="stats-hero"><div class="stats-kicker">BODY COUNT</div><div class="stats-count">${totalBodyCount}</div><div class="stats-encounters">${encounters.length} ${encounters.length===1?'ENCOUNTER':'ENCOUNTERS'}</div></section>
 
     <section class="stats-section"><div class="stats-section-title">THE NUMBERS</div><div class="stats-number-grid">${sexStats.map(([label,value])=>`<div class="stats-number-card"><strong>${value}</strong><span>${label}</span></div>`).join('')}</div><div class="stats-based">Unique guys · based on recorded encounter details</div></section>
 
@@ -501,11 +507,17 @@ function settingsPrivacyCopy(){
 }
 
 async function renderSettings(){
+  const baseline=await initialBodyCount();
   app.innerHTML=`<main class="settings-screen">
     <header class="settings-head"><h1>Settings</h1></header>
 
     <section class="settings-section">
       <div class="settings-section-title">DATA</div>
+      <div class="settings-baseline">
+        <label for="initialBodyCount"><strong>BODY COUNT BEFORE THIS APP</strong></label>
+        <input id="initialBodyCount" type="number" inputmode="numeric" min="0" step="1" value="${baseline}">
+        <p>Already know your Body Count? Enter your previous count here, or add past guys individually if you prefer. Only individually added guys appear in your stats.</p>
+      </div>
       <button class="settings-row settings-row-button" id="openBackup" type="button">
         <span><strong>Backup</strong><small>Export or restore your data</small></span><b>›</b>
       </button>
@@ -557,6 +569,16 @@ async function renderSettings(){
     ${nav('you')}
   </main>`;
 
+  const initialBodyCountInput=document.getElementById('initialBodyCount');
+  const saveInitialBodyCount=async()=>{
+    const raw=initialBodyCountInput.value.trim();
+    const n=raw===''?0:Number(raw);
+    const value=Number.isSafeInteger(n)&&n>=0?n:0;
+    initialBodyCountInput.value=String(value);
+    await put('settings',{key:'initialBodyCount',value});
+  };
+  initialBodyCountInput.onchange=saveInitialBodyCount;
+  initialBodyCountInput.onblur=saveInitialBodyCount;
   document.getElementById('openBackup').onclick=()=>{state.screen='backup';render()};
   const modal=document.getElementById('deleteAllModal');
   const input=document.getElementById('deleteAllInput');
@@ -1962,7 +1984,7 @@ async function renderPerson(){
       <div class="profile-encounters">
         ${encounters.length?encounters.map(e=>{
           const lines=encounterSummaryLines(e);
-          return `<button class="profile-encounter-card" data-encounter="${e.id}" type="button">
+          return `<div class="profile-encounter-wrap"><button class="profile-encounter-card" data-encounter="${e.id}" type="button">
             <div class="profile-encounter-top">
               <span class="profile-encounter-date-note">
                 <strong>${esc(encounterWhenLabel(e))}</strong>
@@ -1975,7 +1997,7 @@ async function renderPerson(){
               </span>
             </div>
             ${lines.map(x=>`<div class="profile-encounter-line">${esc(x)}</div>`).join('')}
-          </button>`;
+          </button><button class="profile-encounter-delete" data-delete-encounter="${e.id}" type="button" aria-label="Delete encounter"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg></button></div>`;
         }).join(''):`<div class="profile-no-encounters">No encounters yet.</div>`}
       </div>
       <button class="profile-add-encounter-wide" id="addEncounter" type="button">ADD ENCOUNTER</button>
@@ -2038,6 +2060,13 @@ async function renderPerson(){
       </div>
     </div>`:''}
 
+    <div class="profile-delete-modal" id="deleteEncounterModal" hidden>
+      <button class="profile-delete-backdrop" id="deleteEncounterBackdrop" aria-label="Cancel"></button>
+      <section class="profile-delete-sheet" role="dialog" aria-modal="true" aria-labelledby="deleteEncounterTitle">
+        <h2 id="deleteEncounterTitle">Delete this encounter?</h2><p>This can’t be undone.</p>
+        <div class="profile-delete-buttons"><button id="cancelDeleteEncounter" type="button">Cancel</button><button id="confirmDeleteEncounter" type="button">Delete</button></div>
+      </section>
+    </div>
     <div class="profile-delete-modal" id="deleteModal" hidden>
       <button class="profile-delete-backdrop" id="deleteBackdrop" aria-label="Cancel"></button>
       <section class="profile-delete-sheet" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
@@ -2084,10 +2113,21 @@ async function renderPerson(){
 
   document.querySelectorAll('[data-encounter]').forEach(b=>b.onclick=()=>{
     state.selectedEncounterId=Number(b.dataset.encounter);
-    state.detailsReturn='person';
-    state.screen='encounterEdit';
-    render();
+    state.detailsReturn='person'; state.screen='encounterEdit'; render();
   });
+  const deleteEncounterModal=document.getElementById('deleteEncounterModal');
+  let deleteEncounterId=null;
+  const closeDeleteEncounter=()=>{deleteEncounterModal.hidden=true;document.body.classList.remove('modal-open');deleteEncounterId=null};
+  document.querySelectorAll('[data-delete-encounter]').forEach(b=>b.onclick=ev=>{
+    ev.preventDefault();ev.stopPropagation();deleteEncounterId=Number(b.dataset.deleteEncounter);
+    deleteEncounterModal.hidden=false;document.body.classList.add('modal-open');
+  });
+  document.getElementById('deleteEncounterBackdrop').onclick=closeDeleteEncounter;
+  document.getElementById('cancelDeleteEncounter').onclick=closeDeleteEncounter;
+  document.getElementById('confirmDeleteEncounter').onclick=async()=>{
+    if(deleteEncounterId!==null)await remove('encounters',deleteEncounterId);
+    document.body.classList.remove('modal-open');deleteEncounterId=null;renderPerson();
+  };
 
 
   const profileEncounterNoteModal=document.getElementById('profileEncounterNoteModal');
@@ -2461,7 +2501,7 @@ function attachCollectionRows(){document.querySelectorAll('[data-person]').forEa
   render();
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=10.30');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=10.32');
       await reg.update();
       let refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',()=>{
